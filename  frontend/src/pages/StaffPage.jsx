@@ -72,7 +72,7 @@ function StaffPage({ onPageChange }) {
                   <span className={`text-sm font-medium transition-colors ${
                     employee.active ? 'text-green-400' : 'text-slate-500'
                   }`}>
-                    {employee.active ? 'Ativo' : 'Inativo'}
+                    {employee.active ? 'Active' : 'Inactive'}
                   </span>
                 </label>
               </div>
