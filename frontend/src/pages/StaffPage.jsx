@@ -12,6 +12,7 @@ function StaffPage({ onPageChange }) {
         { id: 2, name: 'Artur Dantas', active: true },
         { id: 3, name: 'Gabriel Padilha', active: false },
         { id: 4, name: 'Arthur Rocha', active: false },
+        { id: 5, name: 'Ângelo de Carvalho', active: false }
     ]);
 
     const handleAddEmployee = () => {

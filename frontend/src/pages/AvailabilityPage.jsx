@@ -20,7 +20,7 @@ function AvailabilityPage({
     })
 
     //matriz(7x24) de disponibilidade false = indisponível, true = disponível. Se for para editar é necessário receber essa matriz de disponibilidade do backend
-    const [avalability, setAvailability] = useState(() => {
+    const [availability, setAvailability] = useState(() => {
         const initial ={}
         days.forEach(day => {
             initial[day] = {};
