@@ -1,3 +1,5 @@
+import { ArrowRight } from 'lucide-react';
+
 function getMonthCalendar(year, month) {
     const firstDay = new Date(year, month-1, 1);
     const lastDay = new Date(year, month, 0);
@@ -5,14 +7,14 @@ function getMonthCalendar(year, month) {
     let currentWeek = [];
     const startDayOfWeek = firstDay.getDate() === 0
         ? 6
-        : firstDay.getDate() - 1
+        : firstDay.getDay() - 1
     
     for (let i = 0; i < startDayOfWeek; i++) {
         const prevFirstDay = new Date(year, month - 1, -startDayOfWeek + 1 + i);
         currentWeek.push(prevFirstDay);
     }
 
-    for (let day = 1; day <= lastDay; day++) {
+    for (let day = 1; day <= lastDay.getDate(); day++) {
         currentWeek.push(new Date(year, month - 1, day));
 
         if (currentWeek.length === 7) {
@@ -72,7 +74,7 @@ function CalendarTable({
               >
                 {week.map((date, dayIdx) => {
                   const isCurrentMonth = date.getMonth() + 1 === currentMonth;
-                  const selected = isSelected(date);
+                  const selected = isSelectedDay(date);
                   const isSelectedWeek = selectedWeek === weekIdx + 1;
                   
                   return (
