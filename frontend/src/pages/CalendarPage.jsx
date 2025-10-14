@@ -63,10 +63,10 @@ function CalendarPage ({
     }
   };
 
-  const months = [
-    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-  ];
+const months = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December'
+];
 
   return (
     <BaseLayout 
@@ -76,12 +76,12 @@ function CalendarPage ({
       currentPage={0}
       onPageChange={onPageChange}
     >
-      <Header title="Calendário" icon={Calendar}>
+      <Header title="Calendar" icon={Calendar}>
         <div className="flex items-center gap-4 ml-8">
           <button
             onClick={handlePrevMonth}
             className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-            title="Mês anterior"
+            title="Previous month"
           >
             <ChevronLeft size={24} className="text-slate-300" />
           </button>
@@ -93,7 +93,7 @@ function CalendarPage ({
           <button
             onClick={handleNextMonth}
             className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-            title="Próximo mês"
+            title="Next month"
           >
             <ChevronRight size={24} className="text-slate-300" />
           </button>

@@ -84,9 +84,6 @@ function ShiftConfigPage({onPageChange, selectedDays}) {
     const createSchedule = async () => {
         // TODO: guardar shifts em alguma estrutura JSON e mandar pro backend
     }
-
-    
-
  
     return (
         <BaseLayout
@@ -96,7 +93,7 @@ function ShiftConfigPage({onPageChange, selectedDays}) {
             selectionPanelData={{ none: null ,selectedDays }}
             onPageChange={onPageChange}
         >
-            <Header title="Configuração de Turnos" />
+            <Header title="Shift Configuration" />
             <div className="bg-slate-800 rounded-lg overflow-x-auto border border-slate-700 mb-6">
                 <table className="w-full">
                     <thead>

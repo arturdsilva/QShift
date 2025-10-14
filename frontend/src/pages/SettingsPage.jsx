@@ -9,7 +9,7 @@ function SettingsPage({onPageChange}) {
             <Header title="System Settings" icon={Settings}/>
             <div className="space-y-4">
                 <div className="text-slate-400">
-                Configurações em desenvolvimento...
+                Configurations under development...
                 </div>
             </div>
         </BaseLayout>
