@@ -3,33 +3,315 @@ import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 
+// Dados para teste. TODO: Retirar quando conseguir dados pelo backend
+const employeesData = {
+  1: {
+    id: 1,
+    name: 'Guilherme Moriya',
+    active: true,
+    availability: {
+      'Monday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Tuesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Wednesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Thursday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Friday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': false
+      },
+      'Saturday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Sunday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      }
+    }
+  },
+  2: {
+    id: 2,
+    name: 'Artur Dantas',
+    active: true,
+    availability: {
+      'Monday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Tuesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Wednesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Thursday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Friday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': true
+      },
+      'Saturday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Sunday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      }
+    }
+  },
+  3: {
+    id: 3,
+    name: 'Gabriel Padilha',
+    active: false,
+    availability: {
+      'Monday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Tuesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Wednesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Thursday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Friday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Saturday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Sunday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      }
+    }
+  },
+  4: {
+    id: 4,
+    name: 'Arthur Rocha',
+    active: false,
+    availability: {
+      'Monday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': false
+      },
+      'Tuesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': false
+      },
+      'Wednesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': false
+      },
+      'Thursday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': false
+      },
+      'Friday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': true
+      },
+      'Saturday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      },
+      'Sunday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
+        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      }
+    }
+  },
+  5: {
+    id: 5,
+    name: 'Ângelo de Carvalho',
+    active: true,
+    availability: {
+      'Monday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Tuesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Wednesday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Thursday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Friday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': true, '23:00': false
+      },
+      'Saturday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
+        '20:00': true, '21:00': true, '22:00': false, '23:00': false
+      },
+      'Sunday': {
+        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
+        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
+        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
+        '15:00': true, '16:00': true, '17:00': true, '18:00': false, '19:00': false,
+        '20:00': false, '21:00': false, '22:00': false, '23:00': false
+      }
+    }
+  }
+};
 
 function AvailabilityPage({
     onPageChange,
-    employeeId,
-    employeeName
+    selectEditEmployee,
+    setSelectEditEmployee
 }) {
-    const [name, setName] = useState(employeeId || '');
-    const [isActive, setIsActive] = useState(true);
+    const employeeData = selectEditEmployee ? employeesData[selectEditEmployee] : null;
+    const [name, setName] = useState(employeeData?.name || '');
+    const [isActive, setIsActive] = useState(employeeData?.active ?? true);
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
 
-    const hours = Array.from({length:24}, (_,i) => {
-        const hour = i.toString().padStart(2, "0");
-        return `${hour}:00`;
-    })
+    const initializeAvailability = () => {
+      const initial = {};
+      days.forEach(day => {
+        initial[day] = {};
+        hours.forEach(hour => {
+          initial[day][hour] = false;          
+        });
+      });
+      return initial;
+    }
 
     //matriz(7x24) de disponibilidade false = indisponível, true = disponível. Se for para editar é necessário receber essa matriz de disponibilidade do backend
-    const [availability, setAvailability] = useState(() => {
-        const initial ={}
-        days.forEach(day => {
-            initial[day] = {};
-            hours.forEach(hour => {
-                initial[day][hour] = false;
-            })
-        })
-        return initial;
-    })
+    const [availability, setAvailability] = useState(() =>  employeeData ? employeeData.availability : initializeAvailability())
 
     const [isMouseDown, setIsMouseDown] = useState(false);
     const [paintMode, setPaintMode] = useState(true); // true = pintar verde, false = pintar vermelho
@@ -75,9 +357,9 @@ function AvailabilityPage({
   return (
     <BaseLayout 
         showSidebar={false}
-        currentPage={1} 
+        currentPage={4} 
         onPageChange={onPageChange}>
-      <Header title="Disponibilidade do Funcionário" icon={Calendar} />
+      <Header title="Employee availability" icon={Calendar} />
       
       <div className="space-y-6" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
         {/* Seção de informações do funcionário */}
@@ -88,13 +370,13 @@ function AvailabilityPage({
             </div>
             <div className="flex-1">
               <label className="block text-sm font-medium text-slate-300 mb-2">
-                Nome do Funcionário
+                Employee name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Digite o nome..."
+                placeholder="Enter the name..."
                 className="w-full px-4 py-2 bg-slate-900 border border-slate-700 rounded-lg text-white placeholder-slate-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50 transition-colors"
               />
             </div>
@@ -121,7 +403,7 @@ function AvailabilityPage({
                 )}
               </div>
               <span className={`text-sm font-medium ${isActive ? 'text-green-400' : 'text-slate-500'}`}>
-                {isActive ? 'Funcionário Ativo' : 'Funcionário Inativo'}
+                {isActive ? 'Active Employee' : 'Inactive Employee'}
               </span>
             </label>
           </div>
@@ -130,9 +412,9 @@ function AvailabilityPage({
         {/* Grade de disponibilidade */}
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
           <div className="mb-4">
-            <h3 className="text-lg font-semibold text-white mb-2">Selecione a Disponibilidade</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Select Availability</h3>
             <p className="text-sm text-slate-400">
-              Clique e arraste para marcar os horários disponíveis (verde) ou indisponíveis (vermelho)
+              Click and drag to mark available (green) or unavailable (red) times
             </p>
           </div>
           
@@ -178,7 +460,7 @@ function AvailabilityPage({
             className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
           >
             <X className="w-4 h-4" />
-            Cancelar
+            Cancel
           </button>
           <button
             onClick={handleSave}
@@ -186,7 +468,7 @@ function AvailabilityPage({
             className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors flex items-center gap-2"
           >
             <Save className="w-4 h-4" />
-            Salvar
+            Save
           </button>
         </div>
       </div>

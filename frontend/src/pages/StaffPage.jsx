@@ -3,7 +3,11 @@ import {Users, Plus} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 
-function StaffPage({ onPageChange }) {
+function StaffPage({ 
+    onPageChange,
+    selectEditEmployee,
+    setSelectEditEmployee
+  }) {
     //TODO: receber os dados do backend dos funcionários
 
     // dados modelo
@@ -12,17 +16,20 @@ function StaffPage({ onPageChange }) {
         { id: 2, name: 'Artur Dantas', active: true },
         { id: 3, name: 'Gabriel Padilha', active: false },
         { id: 4, name: 'Arthur Rocha', active: false },
-        { id: 5, name: 'Ângelo de Carvalho', active: false }
+        { id: 5, name: 'Ângelo de Carvalho', active: true }
     ]);
 
     const handleAddEmployee = () => {
         console.log('Add employee');
+        setSelectEditEmployee(null);
         onPageChange(4);
     };
 
     const handleEditEmployee = (employeeId) => {
         console.log('Edit employee:', employeeId);
         //TODO: navegar para página de edição de funcionário
+        setSelectEditEmployee(employeeId);
+        onPageChange(4);
     }
 
     const handleToggleActive = async (employeeId, currentStatus) => {
@@ -55,7 +62,7 @@ function StaffPage({ onPageChange }) {
                   {employee.name}
                 </div>
                 <div className="text-sm text-slate-400">
-                  Clique para editar
+                  Click to edit
                 </div>
               </div>
               
@@ -89,7 +96,7 @@ function StaffPage({ onPageChange }) {
               <Plus className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
             </div>
             <div className="text-slate-400 group-hover:text-indigo-400 font-medium transition-colors">
-              Adicionar Funcionário
+              Add Employee
             </div>
           </button>
         </div>
@@ -97,7 +104,7 @@ function StaffPage({ onPageChange }) {
         {/* Mensagem quando não há funcionários */}
         {employees.length === 0 && (
           <div className="text-slate-400 text-center py-12">
-            Nenhum funcionário cadastrado ainda
+            No employees registered yet
           </div>
         )}
       </div>
