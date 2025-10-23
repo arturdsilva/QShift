@@ -1,0 +1,18 @@
+# Core
+fastapi
+uvicorn[standard]
+
+# Database
+sqlalchemy[asyncio]
+asyncpg
+alembic
+
+# Config
+pydantic
+pydantic-settings
+python-dotenv
+
+# Tests
+pytest
+pytest-asyncio
+httpx
