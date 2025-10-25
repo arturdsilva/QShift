@@ -3,22 +3,21 @@ import axios from 'axios';
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
   timeout: 10000,
+  Headers: {'Content-Type': 'application/json'}
 });
 
 export const ShiftConfigApi = {
     save: async (shifts) => {
-        return await api.post('/shifts-config-save', { shifts });
+        return await api.post('/shifts-config-save', {shifts});
     },
+    //TODO: Ver save e restore do config de shifts com cache
 
     restore: async () => {
         return await api.get('/shifts-config-restore');
     },
 
-    createShcedule: async (shifts, selectedDays) => {
-        return await api.post('/create-schedule', { 
-            shifts: shifts, 
-            selectedDays: selectedDays 
-        });
+    createShcedule: async (schedule) => {
+        return await api.post('/create-schedule', {schedule});
     }
 };
 
@@ -48,4 +47,5 @@ export const AvailabilityApi = {
     addNewEmployee: async (employeeData) => {
         return await api.post('/employees', employeeData);
     }
+    // TODO:passa um ID
 }

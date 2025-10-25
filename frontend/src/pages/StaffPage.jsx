@@ -2,6 +2,7 @@ import { useState } from 'react';
 import {Users, Plus} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
+import {StaffApi} from '../services/api.js';
 
 function StaffPage({ 
     onPageChange,
@@ -9,6 +10,10 @@ function StaffPage({
     setSelectEditEmployee
   }) {
     //TODO: receber os dados do backend dos funcionários
+    /*
+    const response = StaffApi.getAll();
+    console.log('Fetched employees:', response.data);
+    */
 
     // dados modelo
     const [employees, setEmployees] = useState([
@@ -27,14 +32,12 @@ function StaffPage({
 
     const handleEditEmployee = (employeeId) => {
         console.log('Edit employee:', employeeId);
-        //TODO: navegar para página de edição de funcionário
         setSelectEditEmployee(employeeId);
         onPageChange(4);
     }
 
     const handleToggleActive = async (employeeId, currentStatus) => {
-        //TODO: enviar para o backend !currentStatus
-
+        StaffApi.toggleActive(employeeId, !currentStatus);
         setEmployees(employees.map(emp => 
             emp.id === employeeId ? {...emp, active: !emp.active} : emp
         ));

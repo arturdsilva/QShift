@@ -2,6 +2,7 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState } from 'react';
 import { Plus, Save, RotateCcw, Calendar, Trash2 } from 'lucide-react';
+import { ShiftConfigApi }   from '../services/api.js';
 
 function ShiftConfigPage({onPageChange, selectedDays}) {
 
@@ -15,15 +16,15 @@ function ShiftConfigPage({onPageChange, selectedDays}) {
     const [shifts, setShifts] = useState([
         {
             id:1,
-            config: {
-                0: {startTime: '', endTime: '', employees: ''},
-                1: {startTime: '', endTime: '', employees: ''},
-                2: {startTime: '', endTime: '', employees: ''},
-                3: {startTime: '', endTime: '', employees: ''},
-                4: {startTime: '', endTime: '', employees: ''},
-                5: {startTime: '', endTime: '', employees: ''},
-                6: {startTime: '', endTime: '', employees: ''},
-            }
+            config: [
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+            ]
         }
     ]);
 
@@ -35,15 +36,15 @@ function ShiftConfigPage({onPageChange, selectedDays}) {
     const addTurn = () => {
         const newShift = {
             id: Date.now(),
-            config: {
-                0: {startTime: '', endTime: '', employees: ''},
-                1: {startTime: '', endTime: '', employees: ''},
-                2: {startTime: '', endTime: '', employees: ''},
-                3: {startTime: '', endTime: '', employees: ''},
-                4: {startTime: '', endTime: '', employees: ''},
-                5: {startTime: '', endTime: '', employees: ''},
-                6: {startTime: '', endTime: '', employees: ''},
-            }
+            config: [
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+                {startTime: '', endTime: '', employees: ''},
+            ]
         }
         setShifts([...shifts, newShift]);
     };
@@ -54,35 +55,44 @@ function ShiftConfigPage({onPageChange, selectedDays}) {
         }
     };
 
-    const updateShiftConfig = (shiftId, daysOfWeek, field, value) => {
-        setShifts(shifts.map(shift => {
-            if (shift.id === shiftId) {
-                return {
-                    ...shift,
-                    config: {
-                        ...shift.config,
-                        [daysOfWeek] : {
-                            ...shift.config[daysOfWeek],
-                            [field] : value
-                        }
+const updateShiftConfig = (shiftId, dayOfWeek, field, value) => {
+    setShifts(shifts.map(shift => {
+        if (shift.id === shiftId) {
+            return {
+                ...shift,
+                config: shift.config.map((dayConfig, index) => {
+                    if (index === dayOfWeek) {
+                        return {
+                            ...dayConfig,
+                            [field]: value
+                        };
                     }
-                };
-            }
+                    return dayConfig;
+                })
+            };
+        }
+        return shift;
+    }));
+};
 
-            return shift;
-        }));
-    };
-
-    const saveConfigShift = async () => {
+    const saveConfigShift = () => {
         // TODO: guardar shifts em alguma estrutura JSON pode ser em uma matriz de dicionários(structs) de células com horários de turnos (startTime - endTime) e quantidade de funcionários e mandar pro backend
+        // TODO: mandar pra um cache local
     };
 
-    const restoreConfigShift = async () => {
+    const restoreConfigShift = () => {
         // TODO: Receber do backend shifts em uma matriz de dicionários(structs) de células com horários de turnos (startTime - endTime) e quantidade de funcionários
+        // TODO: receber do cache local
     }
 
-    const createSchedule = async () => {
-        // TODO: guardar shifts em alguma estrutura JSON pode ser em uma matriz de dicionários(structs) de células com horários de turnos (startTime - endTime) e quantidade de funcionários e mandar pro backend
+    const createSchedule = () => {
+        const schedule = {
+            id: Date.now(),
+            shifts,
+            selectedDays
+        };
+        ShiftConfigApi.createShcedule(schedule);
+        console.log("Criando escala com:", schedule);
     }
  
     return (

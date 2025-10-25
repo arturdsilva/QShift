@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
+import {AvailabilityApi} from '../services/api.js';
 
 // Dados para teste. TODO: Retirar quando conseguir dados pelo backend
 const employeesData = {
@@ -292,6 +293,7 @@ function AvailabilityPage({
     selectEditEmployee,
     setSelectEditEmployee
 }) {
+    // const employeeData = selectEditEmployee ? AvailabilityApi.getEmployee(selectEditEmployee) : null;
     const employeeData = selectEditEmployee ? employeesData[selectEditEmployee] : null;
     const [name, setName] = useState(employeeData?.name || '');
     const [isActive, setIsActive] = useState(employeeData?.active ?? true);
@@ -344,13 +346,20 @@ function AvailabilityPage({
     };
     
     const handleSave = () => {
-        console.log('Salvando disponibilidade:', { name, isActive, availability });
-        // TODO: Enviar para o backend
         if (selectEditEmployee) {
-          // await api.updateEmployeeAvailability(employeeId, { name, isActive, availability }); usar axios ou fetch
+          AvailabilityApi.updateEmployee(selectEditEmployee, availability );
+          console.log('Funcionário atualizado:', {id: selectEditEmployee, name, active: isActive, availability});
         } else {
           // criar um newEmployeeId
-          // await api.addNewEmployee(newEmployeeId, { name, isActive, availability }); usar axios ou fetch
+          const newEmployeeId = Date.now();
+          const Data = {
+            id: newEmployeeId,
+            name,
+            active: isActive,
+            availability
+          };
+          AvailabilityApi.addNewEmployee(Data);
+          console.log('Novo funcionário adicionado:', Data);
         }
         onPageChange(1); // Volta para a página de Staff
     };
