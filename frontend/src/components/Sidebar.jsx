@@ -1,9 +1,8 @@
-import { Calendar, Users, BarChart3, Settings } from 'lucide-react';
+import { CalendarRange, Users, BarChart3, Settings } from 'lucide-react';
 
 function Sidebar({currentPage, onPageChange}){
     const navItems = [
-        {icon: Calendar, label: "Calendar", index:0},
-        {icon: Users, label: "Staff", index:1},
+        {icon: CalendarRange, label: "Create Schedule", index:0},
         {icon: BarChart3, label: "Reports", index:2},
         {icon: Settings, label: "Settings", index:3}
     ]

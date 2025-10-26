@@ -40,8 +40,7 @@ function CalendarTable({
     selectedDays,
     selectedWeek,
     onToggleDay,
-    onToggleWeek,
-    onAdvance
+    onToggleWeek
 }){
     const weeks = getMonthCalendar(currentYear, currentMonth);
     const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -103,15 +102,7 @@ function CalendarTable({
         </table>
       </div>
       
-      <div className="flex justify-end">
-        <button
-          onClick={onAdvance}
-          className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-        >
-          Next
-          <ArrowRight size={20} />
-        </button>
-      </div>
+
     </div>
   );
 }

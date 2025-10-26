@@ -17,6 +17,11 @@ function App() {
 
 
   const pages = [
+    <StaffPage 
+      onPageChange={setCurrentPage}
+      selectEditEmployee={selectEditEmployee}
+      setSelectEditEmployee={setSelectEditEmployee}
+    />,
     <CalendarPage 
       onPageChange={setCurrentPage}
       currentMonth={currentMonth}
@@ -27,11 +32,6 @@ function App() {
       setSelectedWeek={setSelectedWeek}
       selectedDays={selectedDays}
       setSelectedDays={setSelectedDays}
-    />,
-    <StaffPage 
-      onPageChange={setCurrentPage}
-      selectEditEmployee={selectEditEmployee}
-      setSelectEditEmployee={setSelectEditEmployee}
     />,
     <ReportsPage onPageChange={setCurrentPage} />,
     <SettingsPage onPageChange={setCurrentPage} />,

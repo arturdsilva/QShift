@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import {Users, Plus} from 'lucide-react';
+import {Users, Plus, ArrowRight} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
+import {StaffApi} from '../services/api.js';
 
 function StaffPage({ 
     onPageChange,
@@ -9,6 +10,10 @@ function StaffPage({
     setSelectEditEmployee
   }) {
     //TODO: receber os dados do backend dos funcionários
+    /*
+    const response = StaffApi.getAll();
+    console.log('Fetched employees:', response.data);
+    */
 
     // dados modelo
     const [employees, setEmployees] = useState([
@@ -27,22 +32,24 @@ function StaffPage({
 
     const handleEditEmployee = (employeeId) => {
         console.log('Edit employee:', employeeId);
-        //TODO: navegar para página de edição de funcionário
         setSelectEditEmployee(employeeId);
         onPageChange(4);
     }
 
     const handleToggleActive = async (employeeId, currentStatus) => {
-        //TODO: enviar para o backend !currentStatus
-
+        StaffApi.toggleActive(employeeId, !currentStatus);
         setEmployees(employees.map(emp => 
             emp.id === employeeId ? {...emp, active: !emp.active} : emp
         ));
         console.log('Toggle status:', employeeId, !currentStatus);
     };
 
+    const handleAdvance = () => {
+        onPageChange(1);
+    };
+
   return (
-    <BaseLayout currentPage={4} onPageChange={onPageChange}>
+    <BaseLayout currentPage={0} onPageChange={onPageChange}>
       <Header title="Employee Management" icon={Users} />
       
       <div className="space-y-4">
@@ -101,12 +108,22 @@ function StaffPage({
           </button>
         </div>
 
-        {/* Mensagem quando não há funcionários */}
-        {employees.length === 0 && (
+        {employees.length === 0 ? (
           <div className="text-slate-400 text-center py-12">
             No employees registered yet
           </div>
+        ) : (
+          <div className="flex justify-end">
+            <button
+              onClick={handleAdvance}
+              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            >
+              Next
+              <ArrowRight size={20} />
+            </button>
+          </div>
         )}
+
       </div>
     </BaseLayout>
   );
