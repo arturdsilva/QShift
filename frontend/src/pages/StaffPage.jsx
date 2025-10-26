@@ -45,11 +45,11 @@ function StaffPage({
     };
 
     const handleAdvance = () => {
-        onPageChange(0);
+        onPageChange(1);
     };
 
   return (
-    <BaseLayout currentPage={4} onPageChange={onPageChange}>
+    <BaseLayout currentPage={0} onPageChange={onPageChange}>
       <Header title="Employee Management" icon={Users} />
       
       <div className="space-y-4">

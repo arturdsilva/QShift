@@ -7,7 +7,7 @@ import AvailabilityPage from './pages/AvailabilityPage.jsx';
 import ShiftConfigPage from './pages/ShiftConfigPage.jsx';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
   const now = new Date();
   const [currentMonth, setCurrentMonth] = useState(now.getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
@@ -17,6 +17,11 @@ function App() {
 
 
   const pages = [
+    <StaffPage 
+      onPageChange={setCurrentPage}
+      selectEditEmployee={selectEditEmployee}
+      setSelectEditEmployee={setSelectEditEmployee}
+    />,
     <CalendarPage 
       onPageChange={setCurrentPage}
       currentMonth={currentMonth}
@@ -27,11 +32,6 @@ function App() {
       setSelectedWeek={setSelectedWeek}
       selectedDays={selectedDays}
       setSelectedDays={setSelectedDays}
-    />,
-    <StaffPage 
-      onPageChange={setCurrentPage}
-      selectEditEmployee={selectEditEmployee}
-      setSelectEditEmployee={setSelectEditEmployee}
     />,
     <ReportsPage onPageChange={setCurrentPage} />,
     <SettingsPage onPageChange={setCurrentPage} />,

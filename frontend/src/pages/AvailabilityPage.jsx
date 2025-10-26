@@ -361,11 +361,11 @@ function AvailabilityPage({
           AvailabilityApi.addNewEmployee(Data);
           console.log('Novo funcionário adicionado:', Data);
         }
-        onPageChange(1); // Volta para a página de Staff
+        onPageChange(0);
     };
     
     const handleCancel = () => {
-        onPageChange(1); // Volta para a página de Staff
+        onPageChange(0);
     };
 
   return (

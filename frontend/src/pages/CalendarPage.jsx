@@ -63,7 +63,7 @@ function CalendarPage ({
   };
 
   const handleBack = () => {
-    onPageChange(1);
+    onPageChange(0);
   };
 
 const months = [
@@ -76,7 +76,7 @@ const months = [
       showSidebar={true} 
       showSelectionPanel={true}
       selectionPanelData={{ selectedWeek, selectedDays }}
-      currentPage={0}
+      currentPage={1}
       onPageChange={onPageChange}
     >
       <Header title="Calendar" icon={Calendar}>
