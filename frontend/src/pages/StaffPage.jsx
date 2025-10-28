@@ -11,6 +11,15 @@ function StaffPage({
   }) {
     //TODO: receber os dados do backend dos funcionários
     /*
+    utilizar useEffect para buscar os dados ao carregar a página
+    useEffect(() => {
+        async function Employees() {
+            const response = await StaffApi.getAll();
+            setEmployees(response.data);
+        }
+        Employees();
+    }, []);
+    exemplo de fetch:
     const response = StaffApi.getAll();
     console.log('Fetched employees:', response.data);
     */
