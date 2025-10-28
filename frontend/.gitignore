@@ -7,15 +7,19 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Dependências
+node_modules/
+package-lock.json
+
+# Diretórios de build
+dist/
+dist-ssr/
 *.local
 
-# Editor directories and files
+# Configurações do editor
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
