@@ -21,8 +21,6 @@ function App() {
   const pages = [
     <LoginPage
       onPageChange={setCurrentPage}
-      user={user}
-      setUser={setUser}
     />,
     <StaffPage 
       onPageChange={setCurrentPage}

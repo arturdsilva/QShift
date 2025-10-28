@@ -1,14 +1,23 @@
 import { useState } from 'react';
 
 function LoginPage({
-    onPageChange,
-    user,
-    setUser
+    onPageChange
 }) {
+    // evento que o usário preenche com username e senha
+    const [user, setUserState] = useState(null);
+    const DataBaseUser = {
+        user_id: 1,
+        name: 'Demo User',
+        password: '123'
+    };
+
     const handleLogin = () => {
         // Simulate login
-        setUser({ name: 'Demo User' });
+
+        // localStorage.setItem("user_id", response.data.user_id) quando fizer a requisição real
+        localStorage.setItem("user_id", DataBaseUser.user_id);
         onPageChange(1);
+        console.log('User logged in:', DataBaseUser);
     };
     
     return (
