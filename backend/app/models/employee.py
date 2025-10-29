@@ -1,0 +1,39 @@
+from __future__ import annotations
+import uuid
+
+from typing import List
+from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint, Index
+from sqlalchemy.orm import relationship, Mapped, mapped_column
+from sqlalchemy.dialects.postgresql import UUID
+
+from .base import Base
+
+
+class Employee(Base):
+    __tablename__ = "employee"
+    __table_args__ = (
+        # viabiliza FKs compostas a partir de filhos (user_id, employee_id) -> (user_id, id)
+        UniqueConstraint("user_id", "id"),
+        Index("ix_employee_user_id_active", "user_id", "active"),
+        Index("ix_employee_user_id_name", "user_id", "name"),
+    )
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey(
+            "app_user.id", ondelete="CASCADE"
+        ),  # referencia User(id), escopo completo via UNIQUE(user_id,id)
+        nullable=False,
+    )
+
+    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+
+    # relationships
+    user: Mapped["User"] = relationship(back_populates="employees")
+    availabilities: Mapped[List["Availability"]] = relationship(
+        back_populates="employee", cascade="all, delete-orphan"
+    )
+    assignments: Mapped[List["ShiftAssignment"]] = relationship(
+        back_populates="employee", cascade="all, delete-orphan"
+    )
