@@ -57,25 +57,29 @@ function ShiftConfigPage({onPageChange, selectedDays}) {
         }
     };
 
-const updateShiftConfig = (shiftId, dayOfWeek, field, value) => {
-    setShifts(shifts.map(shift => {
-        if (shift.id === shiftId) {
-            return {
-                ...shift,
-                config: shift.config.map((dayConfig, index) => {
-                    if (index === dayOfWeek) {
-                        return {
-                            ...dayConfig,
-                            [field]: value
-                        };
-                    }
-                    return dayConfig;
-                })
-            };
-        }
-        return shift;
-    }));
-};
+    const updateShiftConfig = (shiftId, dayOfWeek, field, value) => {
+        setShifts(shifts.map(shift => {
+            if (shift.id === shiftId) {
+                return {
+                    ...shift,
+                    config: shift.config.map((dayConfig, index) => {
+                        if (index === dayOfWeek) {
+                            return {
+                                ...dayConfig,
+                                [field]: value
+                            };
+                        }
+                        return dayConfig;
+                    })
+                };
+            }
+            return shift;
+        }));
+    };
+
+    // TODO: Trocar quando for para usar arquivos ao invés de localStorage
+    // const fs = require('fs');
+    // const path = require('path');
 
     const saveConfigShift = () => {
         const configToSave = shifts.map(shift => ({
@@ -86,12 +90,20 @@ const updateShiftConfig = (shiftId, dayOfWeek, field, value) => {
                 employees: dayConfig.employees
             }))
         }));
+        // const configPath = path.join(__dirname, 'shiftConfigurations.json');
+        // fs.writeFileSync(configPath, JSON.stringify(configToSave, null, 2));
         localStorage.setItem('shiftConfigurations', JSON.stringify(configToSave));
         console.log("Configurações de turno salvas:", configToSave);
     };
 
     const restoreConfigShift = () => {
-        const savedConfig = localStorage.getItem('shiftConfigurations');
+        /* const configPath = path.join(__dirname, 'shiftConfigurations.json');
+        if (!fs.existsSync(configPath)) {
+            console.log("Nenhum arquivo de configuração encontrado.");
+            return;
+        }
+        const savedConfig = fs.readFileSync(configPath); */
+        const savedConfig =  localStorage.getItem('shiftConfigurations');
         if (savedConfig) {
             const parsedConfig = JSON.parse(savedConfig);
             const restoredShifts = parsedConfig.map(shift => ({
