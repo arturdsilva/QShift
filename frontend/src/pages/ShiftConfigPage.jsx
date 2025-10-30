@@ -127,6 +127,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
             shifts,
             week: {
                 id: Date.now(),
+                startDateWeek: startDate,
                 selectedDays: selectedDays,
                 approved: false
             }
