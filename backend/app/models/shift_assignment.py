@@ -43,7 +43,10 @@ class ShiftAssignment(Base):
     employee_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), nullable=False
+        DateTime(timezone=True),
+        default=datetime.now(),
+        server_default=func.now(),
+        nullable=False,
     )
 
     # relationships

@@ -2,7 +2,7 @@ from __future__ import annotations
 import uuid
 
 from typing import List
-from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint, Index, text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -27,7 +27,9 @@ class Employee(Base):
     )
 
     name: Mapped[str] = mapped_column(String(120), nullable=False)
-    active: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="true")
+    active: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=True, server_default=text("true")
+    )
 
     # relationships
     user: Mapped["User"] = relationship(back_populates="employees")

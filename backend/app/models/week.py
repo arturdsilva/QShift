@@ -13,9 +13,10 @@ from sqlalchemy import (
     CheckConstraint,
     Index,
     func,
+    text,
 )
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, INTEGER
 
 from .base import Base
 
@@ -32,6 +33,14 @@ class Week(Base):
         ),
         # segunda-feira = 1 no Postgres (0=domingo, 1=segunda, ..., 6=sábado)
         CheckConstraint("EXTRACT(DOW FROM start_date) = 1", name="start_is_monday"),
+        CheckConstraint(
+            "open_days IS NOT NULL AND cardinality(open_days) >= 1",
+            name="open_days_nonempty",
+        ),
+        CheckConstraint(
+            "NOT EXISTS (SELECT 1 FROM unnest(open_days) d WHERE d < 0 OR d > 6)",
+            name="open_days_range",
+        ),
         Index("ix_week_user_id_approved", "user_id", "approved"),
     )
 
@@ -42,9 +51,14 @@ class Week(Base):
     )
 
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
-    open_days_mask: Mapped[int] = mapped_column(Integer, nullable=False, default=127)
+    open_days_mask: Mapped[List[int]] = mapped_column(
+        ARRAY(INTEGER),
+        nullable=False,
+        default=[0, 1, 2, 3, 4, 5, 6],
+        server_default=text("ARRAY[0,1,2,3,4,5,6]::int[]"),
+    )
     approved: Mapped[bool] = mapped_column(
-        Boolean, nullable=False, server_default="false"
+        Boolean, nullable=False, default=False, server_default=text("false")
     )
     approved_at: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True
