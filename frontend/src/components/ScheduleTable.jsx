@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import { Edit2, Save, X, Settings, Trash2, Plus } from 'lucide-react';
+
 // DADOS MOCKADOS
 const INITIAL_SCHEDULE = {
   // Cada dia tem seus próprios horários
@@ -68,12 +71,65 @@ const INITIAL_SCHEDULE = {
   }
 };
 
-
-
-
 function ScheduleTable({
-
 }) {
+    const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const [scheduleData, setScheduleData] = useState(INITIAL_SCHEDULE);
 
-    return 
+    return (
+        <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 shadow-xl">
+            <div className="overflow-x-auto">
+            <table className="w-full">
+                <thead>
+                <tr className="bg-slate-700">
+                    {days_of_week.map(day => (
+                    <>
+                        <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
+                            Horários
+                        </th>
+                        <th className="px-4 py-3 text-center text-sm font-bold text-slate-200 border-r border-slate-600 last:border-r-0">
+                        <div className="flex items-center justify-center gap-2">
+                            <span>{day}</span>
+                        </div>
+                        </th>
+                    </>
+                    ))}
+                </tr>
+                </thead>
+                
+                <tbody>
+                    <tr className="border-t border-slate-700">
+                    {days_of_week.map(day => {
+                        return (
+                        <>
+                            <td className="px-3 py-3 bg-slate-750 border-r border-slate-600 text-xs">
+                                <div>
+                                    <div className="text-slate-500 text-[10px] mt-0.5">
+                                    startTime-endTime
+                                    </div>
+                                </div>
+                            </td>
+                            <div className="min-h-[80px] flex flex-col gap-1">
+                                <>
+                                    <div className="text-xs text-red-400 font-medium mb-1">
+                                        employees/minEmployees
+                                    </div>
+                                    <div
+                                    className="px-2 py-1.5 bg-blue-600 text-white text-xs rounded text-center font-medium"
+                                    >
+                                    employees
+                                    </div>
+                                </>
+                            </div>
+                        </>
+                        );
+                    })}
+                    </tr>
+                </tbody>
+            </table>
+            </div>
+        </div>
+    );
 }
+
+export default ScheduleTable;
