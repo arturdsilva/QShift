@@ -134,6 +134,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         };
         ShiftConfigApi.createShcedule(schedule);
         console.log("Criando escala com:", schedule);
+        onPageChange(7);
     }
  
     return (

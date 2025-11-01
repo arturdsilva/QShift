@@ -6,6 +6,7 @@ import SettingsPage from './pages/SettingsPage.jsx';
 import AvailabilityPage from './pages/AvailabilityPage.jsx';
 import ShiftConfigPage from './pages/ShiftConfigPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
+import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -50,6 +51,9 @@ function App() {
       onPageChange={setCurrentPage}
       selectedDays={selectedDays}
       startDate={startDate}
+    />,
+    <GeneratedSchedule 
+      onPageChange={setCurrentPage}
     />
   ];
 
