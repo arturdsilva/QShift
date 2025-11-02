@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError, DataError
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from app.core.config import settings
 
@@ -17,11 +17,11 @@ def get_session():
     except (IntegrityError, DataError) as e:
         db.rollback()
         raise HTTPException(
-            status_code=400, detail="Invalid or conflicting data"
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or conflicting data"
         ) from e
     except SQLAlchemyError as e:
         db.rollback()
-        raise HTTPException(status_code=500, detail="Database error") from e
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error") from e
     except Exception:
         db.rollback()
         raise
