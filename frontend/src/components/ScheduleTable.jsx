@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
+import React from 'react';
 
 function EmployeeSelector({
   day,
@@ -22,7 +23,22 @@ function EmployeeSelector({
           </button>
         </div>
         <div>
-
+          {/*TODO: o botão do funcionário não está atualizando o estilo do botão*/}
+          {employeeList.map(emp => {
+            const isSelected = assignedEmployees.includes(emp);
+            return (
+              <React.Fragment key={day}>
+                <button
+                  onClick={() => onToggleEmployee(emp, slot, day)}
+                  className={`w-full px-4 py-2 ${isSelected 
+                    ? 'bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium'
+                    : 'bg-slate-600 text-white rounded-lg hover:bg-slate-700 transition-colors font-medium'}`}
+                >
+                  {emp}
+                </button>
+              </React.Fragment>
+            );
+          })}
         </div>
         <button
           onClick={onClose}
@@ -56,35 +72,34 @@ function ScheduleTable({
         ? index + week.startDateWeek.getDate()
         : index + week.startDateWeek.getDate() - lastDay.getDate();
     });
-    function handleEmployeeSelector(slot, day) {
+    const handleEmployeeSelector = (slot, day) => {
       setShowEmployeeSelector(true);
       setSelectedSlot({ slot, day });
     };
 
-    function onToggleEmployee(employee, slot, day) {
-      setScheduleData(data => {
-        const newData = {...data};
-        const dayData = {...newData[day]};
-        const assignments = {...slot.employees}
-
-
-        index = assignments.indexOf(employee);
-        if (index > -1) {
-          assignments.splice(index, 1)
-        } else {
-          assignments.push(employee)
-        };
-
-        let slotId;
-        dayData.forEach(slt => {
-          if (slt.id === slot.id) {
-            slotId = slot.id;
-          }
-        })
-        dayData[slotId].employees = assignments;
-        newData[day] = dayData;
-        return newData;
-      })
+    const onToggleEmployee = (employee, slot, day) => {
+        setScheduleData(data => {
+            const newData = { ...data };
+            const dayData = [...newData[day]];
+            
+            newData[day] = dayData.map(slt => {
+                if (slt.id === slot.id) {
+                    const employees = [...slt.employees];
+                    const index = employees.indexOf(employee);
+                    
+                    if (index > -1) {
+                        employees.splice(index, 1);
+                    } else {
+                        employees.push(employee);
+                    }
+                    
+                    return { ...slt, employees };
+                }
+                return slt;
+            });
+            
+            return newData;
+        });
     };
 
     return (
@@ -95,7 +110,7 @@ function ScheduleTable({
               <thead>
                 <tr className="bg-slate-700">
                   {days_of_week.map(day => (
-                    <>
+                    <React.Fragment key={day}>
                         <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
                             Time Slot
                         </th>
@@ -107,7 +122,7 @@ function ScheduleTable({
                             <span>{selecetedDaysMap[day]}</span>
                         </div>
                         </th>
-                    </>
+                    </React.Fragment>
                   ))}
                 </tr>
               </thead>
@@ -121,7 +136,7 @@ function ScheduleTable({
                         const isUnderStaffed = slot ? employees.length < slot.minEmployees : false;
                         
                         return (
-                        <>
+                        <React.Fragment key={day}>
                             <td
                             
                             className="px-3 py-3 bg-slate-750 border-r border-slate-600 text-xs">
@@ -158,11 +173,11 @@ function ScheduleTable({
                                     )}
                                 </>
                                 ) : (
-                                <div className="text-slate-700 text-center py-6">—</div>
+                                  <div className="text-slate-700 text-center py-6">—</div>
                                 )}
                             </div>
                             </td>
-                        </>
+                        </React.Fragment>
                         );
                     })}
                   </tr>
@@ -171,18 +186,19 @@ function ScheduleTable({
             </table>
           </div>
         </div>
-        {showEmployeeSelector && 
+        {showEmployeeSelector && selectedSlot && (
           <EmployeeSelector
             day={selectedSlot.day}
             slot={selectedSlot.slot}
             assignedEmployees={selectedSlot.slot.employees}
             employeeList={employeeList}
-            onToggleEmployee={onToggleEmployee}
+            onToggleEmployee={(emp) => onToggleEmployee(emp, selectedSlot.slot, selectedSlot.day)}
             onClose={() => {
               setShowEmployeeSelector(false);
               setSelectedSlot(null);
             }}
-          />}
+          />          
+        )}
       </div>
 
     );
