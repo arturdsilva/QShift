@@ -5,7 +5,7 @@ function getMonthCalendar(year, month) {
     const lastDay = new Date(year, month, 0);
     const weeks = [];
     let currentWeek = [];
-    const startDayOfWeek = firstDay.getDate() === 0
+    const startDayOfWeek = firstDay.getDay() === 0
         ? 6
         : firstDay.getDay() - 1
     

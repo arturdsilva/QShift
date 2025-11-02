@@ -1,7 +1,7 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState } from 'react';
-import { Plus, Save, RotateCcw, Calendar, Trash2 } from 'lucide-react';
+import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
 import { ShiftConfigApi }   from '../services/api.js';
 
 function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
@@ -28,7 +28,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         }
     ]);
 
-    const handleCancel = () => {
+    const handleBack = () => {
         console.log("Voltando para página de calendário");
         onPageChange(2);
     };
@@ -134,6 +134,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         };
         ShiftConfigApi.createShcedule(schedule);
         console.log("Criando escala com:", schedule);
+        onPageChange(7);
     }
  
     return (
@@ -255,19 +256,22 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
 
             <button
                 onClick={addTurn}
-                className="w-full mb-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
+                className="w-full mb-6 px-6 py-3 bg-slate-700 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2"
             >
                 <Plus className="w-5 h-5" />
                 Add shift
             </button>
 
             <div className="flex flex-wrap gap-3">
+                <div className="flex-1 justify-start flex">
                 <button
-                    onClick={handleCancel}
-                    className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                    onClick={handleBack}
+                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                 >
-                    Cancel
+                    Back
+                    <ArrowLeft size={20} />
                 </button>
+                </div>
                 
                 <button
                     onClick={restoreConfigShift}
@@ -279,7 +283,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                 
                 <button
                     onClick={saveConfigShift}
-                    className="px-6 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+                    className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
                 >
                     <Save className="w-4 h-4" />
                     Save settings
@@ -287,7 +291,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                 
                 <button
                     onClick={createSchedule}
-                    className="px-6 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 ml-auto"
+                    className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 ml-auto"
                 >
                     <Calendar className="w-4 h-4" />
                     Create Schedule

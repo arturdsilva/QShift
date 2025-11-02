@@ -52,3 +52,15 @@ export const AvailabilityApi = {
     }
     // TODO:passa um ID
 }
+
+export const GeneratedScheduleApi = {
+    getEmployees: async () => {
+        return await api.get('/employees');
+    },
+    getGeneratedSchedule: async () => {
+        return await api.get('/schedule');
+    },
+    approvedSchedule: async (schedule) => {
+        return await api.post('/schedule', {schedule});
+    }
+}
