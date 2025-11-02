@@ -68,9 +68,11 @@ function GeneratedSchedule({onPageChange}) {
     const [scheduleData, setScheduleData] = useState(INITIAL_SCHEDULE2);
     const [employeeList, setEmployeeList] = useState([]);
     const [editMode, setEditMode] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
     async function fetchData() {
+        setIsLoading(true); 
         try {
         const [employeesResponse, scheduleResponse] = await Promise.all([
             GeneratedScheduleApi.getEmployees(),
@@ -86,6 +88,8 @@ function GeneratedSchedule({onPageChange}) {
         console.error('Erro ao carregar dados da API:', error);
         setEmployeeList(MOCK_EMPLOYEES);
         setScheduleData(INITIAL_SCHEDULE);
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -110,6 +114,18 @@ function GeneratedSchedule({onPageChange}) {
         console.error('Erro ao aprovar a escala:', error);
     }};
 
+    if (isLoading) {
+        return (
+            <BaseLayout showSidebar={false} currentPage={7} onPageChange={onPageChange}>
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-slate-400">Loading...</p>
+                    </div>
+                </div>
+            </BaseLayout>
+        );
+    }
     return (
         <BaseLayout
             showSidebar={false}
