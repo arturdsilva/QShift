@@ -7,55 +7,35 @@ import {StaffApi} from '../services/api.js';
 function StaffPage({ 
     onPageChange,
     selectEditEmployee,
-    setSelectEditEmployee
+    setSelectEditEmployee,
+    employeesData,
+    setEmployeesData
   }) {
-    //TODO: receber os dados do backend dos funcionários
-    /*
-    utilizar useEffect para buscar os dados ao carregar a página
-    useEffect(() => {
-        async function Employees() {
-            const response = await StaffApi.getAll();
-            setEmployees(response.data);
-        }
-        Employees();
-    }, []);
-    exemplo de fetch:
-    const response = StaffApi.getAll();
-    console.log('Fetched employees:', response.data);
-    */
+  const [employees, setEmployees] = useState(employeesData);
 
-    // dados modelo
-    const [employees, setEmployees] = useState([
-        { id: 1, name: 'Guilherme Moriya', active: true },
-        { id: 2, name: 'Artur Dantas', active: true },
-        { id: 3, name: 'Gabriel Padilha', active: false },
-        { id: 4, name: 'Arthur Rocha', active: false },
-        { id: 5, name: 'Ângelo de Carvalho', active: true }
-    ]);
+  const handleAddEmployee = () => {
+      console.log('Add employee');
+      setSelectEditEmployee(null);
+      onPageChange(5);
+  };
 
-    const handleAddEmployee = () => {
-        console.log('Add employee');
-        setSelectEditEmployee(null);
-        onPageChange(5);
-    };
+  const handleEditEmployee = (employeeId) => {
+      console.log('Edit employee:', employeeId);
+      setSelectEditEmployee(employeeId);
+      onPageChange(5);
+  }
 
-    const handleEditEmployee = (employeeId) => {
-        console.log('Edit employee:', employeeId);
-        setSelectEditEmployee(employeeId);
-        onPageChange(5);
-    }
+  const handleToggleActive = async (employeeId, currentStatus) => {
+      StaffApi.toggleActive(employeeId, !currentStatus);
+      setEmployees(employees.map(emp => 
+          emp.id === employeeId ? {...emp, active: !emp.active} : emp
+      ));
+      console.log('Toggle status:', employeeId, !currentStatus);
+  };
 
-    const handleToggleActive = async (employeeId, currentStatus) => {
-        StaffApi.toggleActive(employeeId, !currentStatus);
-        setEmployees(employees.map(emp => 
-            emp.id === employeeId ? {...emp, active: !emp.active} : emp
-        ));
-        console.log('Toggle status:', employeeId, !currentStatus);
-    };
-
-    const handleAdvance = () => {
-        onPageChange(2);
-    };
+  const handleAdvance = () => {
+      onPageChange(2);
+  };
 
   return (
     <BaseLayout currentPage={1} onPageChange={onPageChange}>

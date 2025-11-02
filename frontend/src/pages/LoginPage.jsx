@@ -1,15 +1,14 @@
 import { useState } from 'react';
+import {DataBaseUser} from '../MockData.js';
+import BaseLayout from '../layouts/BaseLayout.jsx';
 
 function LoginPage({
-    onPageChange
+    onPageChange,
+    onLoginSucess,
+    isLoading
 }) {
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
-    const DataBaseUser = {
-        user_id: 1,
-        username: 'gui',
-        password: '123'
-    };
 
     const handleLogin = () => {
         // Simulate login
@@ -17,14 +16,27 @@ function LoginPage({
         // localStorage.setItem("user_id", response.data.user_id) quando fizer a requisição real
         if (username === DataBaseUser.username && password === DataBaseUser.password) {
             localStorage.setItem("user_id", DataBaseUser.user_id);
-            onPageChange(1);            
+            onLoginSucess();
             console.log('User logged in:', DataBaseUser);
         }
         else {
             alert('Invalid username or password');
         }
     };
-    
+
+    if (isLoading) {
+        return (
+            <BaseLayout showSidebar={false} currentPage={0} onPageChange={onPageChange}>
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-slate-400">Loading...</p>
+                    </div>
+                </div>
+            </BaseLayout>
+        );
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-900">
             <div className="bg-slate-800 p-8 rounded-lg shadow-lg w-full max-w-md border border-slate-700">
