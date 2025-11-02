@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { X, Check } from 'lucide-react';
 import React from 'react';
 
@@ -104,6 +104,29 @@ function ScheduleTable({
         });
     };
 
+    const areEqualSlots = (slots1, slots2) => {
+      if (slots1.length !== slots2.length) return false;
+
+      return slots1.every((slot1, index) => {
+        const slot2 = slots2[index];
+        return (
+          slot1.startTime === slot2.startTime &&
+          slot1.endTime === slot2.endTime
+        );
+      });
+    }
+
+    const visibleSlots = useMemo(() => {
+      const visible = {};
+      let previousSlots = [];
+      days_of_week.forEach(day => {
+        const currentSlots = scheduleData[day];
+        visible[day] = !areEqualSlots(currentSlots, previousSlots);
+        previousSlots = currentSlots;
+      });
+      return visible;
+    }, [scheduleData]);
+
     return (
       <div>
         <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 shadow-xl">
@@ -113,17 +136,19 @@ function ScheduleTable({
                 <tr className="bg-slate-700">
                   {days_of_week.map(day => (
                     <React.Fragment key={day}>
+                      {visibleSlots[day] && (
                         <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
                             Time Slot
-                        </th>
-                        <th className="px-4 py-3 text-center text-sm font-bold text-slate-200 border-r border-slate-600 last:border-r-0">
+                        </th>                        
+                      )}
+                      <th className="px-4 py-3 text-center text-sm font-bold text-slate-200 border-r border-slate-600 last:border-r-0">
                         <div className="flex items-center justify-center gap-2">
                             <span>{day}</span>
                         </div>
                         <div className="text-center text-sm font-bold text-slate-200 mt-1">
                             <span>{selecetedDaysMap[day]}</span>
                         </div>
-                        </th>
+                      </th>
                     </React.Fragment>
                   ))}
                 </tr>
@@ -139,19 +164,21 @@ function ScheduleTable({
                         
                         return (
                         <React.Fragment key={day}>
-                            <td
-                            
-                            className="px-3 py-3 bg-slate-750 border-r border-slate-600 text-xs">
-                                {slot ? (
-                                <div>
-                                    <div className="font-medium text-white">
-                                    {slot.startTime}-{slot.endTime}
-                                    </div>
-                                </div>
-                                ) : (
-                                <div className="text-slate-700">—</div>
-                                )}
-                            </td>
+                            {visibleSlots[day] && (
+                              <td
+                              
+                              className="px-3 py-3 bg-slate-750 border-r border-slate-600 text-xs">
+                                  {slot ? (
+                                  <div>
+                                      <div className="font-medium text-white">
+                                      {slot.startTime}-{slot.endTime}
+                                      </div>
+                                  </div>
+                                  ) : (
+                                  <div className="text-slate-700">—</div>
+                                  )}
+                              </td>                              
+                            )}
                             <td
                             onClick={() => slot && editMode && handleEmployeeSelector(slot, day)}
                             className={`px-2 py-3 border-r border-slate-600 last:border-r-0 
