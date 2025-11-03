@@ -5,7 +5,11 @@ from sqlalchemy.orm import Session
 
 from app.core.db import get_session
 from app.api.dependencies import current_user_id
-from app.schemas.availability import AvailabilityCreate, AvailabilityOut
+from app.schemas.availability import (
+    AvailabilityCreate,
+    AvailabilityUpdate,
+    AvailabilityOut,
+)
 from app.models.availability import Availability
 from app.models.employee import Employee
 
@@ -14,6 +18,40 @@ router = APIRouter(
 )
 
 
+# HELPERS
+def _get_employee(employee_id: UUID, user_id: UUID, db: Session):
+    employee = (
+        db.query(Employee)
+        .filter(Employee.id == employee_id, Employee.user_id == user_id)
+        .first()
+    )
+    if employee is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
+        )
+    return employee
+
+
+def _get_availability(
+    availability_id: UUID, employee_id: UUID, user_id: UUID, db: Session
+):
+    availability = (
+        db.query(Availability)
+        .filter(
+            Availability.user_id == user_id,
+            Availability.employee_id == employee_id,
+            Availability.id == availability_id,
+        )
+        .first()
+    )
+    if availability is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Availability not found"
+        )
+    return availability
+
+
+# CREATE
 @router.post("", response_model=AvailabilityOut, status_code=status.HTTP_201_CREATED)
 def create_availability(
     payload: AvailabilityCreate,
@@ -22,16 +60,7 @@ def create_availability(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    employee = (
-        db.query(Employee)
-        .filter(Employee.id == employee_id, Employee.user_id == user_id)
-        .first()
-    )
-
-    if employee is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
-        )
+    _get_employee(db, user_id, employee_id)
 
     availability = Availability(
         user_id=user_id, employee_id=employee_id, **payload.model_dump()
@@ -42,28 +71,20 @@ def create_availability(
     db.refresh(availability)
 
     response.headers["Location"] = (
-        f"employees/{employee_id}/availabilities/{availability.id}"
+        f"/employees/{employee_id}/availabilities/{availability.id}"
     )
 
     return availability
 
 
+# READ
 @router.get("", response_model=list[AvailabilityOut], status_code=status.HTTP_200_OK)
 def get_availabilities(
     employee_id: UUID,
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    employee = (
-        db.query(Employee)
-        .filter(Employee.id == employee_id, Employee.user_id == user_id)
-        .first()
-    )
-
-    if employee is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
-        )
+    _get_employee(db, user_id, employee_id)
 
     availabilities = (
         db.query(Availability)
@@ -75,3 +96,43 @@ def get_availabilities(
     )
 
     return availabilities
+
+
+# UPDATE
+@router.patch(
+    "/{availability_id}", response_model=AvailabilityOut, status_code=status.HTTP_200_OK
+)
+def update_availability(
+    payload: AvailabilityUpdate,
+    employee_id: UUID,
+    availability_id: UUID,
+    user_id: UUID = Depends(current_user_id),
+    db: Session = Depends(get_session),
+):
+    _get_employee(db, user_id, employee_id)
+    availability = _get_availability(db, user_id, employee_id, availability_id)
+
+    data = payload.model_dump(exclude_unset=True)
+    for field, value in data.items():
+        setattr(availability, field, value)
+
+    db.flush()
+    db.refresh(availability)
+
+    return availability
+
+
+# DELETE
+@router.delete("/{availability_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_availability(
+    employee_id: UUID,
+    availability_id: UUID,
+    user_id: UUID = Depends(current_user_id),
+    db: Session = Depends(get_session),
+):
+    _get_employee(db, user_id, employee_id)
+    availability = _get_availability(db, user_id, employee_id, availability_id)
+
+    db.delete(availability)
+
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
