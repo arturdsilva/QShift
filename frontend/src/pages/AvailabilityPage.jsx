@@ -89,14 +89,14 @@ function AvailabilityPage({
         const daySlots = availability[day];
         SlotsDay[index] = [];
         Object.entries(daySlots).forEach(([hourLabel, slot]) => {
+          const hour = `${hourLabel}:00`;
           if (slot) {
-            // essa hora é um elemento  de const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`); ou seja é tipo '12:00' mas eu quero apenas um int 12
-            slotsActive.push(hourLabel);
+            slotsActive.push(hour);
           } else if (!slot && slotPrevious) {
             SlotsDay[index].push({
               id: crypto.randomUUID(),
               startTime: slotsActive[0],
-              endTime: hourLabel
+              endTime: hour
             });
             slotsActive = [];
           }
@@ -106,7 +106,7 @@ function AvailabilityPage({
             SlotsDay[index].push({
               id: crypto.randomUUID(),
               startTime: slotsActive[0],
-              endTime: '24:00'
+              endTime: '24:00:00'
             });
         }
       })
