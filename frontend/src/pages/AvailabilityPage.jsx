@@ -81,59 +81,73 @@ function AvailabilityPage({
         onPageChange(1);
     };
 
-    const handleAvaibilitySchemas = () => {
-      const SlotsDay = {
-        monday: [
-          {id: 1, startTime: 2, endTime:3}
+    const handleAvaibilitySchemas = (employeeId) => {
+      const SlotsDay = [
+        [
+          { id: 1, startTime: '08:00', endTime: '12:00' },
+          { id: 2, startTime: '13:00', endTime: '18:00' }
         ],
-        tuesday: [
-          {id: 2, startTime: 2, endTime:3}
+        [
+          { id: 3, startTime: '08:00', endTime: '12:00' }
         ],
-        wednesday: [
-          {id: 3, startTime: 2, endTime:3}
+        [
+          { id: 4, startTime: '08:00', endTime: '12:00' }
         ],
-        thirsday: [
-          {id: 4, startTime: 2, endTime:3}
+        [
+          { id: 5, startTime: '08:00', endTime: '12:00' }
         ],
-        friday: [
-          {id: 5, startTime: 2, endTime:3}
+        [
+          { id: 6, startTime: '08:00', endTime: '12:00' }
         ],
-        saturday: [
-          {id: 6, startTime: 2, endTime:3}
+        [
+          { id: 7, startTime: '09:00', endTime: '13:00' }
         ],
-        sunday: [
-          {id: 7, startTime: 2, endTime:3}
-        ]
-      }
-      const availabilitySchemas = days.map(day => ({
-          ...availabilitySchemas, 
-            [day] : SlotsDay[day].map(slot => ({
-              ...slot,
-              id: employee_id,
-              weekday: day,
-              startTime: slot.startTime,
-              endTime: slot.endTime
-          }))
-      }))
+        []
+      ];
+      const availabilitySchemas = [];
+      SlotsDay.forEach((schemas, day) => {
+        availabilitySchemas[day]=[];
+        schemas.forEach((slot, index) => {
+          availabilitySchemas[day][index] = {
+            id: slot.id,
+            employeeId,
+            weekday: day,
+            startTime: slot.startTime,
+            endTime: slot.endTime
+          }
+        })
+      })
 
       return availabilitySchemas;
     }
 
     const handleSave = () => {
         if (selectEditEmployee) {
-          AvailabilityApi.updateEmployee(selectEditEmployee, availability );
-          console.log('Funcionário atualizado:', {id: selectEditEmployee, name: employeeData?.name || '', active: employeeData?.active ?? true, availability});
+          const availabilitySchemas = handleAvaibilitySchemas(selectEditEmployee);
+          console.log('days:', days);
+          console.log('availabilitySchemas:', availabilitySchemas);
+          days.map((day, index) => {
+            availabilitySchemas[index].map(schema => {
+              AvailabilityApi.updateEmployeeAvailability(selectEditEmployee, schema );
+              console.log('Funcionário atualizado:', {id: selectEditEmployee, name: employeeData?.name || '', active: employeeData?.active ?? true, schema});
+            })
+          })
         } else {
-          // criar um newEmployeeId
           const newEmployeeId = Date.now();
+          const availabilitySchemas = handleAvaibilitySchemas(newEmployeeId);
           const Data = {
             id: newEmployeeId,
             name: employeeData.name,
             active: employeeData?.active ?? true,
-            availability
           };
           AvailabilityApi.addNewEmployee(Data);
           console.log('Novo funcionário adicionado:', Data);
+          days.map((day, index) => {
+            availabilitySchemas[index].map(schema => {
+              AvailabilityApi.updateEmployee(newEmployeeId, schema );
+              console.log('Funcionário atualizado:', {id: selectEditEmployee, name: employeeData?.name || '', active: employeeData?.active ?? true, schema});
+            })
+          })
         }
         onPageChange(1);
     };
