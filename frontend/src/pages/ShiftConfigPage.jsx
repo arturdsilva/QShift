@@ -7,11 +7,15 @@ import { ShiftConfigApi }   from '../services/api.js';
 function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
 
     const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
+    const openDaysMask = [];
     const selectedDaysMap = {};
     selectedDays.forEach(day => {
         selectedDaysMap[day.getDay()] = day;
+        openDaysMask.push(day.getDay() === 0 
+        ? 6
+        : day.getDay() - 1);
     });
+    openDaysMask.sort((a, b) => a - b);
 
     const [shifts, setShifts] = useState([
         {
@@ -126,7 +130,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
             shifts,
             week: {
                 startDateWeek: startDate,
-                selectedDays: selectedDays,
+                openDaysMask: openDaysMask,
                 approved: false
             }
         };
