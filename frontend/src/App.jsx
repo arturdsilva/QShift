@@ -70,7 +70,7 @@ function App() {
     <AvailabilityPage 
       onPageChange={setCurrentPage}
       selectEditEmployee={selectEditEmployee}
-      setSelectEditEmplyee={setSelectEditEmployee}
+      setSelectEditEmployee={setSelectEditEmployee}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
     />,

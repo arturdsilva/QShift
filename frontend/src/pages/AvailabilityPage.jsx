@@ -48,7 +48,7 @@ function AvailabilityPage({
 
   //TODO: usar esse useEffect para pegar a disponibilidade, vou ter que fazer uma iteração de requisiçõe pra conseguir montar a tabela
   useEffect(() => {
-    if (!selectEditEmployee.id) return;
+    if (!selectEditEmployee?.id) return;
     setIsLoading(true);
     async function fetchEmployee() {
       try {
@@ -63,7 +63,7 @@ function AvailabilityPage({
       }
     }
     fetchEmployee();
-  }, [selectEditEmployee.id]);
+  }, [selectEditEmployee?.id]);
   //const employeeData = selectEditEmployee ? employeesData[selectEditEmployee] : null;
 
 
@@ -95,7 +95,8 @@ function AvailabilityPage({
   };
   
   const handleCancel = () => {
-      onPageChange(1);
+    setSelectEditEmployee(null);
+    onPageChange(1);
   };
 
   const handleAvaibilitySchemas = () => {
@@ -141,7 +142,7 @@ function AvailabilityPage({
   }
 
   const handleSave = async () => {
-      if (selectEditEmployee.id) {
+      if (selectEditEmployee?.id) {
         const availabilitySchemas = handleAvaibilitySchemas();
         console.log('days:', days);
         console.log('availabilitySchemas:', availabilitySchemas);
@@ -168,6 +169,7 @@ function AvailabilityPage({
           })
         })
       }
+      setSelectEditEmployee(null);
       onPageChange(1);
   };
     
