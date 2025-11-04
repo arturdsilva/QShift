@@ -1,5 +1,4 @@
 from uuid import UUID
-
 from fastapi import APIRouter, status, Depends, Response, HTTPException
 from sqlalchemy.orm import Session
 
@@ -7,8 +6,8 @@ from app.core.db import get_session
 from app.api.dependencies import current_user_id
 from app.schemas.availability import (
     AvailabilityCreate,
-    AvailabilityUpdate,
     AvailabilityOut,
+    AvailabilityUpdate,
 )
 from app.models.availability import Availability
 from app.models.employee import Employee
@@ -79,7 +78,7 @@ def create_availability(
 
 # READ
 @router.get("", response_model=list[AvailabilityOut], status_code=status.HTTP_200_OK)
-def get_availabilities(
+def read_availabilities(
     employee_id: UUID,
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),

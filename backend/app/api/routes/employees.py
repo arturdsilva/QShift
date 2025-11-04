@@ -1,6 +1,6 @@
+from uuid import UUID
 from fastapi import APIRouter, Depends, status, Response, HTTPException
 from sqlalchemy.orm import Session
-from uuid import UUID
 
 from app.core.db import get_session
 from app.api.dependencies import current_user_id
@@ -63,7 +63,7 @@ def list_employees(
 @router.get(
     "/{employee_id}", response_model=EmployeeOut, status_code=status.HTTP_200_OK
 )
-def get_employee(
+def read_employee(
     employee_id: UUID,
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
@@ -84,6 +84,9 @@ def update_employee(
     employee = _get_employee(employee_id, user_id, db)
 
     data = payload.model_dump(exclude_unset=True)
+    if not data:
+        return employee
+
     for field, value in data.items():
         setattr(employee, field, value)
 
