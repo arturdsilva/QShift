@@ -28,9 +28,6 @@ class Week(Base):
             "user_id", "start_date"
         ),  # uma semana por segunda-feira por usuário
         UniqueConstraint("user_id", "id"),  # habilita FKs compostas vindas de Shift
-        CheckConstraint(
-            "open_days_mask BETWEEN 0 AND 127", name="open_days_mask_range"
-        ),
         # segunda-feira = 1 no Postgres (0=domingo, 1=segunda, ..., 6=sábado)
         CheckConstraint("EXTRACT(DOW FROM start_date) = 1", name="start_is_monday"),
         CheckConstraint(
@@ -51,7 +48,7 @@ class Week(Base):
     )
 
     start_date: Mapped[date] = mapped_column(Date, nullable=False)
-    open_days_mask: Mapped[List[int]] = mapped_column(
+    open_days: Mapped[List[int]] = mapped_column(
         ARRAY(INTEGER),
         nullable=False,
         default=[0, 1, 2, 3, 4, 5, 6],
