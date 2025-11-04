@@ -2,10 +2,11 @@ from __future__ import annotations
 import uuid
 
 from pydantic import BaseModel, Field, field_validator
+import backend.app.core.constants as constants
 
 
 class EmployeeBase(BaseModel):
-    name: str = Field(..., max_length=120, description="Employee's name")
+    name: str = Field(..., max_length=constants.MAX_EMPLOYEE_NAME_LENGTH, description="Employee's name")
     active: bool = Field(
         True, description="If True, the employee will be included on the schedule"
     )
@@ -24,7 +25,7 @@ class EmployeeCreate(EmployeeBase):
 
 
 class EmployeeUpdate(BaseModel):
-    name: str | None = Field(None, max_length=120)
+    name: str | None = Field(None, max_length=constants.MAX_EMPLOYEE_NAME_LENGTH)
     active: bool | None = Field(None)
 
     @field_validator("name")

@@ -5,6 +5,7 @@ from typing import List
 from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint, Index, text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
+import backend.app.core.constants as constants
 
 from .base import Base
 
@@ -26,7 +27,7 @@ class Employee(Base):
         nullable=False,
     )
 
-    name: Mapped[str] = mapped_column(String(120), nullable=False)
+    name: Mapped[str] = mapped_column(String(constants.MAX_EMPLOYEE_NAME_LENGTH), nullable=False)
     active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default=text("true")
     )
