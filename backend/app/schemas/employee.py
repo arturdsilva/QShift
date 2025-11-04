@@ -2,7 +2,7 @@ from __future__ import annotations
 import uuid
 
 from pydantic import BaseModel, Field, field_validator
-import backend.app.core.constants as constants
+import app.core.constants as constants
 
 
 class EmployeeBase(BaseModel):

@@ -5,7 +5,7 @@ from typing import List
 from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint, Index, text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
-import backend.app.core.constants as constants
+import app.core.constants as constants
 
 from .base import Base
 
