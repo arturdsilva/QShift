@@ -17,13 +17,13 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         {
             id: 1,
             config: [
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
             ]
         }
     ]);
@@ -38,13 +38,13 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         const newShift = {
             id: Date.now(),
             config: [
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
+                {localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
             ]
         }
         setShifts([...shifts, newShift]);
@@ -110,7 +110,6 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                 ...shift,
                 config: shift.config.map((dayConfig, index) => ({
                     ...dayConfig,
-                    id: crypto.randomUUID(),
                     localDate: selectedDaysMap[index] || null
                 }))
             }));
@@ -126,7 +125,6 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
             id: Date.now(),
             shifts,
             week: {
-                id: Date.now(),
                 startDateWeek: startDate,
                 selectedDays: selectedDays,
                 approved: false
