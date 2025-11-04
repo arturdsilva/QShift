@@ -21,13 +21,13 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         {
             id: 1,
             config: [
-                {localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
+                {weekday: 0, startTime: '', endTime: '', employees: ''},
+                {weekday: 1, startTime: '', endTime: '', employees: ''},
+                {weekday: 2, startTime: '', endTime: '', employees: ''},
+                {weekday: 3, startTime: '', endTime: '', employees: ''},
+                {weekday: 4, startTime: '', endTime: '', employees: ''},
+                {weekday: 5, startTime: '', endTime: '', employees: ''},
+                {weekday: 6, startTime: '', endTime: '', employees: ''},
             ]
         }
     ]);
@@ -42,13 +42,13 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         const newShift = {
             id: Date.now(),
             config: [
-                {localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
-                {localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
+                {weekday: 0, startTime: '', endTime: '', employees: ''},
+                {weekday: 1, startTime: '', endTime: '', employees: ''},
+                {weekday: 2, startTime: '', endTime: '', employees: ''},
+                {weekday: 3, startTime: '', endTime: '', employees: ''},
+                {weekday: 4, startTime: '', endTime: '', employees: ''},
+                {weekday: 5, startTime: '', endTime: '', employees: ''},
+                {weekday: 6, startTime: '', endTime: '', employees: ''},
             ]
         }
         setShifts([...shifts, newShift]);
@@ -126,7 +126,6 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
 
     const createSchedule = () => {
         const schedule = {
-            id: Date.now(),
             shifts,
             week: {
                 startDateWeek: startDate,
