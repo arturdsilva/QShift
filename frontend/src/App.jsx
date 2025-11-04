@@ -44,6 +44,7 @@ function App() {
       onPageChange={setCurrentPage}
       onLoginSucess={handLoginSucess}
       isLoading={isLoading}
+      setIsLoading={setIsLoading}
     />,
     <StaffPage 
       onPageChange={setCurrentPage}

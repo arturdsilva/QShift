@@ -63,3 +63,9 @@ export const GeneratedScheduleApi = {
         return await api.post('/schedule', schedule);
     }
 }
+
+export const LoginApi = {
+    authenticateUser: async (username, password) => {
+        return await api.post('/login', {username, password});
+    }
+}
