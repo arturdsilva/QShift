@@ -9,7 +9,8 @@ function StaffPage({
     selectEditEmployee,
     setSelectEditEmployee,
     employeesData,
-    setEmployeesData
+    setEmployeesData,
+    setIsLoading
   }) {
   const [employees, setEmployees] = useState(employeesData);
 
@@ -20,6 +21,7 @@ function StaffPage({
   };
 
   const handleEditEmployee = (employeeId) => {
+    setIsLoading(true);
     const emp = employeesData.find(e => e.id === employeeId);
     if (emp) {
       console.log('entrou', emp);

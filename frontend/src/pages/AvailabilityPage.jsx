@@ -48,9 +48,7 @@ function AvailabilityPage({
 
 
   useEffect(() => {
-
     if (!selectEditEmployee?.id) return;
-    setIsLoading(true);    
     async function fetchEmployee() {
       try {
         const response = await AvailabilityApi.getAvailabilityEmployee(selectEditEmployee.id);

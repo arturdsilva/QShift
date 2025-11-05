@@ -51,6 +51,7 @@ function App() {
       setSelectEditEmployee={setSelectEditEmployee}
       employeesData={employees}
       setEmployeesData={setEmployees}
+      setIsLoading={setIsLoading}
     />,
     <CalendarPage 
       onPageChange={setCurrentPage}
