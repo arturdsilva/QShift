@@ -6,8 +6,10 @@ from typing import List
 from pydantic import BaseModel, Field
 import app.core.constants as constants
 
+
 class ScheduleOut(BaseModel):
     shifts: List[ScheduleShiftOut]
+
 
 class ScheduleShiftOut(BaseModel):
     shift_id: uuid.UUID
@@ -19,15 +21,20 @@ class ScheduleShiftOut(BaseModel):
     )
     employees: List[ScheduleShiftEmployeeOut]
 
+
 class ScheduleShiftEmployeeOut(BaseModel):
     employee_id: uuid.UUID
-    name: str = Field(..., max_length=constants.MAX_EMPLOYEE_NAME_LENGTH, description="Employee's name")
+    name: str = Field(
+        ...,
+        max_length=constants.MAX_EMPLOYEE_NAME_LENGTH,
+        description="Employee's name",
+    )
+
 
 class ScheduleCreate(BaseModel):
     shifts: List[ScheduleShiftCreate]
 
+
 class ScheduleShiftCreate(BaseModel):
     shift_id: uuid.UUID
     employee_ids: List[uuid.UUID]
-
-
