@@ -21,11 +21,23 @@ api.interceptors.request.use(config => {
 
 export const ShiftConfigApi = {
     createShcedule: async (weekPath, shifts) => {
-        return await api.post(`${weekPath}/schedule`, shifts);
+        try {
+            return await api.post(`${weekPath}/schedule`, shifts);
+        } catch (error) {
+            console.error('Erro ao criar uma escala:', error);
+            throw error;
+        }
+
     },
 
     submitWeekData: async (week) => {
-        return await api.post('/weeks', week);
+        try {
+            return await api.post('/weeks', week);
+        } catch (error) {
+            console.error('Erro ao criar uma semana:', error);
+            throw error;
+        }
+
     }
 };
 
