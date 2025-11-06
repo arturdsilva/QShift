@@ -1,8 +1,9 @@
 import axios from 'axios';
+import { week } from '../MockData';
 
 const api = axios.create({
   baseURL: 'http://localhost:5000/api',
-  timeout: 10000,
+  timeout: 500,
   headers: {'Content-Type': 'application/json'}
 });
 
@@ -19,8 +20,12 @@ api.interceptors.request.use(config => {
 });
 
 export const ShiftConfigApi = {
-    createShcedule: async (schedule) => {
-        return await api.post('/create-schedule', {schedule});
+    createShcedule: async (weekPath, shifts) => {
+        return await api.post(`${weekPath}/schedule`, shifts);
+    },
+
+    submitWeekData: async (week) => {
+        return await api.post('/weeks', week);
     }
 };
 
@@ -35,8 +40,8 @@ export const StaffApi = {
 };
 
 export const AvailabilityApi = {
-    getEmployee: async (employeeId) => {
-        return await api.get(`/employees/${employeeId}`);
+    getAvailabilityEmployee: async (employeeId) => {
+        return await api.get(`/employees/${employeeId}/availabilities`);
     },
 
     getByEmployeeId: async (employeeId) => {
@@ -44,13 +49,12 @@ export const AvailabilityApi = {
     },
 
     updateEmployeeAvailability: async (employeeId, availability) => {
-        return await api.put(`/availability/${employeeId}`, { availability });
+        return await api.put(`/availability/${employeeId}`, availability );
     },
 
     addNewEmployee: async (employeeData) => {
-        return await api.post('/employees', {employeeData});
+        return await api.post('/employees', employeeData);
     }
-    // TODO:passa um ID
 }
 
 export const GeneratedScheduleApi = {
@@ -61,6 +65,12 @@ export const GeneratedScheduleApi = {
         return await api.get('/schedule');
     },
     approvedSchedule: async (schedule) => {
-        return await api.post('/schedule', {schedule});
+        return await api.post('/schedule', schedule);
+    }
+}
+
+export const LoginApi = {
+    authenticateUser: async (username, password) => {
+        return await api.post('/login', {username, password});
     }
 }

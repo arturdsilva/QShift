@@ -57,8 +57,16 @@ class Shift(Base):
 
     # relationships
     week: Mapped["Week"] = relationship(back_populates="shifts")
-    assignments: Mapped[List["ShiftAssignment"]] = relationship(
-        back_populates="shift", cascade="all, delete-orphan"
+    assignments: Mapped[list["ShiftAssignment"]] = relationship(
+        "ShiftAssignment",
+        back_populates="shift",
+        cascade="all, delete-orphan",
+        primaryjoin=(
+            "and_(ShiftAssignment.user_id==Shift.user_id, "
+            "ShiftAssignment.shift_id==Shift.id)"
+        ),
+        foreign_keys="[ShiftAssignment.user_id, ShiftAssignment.shift_id]",
+        overlaps="employee,assignments",
     )
 
     def to_domain(self):

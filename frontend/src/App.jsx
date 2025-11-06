@@ -23,7 +23,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handLoginSucess = async () => {
-    setIsLoading(true);
     try {
       const response = await StaffApi.getAll();
       setEmployees(response.data);
@@ -44,6 +43,7 @@ function App() {
       onPageChange={setCurrentPage}
       onLoginSucess={handLoginSucess}
       isLoading={isLoading}
+      setIsLoading={setIsLoading}
     />,
     <StaffPage 
       onPageChange={setCurrentPage}
@@ -51,6 +51,7 @@ function App() {
       setSelectEditEmployee={setSelectEditEmployee}
       employeesData={employees}
       setEmployeesData={setEmployees}
+      setIsLoading={setIsLoading}
     />,
     <CalendarPage 
       onPageChange={setCurrentPage}
@@ -70,7 +71,9 @@ function App() {
     <AvailabilityPage 
       onPageChange={setCurrentPage}
       selectEditEmployee={selectEditEmployee}
-      setSelectEditEmplyee={setSelectEditEmployee}
+      setSelectEditEmployee={setSelectEditEmployee}
+      isLoading={isLoading}
+      setIsLoading={setIsLoading}
     />,
     <ShiftConfigPage 
       onPageChange={setCurrentPage}

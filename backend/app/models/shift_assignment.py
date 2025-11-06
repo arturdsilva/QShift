@@ -44,11 +44,28 @@ class ShiftAssignment(Base):
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
-        default=datetime.now(),
         server_default=func.now(),
         nullable=False,
     )
 
-    # relationships
-    shift: Mapped["Shift"] = relationship(back_populates="assignments")
-    employee: Mapped["Employee"] = relationship(back_populates="assignments")
+    shift: Mapped["Shift"] = relationship(
+        "Shift",
+        back_populates="assignments",
+        primaryjoin=(
+            "and_(ShiftAssignment.user_id==Shift.user_id, "
+            "ShiftAssignment.shift_id==Shift.id)"
+        ),
+        foreign_keys="[ShiftAssignment.user_id, ShiftAssignment.shift_id]",
+        overlaps="employee,assignments",
+    )
+
+    employee: Mapped["Employee"] = relationship(
+        "Employee",
+        back_populates="assignments",
+        primaryjoin=(
+            "and_(ShiftAssignment.user_id==Employee.user_id, "
+            "ShiftAssignment.employee_id==Employee.id)"
+        ),
+        foreign_keys="[ShiftAssignment.user_id, ShiftAssignment.employee_id]",
+        overlaps="shift,assignments",
+    )

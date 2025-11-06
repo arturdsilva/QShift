@@ -12,286 +12,58 @@ export const employeesMock = [
     { id: 5, name: 'Ângelo de Carvalho', active: true }
 ];
 
-export const employeesAvaibility = {
+export const employeesAvailability = {
   1: {
     id: 1,
     name: 'Guilherme Moriya',
-    active: true,
-    availability: {
-      'Monday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Tuesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Wednesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Thursday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Friday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': false
-      },
-      'Saturday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Sunday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      }
-    }
+    availability: [
+      { weekday: 0, startTime: '08:00:00', endTime: '17:00:00' },
+      { weekday: 1, startTime: '08:00:00', endTime: '20:00:00' },
+      { weekday: 2, startTime: '13:00:00', endTime: '21:00:00' },
+      { weekday: 3, startTime: '08:00:00', endTime: '19:00:00' },
+      { weekday: 4, startTime: '08:00:00', endTime: '23:00:00' },
+      { weekday: 5, startTime: '09:00:00', endTime: '18:00:00' }
+    ]
   },
   2: {
     id: 2,
     name: 'Artur Dantas',
-    active: true,
-    availability: {
-      'Monday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Tuesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Wednesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Thursday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Friday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': true
-      },
-      'Saturday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Sunday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      }
-    }
+    availability: [
+      { weekday: 0, startTime: '10:00:00', endTime: '21:00:00' },
+      { weekday: 1, startTime: '10:00:00', endTime: '22:00:00' },
+      { weekday: 2, startTime: '10:00:00', endTime: '19:00:00' },
+      { weekday: 4, startTime: '10:00:00', endTime: '24:00:00' },
+      { weekday: 5, startTime: '08:00:00', endTime: '21:00:00' }
+    ]
   },
   3: {
     id: 3,
     name: 'Gabriel Padilha',
-    active: false,
-    availability: {
-      'Monday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Tuesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Wednesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Thursday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Friday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Saturday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Sunday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      }
-    }
+    availability: []
   },
   4: {
     id: 4,
     name: 'Arthur Rocha',
-    active: false,
-    availability: {
-      'Monday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': false
-      },
-      'Tuesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': false
-      },
-      'Wednesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': false
-      },
-      'Thursday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': false
-      },
-      'Friday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': true
-      },
-      'Saturday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      },
-      'Sunday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': false, '11:00': false, '12:00': false, '13:00': false, '14:00': false,
-        '15:00': false, '16:00': false, '17:00': false, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      }
-    }
+    availability: [
+      { weekday: 0, startTime: '14:00:00', endTime: '23:00:00' },
+      { weekday: 1, startTime: '14:00:00', endTime: '23:00:00' },
+      { weekday: 2, startTime: '14:00:00', endTime: '23:00:00' },
+      { weekday: 3, startTime: '14:00:00', endTime: '23:00:00' },
+      { weekday: 4, startTime: '14:00:00', endTime: '24:00:00' },
+      { weekday: 5, startTime: '10:00:00', endTime: '20:00:00' }
+    ]
   },
   5: {
     id: 5,
     name: 'Ângelo de Carvalho',
-    active: true,
-    availability: {
-      'Monday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Tuesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Wednesday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Thursday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Friday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': true, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': true, '23:00': false
-      },
-      'Saturday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': true, '09:00': true,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': true, '19:00': true,
-        '20:00': true, '21:00': true, '22:00': false, '23:00': false
-      },
-      'Sunday': {
-        '00:00': false, '01:00': false, '02:00': false, '03:00': false, '04:00': false,
-        '05:00': false, '06:00': false, '07:00': false, '08:00': false, '09:00': false,
-        '10:00': true, '11:00': true, '12:00': true, '13:00': true, '14:00': true,
-        '15:00': true, '16:00': true, '17:00': true, '18:00': false, '19:00': false,
-        '20:00': false, '21:00': false, '22:00': false, '23:00': false
-      }
-    }
+    availability: [
+      { weekday: 0, startTime: '07:00:00', endTime: '22:00:00' },
+      { weekday: 1, startTime: '07:00:00', endTime: '22:00:00' },
+      { weekday: 2, startTime: '07:00:00', endTime: '22:00:00' },
+      { weekday: 3, startTime: '07:00:00', endTime: '22:00:00' },
+      { weekday: 4, startTime: '07:00:00', endTime: '23:00:00' },
+      { weekday: 5, startTime: '08:00:00', endTime: '22:00:00' }
+    ]
   }
 };
 
@@ -351,3 +123,11 @@ export const week = {
   selectedDays: [27, 28, 29, 30, 31, 1],
   approved: false
 }
+
+export const listAvailability = [
+  {weekday: 0, startTime: '10:00:00', endTime: '21:00:00'},
+  {weekday: 1, startTime: '10:00:00', endTime: '22:00:00'},
+  {weekday: 2, startTime: '10:00:00', endTime: '19:00:00'},
+  {weekday: 4, startTime: '10:00:00', endTime: '24:00:00'},
+  {weekday: 5, startTime: '08:00:00', endTime: '21:00:00'}
+]

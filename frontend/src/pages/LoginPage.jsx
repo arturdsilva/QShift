@@ -1,26 +1,33 @@
 import { useState } from 'react';
 import {DataBaseUser} from '../MockData.js';
 import BaseLayout from '../layouts/BaseLayout.jsx';
+import {LoginApi} from '../services/api.js';
 
 function LoginPage({
     onPageChange,
     onLoginSucess,
-    isLoading
+    isLoading,
+    setIsLoading
 }) {
     const [username, setUsername] = useState(null);
     const [password, setPassword] = useState(null);
 
-    const handleLogin = () => {
-        // Simulate login
-        // TODO: api.login para autenticar usuário
-        // localStorage.setItem("user_id", response.data.user_id) quando fizer a requisição real
-        if (username === DataBaseUser.username && password === DataBaseUser.password) {
-            localStorage.setItem("user_id", DataBaseUser.user_id);
-            onLoginSucess();
-            console.log('User logged in:', DataBaseUser);
-        }
-        else {
-            alert('Invalid username or password');
+    const handleLogin = async () => {
+        setIsLoading(true);
+        try {
+            const response = await LoginApi.authenticateUser(username, password);
+            localStorage.setItem("user_id", response.data.user_id);
+        } catch (err) {
+            console.error(err);
+            if (username === DataBaseUser.username && password === DataBaseUser.password) {
+                localStorage.setItem("user_id", DataBaseUser.user_id);
+                onLoginSucess();
+                console.log('User logged in:', DataBaseUser.username);
+            }
+            else {
+                alert('Invalid username or password');
+                setIsLoading(false);
+            }
         }
     };
 

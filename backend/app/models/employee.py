@@ -27,7 +27,9 @@ class Employee(Base):
         nullable=False,
     )
 
-    name: Mapped[str] = mapped_column(String(constants.MAX_EMPLOYEE_NAME_LENGTH), nullable=False)
+    name: Mapped[str] = mapped_column(
+        String(constants.MAX_EMPLOYEE_NAME_LENGTH), nullable=False
+    )
     active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default=text("true")
     )
@@ -37,6 +39,14 @@ class Employee(Base):
     availabilities: Mapped[List["Availability"]] = relationship(
         back_populates="employee", cascade="all, delete-orphan"
     )
-    assignments: Mapped[List["ShiftAssignment"]] = relationship(
-        back_populates="employee", cascade="all, delete-orphan"
+    assignments: Mapped[list["ShiftAssignment"]] = relationship(
+        "ShiftAssignment",
+        back_populates="employee",
+        cascade="all, delete-orphan",
+        primaryjoin=(
+            "and_(ShiftAssignment.user_id==Employee.user_id, "
+            "ShiftAssignment.employee_id==Employee.id)"
+        ),
+        foreign_keys="[ShiftAssignment.user_id, ShiftAssignment.employee_id]",
+        overlaps="shift,assignments",
     )

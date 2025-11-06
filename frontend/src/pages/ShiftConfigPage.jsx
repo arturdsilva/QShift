@@ -3,27 +3,32 @@ import Header from '../components/Header';
 import { useState } from 'react';
 import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
 import { ShiftConfigApi }   from '../services/api.js';
+import { week } from '../MockData.js';
 
 function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
 
-    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
+    const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const openDaysMask = [];
     const selectedDaysMap = {};
     selectedDays.forEach(day => {
-        selectedDaysMap[day.getDay()] = day;
+        selectedDaysMap[day.getDay()===0 ? 6 : day.getDay()-1] = day;
+        openDaysMask.push(day.getDay() === 0 
+        ? 6
+        : day.getDay() - 1);
     });
+    openDaysMask.sort((a, b) => a - b);
 
     const [shifts, setShifts] = useState([
         {
             id: 1,
             config: [
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(), localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
+                {weekday: 0, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[0]},
+                {weekday: 1, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[1]},
+                {weekday: 2, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[2]},
+                {weekday: 3, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[3]},
+                {weekday: 4, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[4]},
+                {weekday: 5, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[5]},
+                {weekday: 6, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[6]},
             ]
         }
     ]);
@@ -38,13 +43,13 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         const newShift = {
             id: Date.now(),
             config: [
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[0], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[1], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[2], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[3], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[4], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[5], startTime: '', endTime: '', employees: ''},
-                {id: crypto.randomUUID(),  localDate: selectedDaysMap[6], startTime: '', endTime: '', employees: ''},
+                {weekday: 0, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[0]},
+                {weekday: 1, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[1]},
+                {weekday: 2, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[2]},
+                {weekday: 3, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[3]},
+                {weekday: 4, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[4]},
+                {weekday: 5, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[5]},
+                {weekday: 6, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[6]},
             ]
         }
         setShifts([...shifts, newShift]);
@@ -85,6 +90,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         const configToSave = shifts.map(shift => ({
             id: shift.id,
             config: shift.config.map(dayConfig => ({
+                weekday: dayConfig.weekday,
                 startTime: dayConfig.startTime,
                 endTime: dayConfig.endTime,
                 employees: dayConfig.employees
@@ -110,7 +116,6 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                 ...shift,
                 config: shift.config.map((dayConfig, index) => ({
                     ...dayConfig,
-                    id: crypto.randomUUID(),
                     localDate: selectedDaysMap[index] || null
                 }))
             }));
@@ -121,19 +126,26 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         }
     }
 
+    const handleShiftsSchedule = () => {
+        let shiftsSchedule = [];
+        shifts.forEach(weekShift => {
+            weekShift.config.forEach(shift => {
+                shiftsSchedule.push(shift);
+            })
+        })
+        return shiftsSchedule;
+    }
+
     const createSchedule = () => {
-        const schedule = {
-            id: Date.now(),
-            shifts,
-            week: {
-                id: Date.now(),
-                startDateWeek: startDate,
-                selectedDays: selectedDays,
-                approved: false
-            }
-        };
-        ShiftConfigApi.createShcedule(schedule);
-        console.log("Criando escala com:", schedule);
+        const shiftsSchedule = handleShiftsSchedule();
+        console.log('shiftsSchedule', shiftsSchedule);
+        const week = {
+            startDateWeek: startDate,
+            openDaysMask: openDaysMask,
+            approved: false
+        }
+        const responseWeek = ShiftConfigApi.submitWeekData(week);
+        ShiftConfigApi.createShcedule(responseWeek.data, shiftsSchedule);
         onPageChange(7);
     }
  

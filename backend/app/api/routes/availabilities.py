@@ -59,7 +59,7 @@ def create_availability(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    _get_employee(db, user_id, employee_id)
+    _get_employee(employee_id, user_id, db)
 
     availability = Availability(
         user_id=user_id, employee_id=employee_id, **payload.model_dump()
@@ -83,7 +83,7 @@ def read_availabilities(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    _get_employee(db, user_id, employee_id)
+    _get_employee(employee_id, user_id, db)
 
     availabilities = (
         db.query(Availability)
@@ -108,8 +108,8 @@ def update_availability(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    _get_employee(db, user_id, employee_id)
-    availability = _get_availability(db, user_id, employee_id, availability_id)
+    _get_employee(employee_id, user_id, db)
+    availability = _get_availability(availability_id, employee_id, user_id, db)
 
     data = payload.model_dump(exclude_unset=True)
     for field, value in data.items():
@@ -129,8 +129,8 @@ def delete_availability(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    _get_employee(db, user_id, employee_id)
-    availability = _get_availability(db, user_id, employee_id, availability_id)
+    _get_employee(employee_id, user_id, db)
+    availability = _get_availability(availability_id, employee_id, user_id, db)
 
     db.delete(availability)
 
