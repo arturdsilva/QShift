@@ -11,10 +11,10 @@ app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # origem do seu frontend (Vite)
+    allow_origins=[settings.ALLOWED_ORIGINS],
     allow_credentials=True,
-    allow_methods=["*"],  # permite GET, POST, PATCH, DELETE, etc.
-    allow_headers=["*"],  # permite todos os headers
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 @app.get("/")

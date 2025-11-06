@@ -1,5 +1,5 @@
 from __future__ import annotations
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
 from datetime import date, time, timedelta
 
@@ -35,8 +35,11 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
             synchronize_session=False
         )
         db.query(Shift).filter_by(user_id=user_id).delete(synchronize_session=False)
+        print('delete shift ta safe')
         db.query(Week).filter_by(user_id=user_id).delete(synchronize_session=False)
+        print('delete week ta safe')
         db.query(Employee).filter_by(user_id=user_id).delete(synchronize_session=False)
+        print('delete employee ta safe')
 
         # 1) USER
         user = db.query(User).filter(User.id == user_id).first()
@@ -44,24 +47,29 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
             user = User(id=user_id, username="demo", password_hash="x")
             db.add(user)
             db.flush()
-
+        print('add user ta safe')
         # 2) EMPLOYEES
         names: list[str] = ["Artur", "Arthur", "Angelo", "Gabriel", "Guilherme"]
         for n in names:
             db.add(Employee(user_id=user_id, name=n, active=True))
         db.flush()
+        print('add employee ta safe')
 
         # 3) WEEK (next Monday; your schemas use open_days: List[int])
         start = next_monday(date.today())
         # Mon..Sat => [0,1,2,3,4,5]  (0=Mon ... 6=Sun),
+        print('start ta safe')
         week = Week(
             user_id=user_id,
             start_date=start,
             open_days=[0, 1, 2, 3, 4, 5],
             approved=False,
         )
+        print('criar modelo week ta safe')
         db.add(week)
+        print('add week ta safe')
         db.flush()
+        print('flush ta safe')
 
         # 4) WEEK SHIFTS
         for wd in week.open_days:  # according to your Week.open_days (int[] 0..6)
@@ -114,6 +122,6 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
             "employees": len(employees),
         }
 
-    except Exception:
+    except Exception as e:
         db.rollback()
-        raise
+        raise HTTPException(status_code=500, detail=str(e)) 

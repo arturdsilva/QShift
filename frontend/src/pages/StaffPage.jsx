@@ -9,9 +9,10 @@ function StaffPage({
     selectEditEmployee,
     setSelectEditEmployee,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    employees,
+    setEmployees
   }) {
-  const [employees, setEmployees] = useState([]);
     useEffect(() => {
     async function employeeData() {
         setIsLoading(true);
@@ -48,11 +49,15 @@ function StaffPage({
     }
   };
   const handleToggleActive = async (employeeId, currentStatus) => {
-      StaffApi.toggleActive(employeeId, !currentStatus);
+    const emp = employees.find(e => e.id === employeeId);
+    if (emp) {
+      const employeeData = {...emp, active: !currentStatus};
+      StaffApi.updateEmployeeData(employeeId, employeeData);
       setEmployees(employees.map(emp => 
           emp.id === employeeId ? {...emp, active: !emp.active} : emp
       ));
-      console.log('Toggle status:', employeeId, !currentStatus);
+      console.log('Toggle status:', employeeId, employeeData.active);
+    }
   };
 
   const handleAdvance = () => {

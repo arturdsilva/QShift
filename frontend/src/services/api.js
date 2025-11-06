@@ -47,7 +47,12 @@ export const StaffApi = {
     },
 
     updateEmployeeData: async (employee_id, employeeData) => {
-        return await api.patch(`/employees/${employee_id}`, employeeData);
+        try {
+            return await api.patch(`/employees/${employee_id}`, employeeData);
+        } catch (error) {
+            console.error('Erro ao atualizar o funcionário:', error);
+            throw error;
+        }
     },
 
     toggleActive: async (employeeId, isActive) => {

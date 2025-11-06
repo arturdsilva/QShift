@@ -14,7 +14,7 @@ function GeneratedSchedule({
 }) {
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const [editMode, setEditMode] = useState(false);
-
+    console.log('employees', employees);
     useEffect(() => {
     async function fetchData() {
         setIsLoading(true);

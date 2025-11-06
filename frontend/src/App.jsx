@@ -7,8 +7,6 @@ import AvailabilityPage from './pages/AvailabilityPage.jsx';
 import ShiftConfigPage from './pages/ShiftConfigPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
-import {StaffApi} from './services/api.js';
-import { employeesMock } from './MockData.js';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -34,6 +32,8 @@ function App() {
       setSelectEditEmployee={setSelectEditEmployee}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
+      employees={employees}
+      setEmployees={setEmployees}
     />,
     <CalendarPage 
       onPageChange={setCurrentPage}
