@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
-import {AvailabilityApi} from '../services/api.js';
+import {AvailabilityApi, StaffApi} from '../services/api.js';
 import { employeesAvailability } from '../MockData.js';
 
 function AvailabilityPage({
@@ -18,6 +18,7 @@ function AvailabilityPage({
   const [isActive, setIsActive] = useState(selectEditEmployee?.active ?? true);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [paintMode, setPaintMode] = useState(true);
+  const [error, setError] = useState(null);
 
   const initializeAvailability = () => {
     const initial = {};
@@ -51,8 +52,7 @@ function AvailabilityPage({
     if (!selectEditEmployee?.id) return;
     async function fetchEmployee() {
       try {
-        const response = await AvailabilityApi.getAvailabilityEmployee(selectEditEmployee.id);
-        const ListSchemas = response.data;
+        const ListSchemas = await AvailabilityApi.getAvailabilityEmployee(selectEditEmployee.id);
         updateAvaibility(ListSchemas);
       } catch (err) {
         console.error(err);
@@ -97,7 +97,7 @@ function AvailabilityPage({
     onPageChange(1);
   };
 
-  const handleAvaibilitySchemas = () => {
+  const convertAvailabilityToSchemas = () => {
     const SlotsDay = [];
     days.forEach((day, index) => {
       let slotsActive = [];
@@ -140,36 +140,39 @@ function AvailabilityPage({
   }
 
   const handleSave = async () => {
-      if (selectEditEmployee?.id) {
-        const availabilitySchemas = handleAvaibilitySchemas();
-        console.log('days:', days);
-        console.log('availabilitySchemas:', availabilitySchemas);
-        days.map((day, index) => {
-          availabilitySchemas[index].map(schema => {
-            AvailabilityApi.updateEmployeeAvailability(selectEditEmployee.id, schema );
-            console.log('Funcionário atualizado:', {id: selectEditEmployee.id, name: name, active: isActive, schema});
-          })
-        })
-      } else {
-        const availabilitySchemas = handleAvaibilitySchemas();
-        const Data = {
+    if (!name.trim()) {
+      setError('Nome do funcionário é obrigatório');
+      return;
+    }
+    setError(null);
+    try {
+      const availabilitySchemas = convertAvailabilityToSchemas();
+      console.log('Schemas gerados:', availabilitySchemas);
+
+      let employeeId = selectEditEmployee?.id;
+      if (!employeeId) {
+        console.log('Criando novo funcionário...');
+        const newEmployee = await AvailabilityApi.addNewEmployee({
           name: name,
-          active: isActive,
-        };
-        console.log('Funcionário atualizado:', { name: name, active: isActive, availabilitySchemas})
-        console.log('employee', Data)
-        const response = await AvailabilityApi.addNewEmployee(Data);
-        const newEmployeeId = response.data.id;
-        console.log('Novo funcionário adicionado:', Data);
-        days.map((day, index) => {
-          availabilitySchemas[index].map(schema => {
-            AvailabilityApi.createEmployeeAvailability(newEmployeeId, schema );
-            console.log('Funcionário atualizado:', {id: newEmployeeId, name: name, active: isActive, schema});
-          })
-        })
+          active: isActive
+        });
+        employeeId = newEmployee.id;
+        console.log('Funcionário criado:', newEmployee);
+      } else {
+        console.log('Atualizando funcionário existente...');
+        await StaffApi.updateEmployeeData(employeeId, { name, active: isActive });
       }
+      console.log('Salvando disponibilidades...');
+      await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
+      
+      console.log(' Funcionário e disponibilidades salvos com sucesso!');
       setSelectEditEmployee(null);
       onPageChange(1);
+
+    } catch (err) {
+      console.error('Erro ao salvar:', err);
+      setError(err.response?.data?.detail || 'Erro ao salvar funcionário. Verifique o console.');
+    }
   };
     
   if (isLoading) {
