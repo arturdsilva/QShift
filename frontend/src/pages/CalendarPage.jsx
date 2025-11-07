@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout';
 import CalendarTable from '../components/CalendarTable';
 import Header from '../components/Header';
+import {CalendarApi} from '../services/api.js';
 
 function CalendarPage ({ 
   onPageChange,
@@ -16,6 +18,21 @@ function CalendarPage ({
   startDate,
   setStartDate
   }) {
+  const [generatedWeeks, setGeneratedWeeks] = useState([]);
+  useEffect(() => {
+  async function getWeeks() {
+      try {
+      const weekResponse = await CalendarApi.getWeeks();
+      setGeneratedWeeks(weekResponse.data);
+
+      console.log('Semanas recebidas com sucesso:', weekResponse.data);
+      } catch (error) {
+      console.error('Erro ao carregar dados da API:', error);
+      } finally {
+      }
+  }
+  getWeeks();
+  }, []);
 
   const handlePrevMonth = () => {
     if (currentMonth === 1) {

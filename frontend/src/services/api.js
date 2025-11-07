@@ -179,3 +179,9 @@ export const LoginApi = {
         return await api.post('/login', {username, password});
     }
 }
+
+export const CalendarApi = {
+    getWeeks: async () => {
+        return await api.get('/weeks');
+    }
+}
