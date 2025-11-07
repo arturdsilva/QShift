@@ -11,6 +11,7 @@ import app.domain.shift as shift_domain
 def build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
     from app.models.shift import Shift
     from app.models import ShiftAssignment, Employee
+
     shifts = (
         db.query(Shift).filter(Shift.week_id == week_id, Shift.user_id == user_id).all()
     )
@@ -76,7 +77,7 @@ class ScheduleGenerator:
         self.weekday = [s.weekday for s in self.shift_vector]  # 0..6
         self.start_min = [_time_to_min(s.start_time) for s in self.shift_vector]
         self.end_min = [_time_to_min(s.end_time) for s in self.shift_vector]
-        self.duration_min = [
+        self.shift_duration_min = [
             max(0, self.end_min[i] - self.start_min[i]) for i in range(self.num_shifts)
         ]
         self.demand = [s.min_staff for s in self.shift_vector]
@@ -99,9 +100,10 @@ class ScheduleGenerator:
         user_id: UUID,
         week_id: UUID,
         shift_ids: List[UUID],
-        employee_ids: List[UUID],
     ):
-        employee_ids, employee_names = cls._get_employees_for_user(db=db, user_id=user_id)
+        employee_ids, employee_names = cls._get_employees_for_user(
+            db=db, user_id=user_id
+        )
         return cls(
             shift_ids=cls._get_shift_ids_for_week(db=db, week_id=week_id),
             employee_ids=employee_ids,
@@ -125,8 +127,11 @@ class ScheduleGenerator:
         return shift_ids
 
     @classmethod
-    def _get_employees_for_user(cls, user_id: UUID, db: Session) -> Tuple[List[UUID], List[str]]:
+    def _get_employees_for_user(
+        cls, user_id: UUID, db: Session
+    ) -> Tuple[List[UUID], List[str]]:
         from app.models import Employee
+
         employees = db.query(Employee.id).filter(Employee.user_id == user_id).all()
         employee_ids = []
         employee_names = []
@@ -140,7 +145,7 @@ class ScheduleGenerator:
         cls, *, db: Session, user_id: UUID, shift_ids: List[UUID]
     ) -> List[shift_domain.Shift]:
         from app.models.shift import Shift
-        from app.models import ShiftAssignment, Employee, Availability
+
         shift_vector = []
         for shift_id in shift_ids:
             shift_model = db.query(Shift).filter(Shift.id == shift_id).first()
@@ -152,12 +157,12 @@ class ScheduleGenerator:
         cls,
         *,
         db: Session,
-        user_id: UUID,
         shift_ids: List[UUID],
         employee_ids: List[UUID],
     ) -> List[List[bool]]:
         from app.models.shift import Shift
         from app.models import Availability
+
         availability_matrix = [
             [False] * len(shift_ids) for _ in range(len(employee_ids))
         ]
@@ -182,11 +187,10 @@ class ScheduleGenerator:
         self,
     ) -> Tuple[cp_model.CpModel, List[List[cp_model.IntVar]]]:
         """
-        Modelo CP-SAT com restrições duras:
-          - Cobertura exata por turno
-          - Disponibilidade
-          - Não sobreposição de turnos por funcionário
-        (NÃO inclui a preferência ≤1 turno/dia/pessoa — isso vai como objetivo de 1ª prioridade.)
+        Create CP-SAT model with hard constraints:
+          - Exact coverage per shift
+          - Availability
+          - No overlapping shifts per employee
         """
         model = cp_model.CpModel()
 
@@ -220,10 +224,8 @@ class ScheduleGenerator:
 
         return model, x
 
-    # -------------------- Feasibility check --------------------
-
     def check_possibility(self) -> bool:
-        """Checa se existe alguma escala viável (sem precisar achar a ótima)."""
+        """Checks if it's possible to build a schedule."""
         if self.num_shifts == 0:
             return True
 
@@ -237,42 +239,38 @@ class ScheduleGenerator:
         status = solver.Solve(model)
         return status in (cp_model.OPTIMAL, cp_model.FEASIBLE)
 
-    # -------------------- Geração com otimização lexicográfica (3 níveis) --------------------
-
     def generate_schedule(self) -> schemas.ScheduleOut:
         """
-        Otimização lexicográfica em um único modelo (prioridades trocadas):
-          1) Minimiza soma |H_e - T| (fairness).
-          2) Fixando (1), minimiza violações da preferência "≤ 1 turno/dia/pessoa".
-          3) Fixando (2), minimiza consistência de horários (desvio dos inícios).
+        Lexicographic optimization in a single model:
+          1) Penalizes differences in total minutes worked per employee.
+          2) Fixing (1), penalizes more than one shift by day by person.
+          3) Fixing (2), penalizes different times of schedules for one employee.
         """
         if self.num_shifts == 0:
             return schemas.ScheduleOut(shifts=[])
 
-        # ---------- Base Model ----------
         model, x = self._build_feasibility_model()
-        UPPER = sum(self.duration_min) if self.duration_min else 0
+        max_working_time = sum(self.shift_duration_min) if self.shift_duration_min else 0
 
-        # =========================
-        # STEP 1 — FAIRNESS (first priority)
-        # =========================
-        # H_e = total minutes per employee
-        H = {e: model.NewIntVar(0, UPPER, f"H[{e}]") for e in range(self.num_employees)}
+        # Step 1: Fairness
+
+        # Total minutes per employee
+        H = {e: model.NewIntVar(0, max_working_time, f"H[{e}]") for e in range(self.num_employees)}
         for e in range(self.num_employees):
             model.Add(
                 H[e]
-                == sum(self.duration_min[t] * x[e][t] for t in range(self.num_shifts))
+                == sum(self.shift_duration_min[t] * x[e][t] for t in range(self.num_shifts))
             )
 
         total_minutes = sum(
-            self.duration_min[t] * int(self.demand[t]) for t in range(self.num_shifts)
+            self.shift_duration_min[t] * int(self.demand[t]) for t in range(self.num_shifts)
         )
         T = total_minutes // max(1, self.num_employees)
 
         # We want to minimize the sum of absolute deviations -> sum(|H_e - T|)
         abs_deviations = []
         for e in range(self.num_employees):
-            dev = model.NewIntVar(0, UPPER, f"dev[{e}]")
+            dev = model.NewIntVar(0, max_working_time, f"dev[{e}]")
             model.AddAbsEquality(dev, H[e] - T)
             abs_deviations.append(dev)
 
@@ -286,15 +284,11 @@ class ScheduleGenerator:
 
         best_fairness = solver1.ObjectiveValue()
 
-        # Optional: tolerance to fairness loss during the next steps
-        fairness_tol = 0.05
+        fairness_tol = 0.05 # Tolerance to fairness loss during the next steps
         model.Add(sum(abs_deviations) <= int((1.0 + fairness_tol) * best_fairness))
 
-        # =========================
-        # ETAPA 2 — ≤ 1 TURNO/DIA/PESSOA (segunda prioridade)
-        # =========================
-        # day_count[e,d] = soma_t em dia d x[e][t]
-        # over[e,d] >= day_count[e,d] - 1   (over >= 0)
+        # Step 2: penalizes more than one 1 shift by day by person
+
         over_vars = []
         for e in range(self.num_employees):
             for d in range(7):
@@ -302,10 +296,13 @@ class ScheduleGenerator:
                 if not day_shift_indices:
                     continue
                 max_day_slots = len(day_shift_indices)
-                day_count = model.NewIntVar(0, max_day_slots, f"day_count[{e},{d}]")
-                model.Add(day_count == sum(x[e][t] for t in day_shift_indices))
+
+                num_shifts_in_day = model.NewIntVar(0, max_day_slots, f"num_shifts_in_day[{e},{d}]")
+                model.Add(num_shifts_in_day == sum(x[e][t] for t in day_shift_indices))
+
+                # Violation variable (to be minimized)
                 over = model.NewIntVar(0, max_day_slots, f"over[{e},{d}]")
-                model.Add(over >= day_count - 1)
+                model.Add(over >= num_shifts_in_day - 1)
                 over_vars.append(over)
 
         # Use solution of step 1 as a hint for step 2
@@ -332,26 +329,24 @@ class ScheduleGenerator:
         if over_vars and best_over_val is not None:
             model.Add(sum(over_vars) <= int((1.0 + over_tolerance) * best_over_val))
 
-        # =========================
-        # ETAPA 3 — CONSISTÊNCIA DOS HORÁRIOS (terceira prioridade)
-        # =========================
-        # Âncora por funcionário (em minutos) e desvio |start_t - anchor_e|
+        # Step 3: Schedule time consistency (penalizes shifts in different times for one employee over the week)
+
         if self.num_shifts > 0:
-            t_anchor = {
-                e: model.NewIntVar(self.min_start, self.max_start, f"t_anchor[{e}]")
+            time_anchor = { # Anchor time for each employee
+                e: model.NewIntVar(self.min_start, self.max_start, f"time_anchor[{e}]")
                 for e in range(self.num_employees)
             }
         else:
-            t_anchor = {}
+            time_anchor = {}
 
-        y = []
+        y = [] # Deviation from anchor time
         for e in range(self.num_employees):
             for t in range(self.num_shifts):
                 y_et = model.NewIntVar(0, 24 * 60, f"y[{e},{t}]")
-                model.Add(y_et >= self.start_min[t] - t_anchor[e]).OnlyEnforceIf(
+                model.Add(y_et >= self.start_min[t] - time_anchor[e]).OnlyEnforceIf(
                     x[e][t]
                 )
-                model.Add(y_et >= t_anchor[e] - self.start_min[t]).OnlyEnforceIf(
+                model.Add(y_et >= time_anchor[e] - self.start_min[t]).OnlyEnforceIf(
                     x[e][t]
                 )
                 model.Add(y_et == 0).OnlyEnforceIf(x[e][t].Not())
@@ -374,7 +369,7 @@ class ScheduleGenerator:
             else chosen_after_2
         )
 
-        # ---------- Montagem do ScheduleOut ----------
+        # Building Schema (ScheduleOut)
         schedule_shifts_out: List[schemas.ScheduleShiftOut] = []
         for t in range(self.num_shifts):
             employees_out: List[schemas.ScheduleShiftEmployeeOut] = []
