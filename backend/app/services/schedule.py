@@ -75,15 +75,15 @@ class ScheduleGenerator:
         self.num_employees = len(self.employee_ids)
 
         self.weekday = [s.weekday for s in self.shift_vector]  # 0..6
-        self.start_min = [_time_to_min(s.start_time) for s in self.shift_vector]
-        self.end_min = [_time_to_min(s.end_time) for s in self.shift_vector]
+        self.start_time_minutes = [_time_to_min(s.start_time) for s in self.shift_vector]
+        self.end_time_minutes = [_time_to_min(s.end_time) for s in self.shift_vector]
         self.shift_duration_min = [
-            max(0, self.end_min[i] - self.start_min[i]) for i in range(self.num_shifts)
+            max(0, self.end_time_minutes[i] - self.start_time_minutes[i]) for i in range(self.num_shifts)
         ]
         self.demand = [s.min_staff for s in self.shift_vector]
 
-        self.min_start = min(self.start_min) if self.start_min else 0
-        self.max_start = max(self.start_min) if self.start_min else 0
+        self.min_start = min(self.start_time_minutes)
+        self.max_start = max(self.start_time_minutes)
 
         self.shifts_indices_by_day = {
             d: [i for i in range(self.num_shifts) if self.weekday[i] == d]
@@ -217,8 +217,8 @@ class ScheduleGenerator:
             for t1 in range(self.num_shifts):
                 for t2 in range(t1 + 1, self.num_shifts):
                     if not (
-                        self.end_min[t1] <= self.start_min[t2]
-                        or self.end_min[t2] <= self.start_min[t1]
+                            self.end_time_minutes[t1] <= self.start_time_minutes[t2]
+                            or self.end_time_minutes[t2] <= self.start_time_minutes[t1]
                     ):
                         model.Add(x[e][t1] + x[e][t2] <= 1)
 
@@ -255,15 +255,21 @@ class ScheduleGenerator:
         # Step 1: Fairness
 
         # Total minutes per employee
-        H = {e: model.NewIntVar(0, max_working_time, f"H[{e}]") for e in range(self.num_employees)}
+        H = {
+            e: model.NewIntVar(0, max_working_time, f"H[{e}]")
+            for e in range(self.num_employees)
+        }
         for e in range(self.num_employees):
             model.Add(
                 H[e]
-                == sum(self.shift_duration_min[t] * x[e][t] for t in range(self.num_shifts))
+                == sum(
+                    self.shift_duration_min[t] * x[e][t] for t in range(self.num_shifts)
+                )
             )
 
         total_minutes = sum(
-            self.shift_duration_min[t] * int(self.demand[t]) for t in range(self.num_shifts)
+            self.shift_duration_min[t] * int(self.demand[t])
+            for t in range(self.num_shifts)
         )
         T = total_minutes // max(1, self.num_employees)
 
@@ -278,13 +284,15 @@ class ScheduleGenerator:
             dev[e] = model.NewIntVar(0, 2 * total_minutes, f"dev[{e}]")
             model.Add(dev[e] == devp[e] + devm[e])
 
-        model.Minimize(sum(dev))
+        model.Minimize(sum(dev.values()))
         solver1 = cp_model.CpSolver()
         solver1.parameters.max_time_in_seconds = 20.0
         solver1.parameters.num_search_workers = self.num_search_workers
         status1 = solver1.Solve(model)
         if status1 != cp_model.OPTIMAL and status1 != cp_model.FEASIBLE:
-            print("No feasible solution found for step 1. Status: ", solver1.StatusName())
+            print(
+                "No feasible solution found for step 1. Status: ", solver1.StatusName()
+            )
             chosen_after_1 = cp_model.CpSolver()
             chosen_after_1.parameters.max_time_in_seconds = 15.0
             chosen_after_1.parameters.num_search_workers = self.num_search_workers
@@ -295,10 +303,8 @@ class ScheduleGenerator:
 
         best_fairness = chosen_after_1.ObjectiveValue()
 
-        fairness_tol = 0.05 # Tolerance to fairness loss during the next steps
-        model.Add(sum(dev) <= int((1.0 + fairness_tol) * best_fairness))
-
-        print("num_shifts: ", self.num_shifts)
+        fairness_tol = 0.05  # Tolerance to fairness loss during the next steps
+        model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
 
         # Step 2: penalizes more than one 1 shift by day by person
 
@@ -310,7 +316,9 @@ class ScheduleGenerator:
                     continue
                 max_day_slots = len(day_shift_indices)
 
-                num_shifts_in_day = model.NewIntVar(0, max_day_slots, f"num_shifts_in_day[{e},{d}]")
+                num_shifts_in_day = model.NewIntVar(
+                    0, max_day_slots, f"num_shifts_in_day[{e},{d}]"
+                )
                 model.Add(num_shifts_in_day == sum(x[e][t] for t in day_shift_indices))
 
                 # Violation variable (to be minimized)
@@ -331,7 +339,9 @@ class ScheduleGenerator:
         solver2.parameters.num_search_workers = self.num_search_workers
         status2 = solver2.Solve(model)
         if status2 != cp_model.OPTIMAL and status2 != cp_model.FEASIBLE:
-            print("No feasible solution found for step 2. Status: ", solver2.StatusName())
+            print(
+                "No feasible solution found for step 2. Status: ", solver2.StatusName()
+            )
             chosen_after_2 = chosen_after_1
             best_over_val = None
         else:
@@ -344,27 +354,20 @@ class ScheduleGenerator:
             model.Add(sum(over_vars) <= int((1.0 + over_tolerance) * best_over_val))
 
         # Step 3: Schedule time consistency (penalizes shifts in different times for one employee over the week)
-        print("num_shifts: ", self.num_shifts)
 
-        if self.num_shifts > 0:
-            time_anchor = { # Anchor time for each employee
-                e: model.NewIntVar(self.min_start, self.max_start, f"time_anchor[{e}]")
-                for e in range(self.num_employees)
-            }
-        else:
-            time_anchor = {}
+        time_anchor = {  # Anchor time for each employee
+            e: model.NewIntVar(self.min_start, self.max_start, f"time_anchor[{e}]")
+            for e in range(self.num_employees)
+        }
 
-        y = [] # Deviation from anchor time
+        y = []  # Deviation from anchor time
         for e in range(self.num_employees):
             for t in range(self.num_shifts):
-                y_et = model.NewIntVar(0, 24 * 60, f"y[{e},{t}]")
-                model.Add(y_et >= self.start_min[t] - time_anchor[e]).OnlyEnforceIf(
-                    x[e][t]
-                )
-                model.Add(y_et >= time_anchor[e] - self.start_min[t]).OnlyEnforceIf(
-                    x[e][t]
-                )
-                model.Add(y_et == 0).OnlyEnforceIf(x[e][t].Not())
+                M = 1440
+                y_et = model.NewIntVar(0, M, f"y[{e},{t}]")
+                model.Add(y_et + time_anchor[e] >= self.start_time_minutes[t] - (M - M * x[e][t]))
+                model.Add(y_et - time_anchor[e] >= - self.start_time_minutes[t] - (M - M * x[e][t]))
+                model.Add(y_et <= M * x[e][t])
                 y.append(y_et)
 
         # Use step 2 as a hint for step 3
@@ -378,13 +381,14 @@ class ScheduleGenerator:
         solver3.parameters.num_search_workers = self.num_search_workers
         status3 = solver3.Solve(model)
 
-        final_solver = (
-            solver3
-            if status3 == cp_model.OPTIMAL or status3 == cp_model.FEASIBLE
-            else chosen_after_2
-        )
-        if not (status3 == cp_model.OPTIMAL or status3 == cp_model.FEASIBLE):
-            print("No feasible solution found for step 3. Status: ", solver3.StatusName())
+        if status3 == cp_model.OPTIMAL or status3 == cp_model.FEASIBLE:
+            final_solver = solver3
+        else:
+            print(
+                "No feasible solution found for step 3. Status: ",
+                solver3.StatusName(status3),
+            )
+            final_solver = chosen_after_2
 
         # Building Schema (ScheduleOut)
         schedule_shifts_out: List[schemas.ScheduleShiftOut] = []
@@ -409,6 +413,5 @@ class ScheduleGenerator:
                     employees=employees_out,
                 )
             )
-        print("num_shifts: ", self.num_shifts)
 
         return schemas.ScheduleOut(shifts=schedule_shifts_out)
