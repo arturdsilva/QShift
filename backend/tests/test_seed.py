@@ -4,9 +4,11 @@ from app.main import app
 
 def test_seed_happy_flow():
     c = TestClient(app)
+    
 
     # 1) Seed
     r = c.post("/dev/seed")
+    print(r.json())
     assert r.status_code == 200
     meta = r.json()
     week_id = meta["week_id"]

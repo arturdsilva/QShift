@@ -7,8 +7,6 @@ import AvailabilityPage from './pages/AvailabilityPage.jsx';
 import ShiftConfigPage from './pages/ShiftConfigPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
-import {StaffApi} from './services/api.js';
-import { employeesMock } from './MockData.js';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -22,26 +20,9 @@ function App() {
   const [employees, setEmployees] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handLoginSucess = async () => {
-    try {
-      const response = await StaffApi.getAll();
-      setEmployees(response.data);
-      setCurrentPage(1);
-
-    } catch (error) {
-      console.error('Erro ao carregar funcionários');
-      setEmployees(employeesMock);
-      setCurrentPage(1);
-    } finally {
-      setIsLoading(false);
-      console.log('mudando loading', isLoading);
-    }
-  }
-
   const pages = [
     <LoginPage
       onPageChange={setCurrentPage}
-      onLoginSucess={handLoginSucess}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
     />,
@@ -49,9 +30,10 @@ function App() {
       onPageChange={setCurrentPage}
       selectEditEmployee={selectEditEmployee}
       setSelectEditEmployee={setSelectEditEmployee}
-      employeesData={employees}
-      setEmployeesData={setEmployees}
+      isLoading={isLoading}
       setIsLoading={setIsLoading}
+      employees={employees}
+      setEmployees={setEmployees}
     />,
     <CalendarPage 
       onPageChange={setCurrentPage}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {Users, Plus, ArrowRight} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
@@ -8,11 +8,28 @@ function StaffPage({
     onPageChange,
     selectEditEmployee,
     setSelectEditEmployee,
-    employeesData,
-    setEmployeesData,
-    setIsLoading
+    isLoading,
+    setIsLoading,
+    employees,
+    setEmployees
   }) {
-  const [employees, setEmployees] = useState(employeesData);
+    useEffect(() => {
+    async function employeeData() {
+        setIsLoading(true);
+        try {
+        const staffResponse = await StaffApi.getAll();
+        setEmployees(staffResponse.data);
+
+        console.log('Fetched Employees:', staffResponse.data);
+        } catch (error) {
+        console.error('Erro ao carregar dados da API:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+    employeeData();
+    }, []);
+
 
   const handleAddEmployee = () => {
       console.log('Add employee');
@@ -22,7 +39,7 @@ function StaffPage({
 
   const handleEditEmployee = (employeeId) => {
     setIsLoading(true);
-    const emp = employeesData.find(e => e.id === employeeId);
+    const emp = employees.find(e => e.id === employeeId);
     if (emp) {
       console.log('entrou', emp);
       setSelectEditEmployee(emp);
@@ -32,17 +49,33 @@ function StaffPage({
     }
   };
   const handleToggleActive = async (employeeId, currentStatus) => {
-      StaffApi.toggleActive(employeeId, !currentStatus);
+    const emp = employees.find(e => e.id === employeeId);
+    if (emp) {
+      const employeeData = {...emp, active: !currentStatus};
+      StaffApi.updateEmployeeData(employeeId, employeeData);
       setEmployees(employees.map(emp => 
           emp.id === employeeId ? {...emp, active: !emp.active} : emp
       ));
-      console.log('Toggle status:', employeeId, !currentStatus);
+      console.log('Toggle status:', employeeId, employeeData.active);
+    }
   };
 
   const handleAdvance = () => {
       onPageChange(2);
   };
 
+  if (isLoading) {
+      return (
+          <BaseLayout showSidebar={false} currentPage={7} onPageChange={onPageChange}>
+              <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center">
+                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      <p className="text-slate-400">Loading...</p>
+                  </div>
+              </div>
+          </BaseLayout>
+      );
+  }
   return (
     <BaseLayout currentPage={1} onPageChange={onPageChange}>
       <Header title="Employee Management" icon={Users} />

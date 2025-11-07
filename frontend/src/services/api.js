@@ -2,8 +2,8 @@ import axios from 'axios';
 import { week } from '../MockData';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
-  timeout: 500,
+  baseURL: ' http://127.0.0.1:8000',
+  timeout: 10000,
   headers: {'Content-Type': 'application/json'}
 });
 
@@ -21,17 +21,38 @@ api.interceptors.request.use(config => {
 
 export const ShiftConfigApi = {
     createShcedule: async (weekPath, shifts) => {
-        return await api.post(`${weekPath}/schedule`, shifts);
+        try {
+            return await api.post(`${weekPath}/schedule`, shifts);
+        } catch (error) {
+            console.error('Erro ao criar uma escala:', error);
+            throw error;
+        }
+
     },
 
     submitWeekData: async (week) => {
-        return await api.post('/weeks', week);
+        try {
+            return await api.post('/weeks', week);
+        } catch (error) {
+            console.error('Erro ao criar uma semana:', error);
+            throw error;
+        }
+
     }
 };
 
 export const StaffApi = {
     getAll: async () => {
     return await api.get('/employees');
+    },
+
+    updateEmployeeData: async (employee_id, employeeData) => {
+        try {
+            return await api.patch(`/employees/${employee_id}`, employeeData);
+        } catch (error) {
+            console.error('Erro ao atualizar o funcionário:', error);
+            throw error;
+        }
     },
 
     toggleActive: async (employeeId, isActive) => {
@@ -41,19 +62,98 @@ export const StaffApi = {
 
 export const AvailabilityApi = {
     getAvailabilityEmployee: async (employeeId) => {
-        return await api.get(`/employees/${employeeId}/availabilities`);
+        try {
+            const response = await api.get(`/employees/${employeeId}/availabilities`);
+            return response.data;
+        } catch (error) {
+            console.error('Erro ao receber a disponibilidade:', error);
+            throw error;
+        }
+
     },
 
-    getByEmployeeId: async (employeeId) => {
-        return await api.get(`/availability/${employeeId}`);
+    updateEmployeeAvailability: async (employeeId, availabilityId, availability) => {
+        try {
+            const response = await api.patch(
+                `/employees/${employeeId}/availabilities/${availabilityId}`,
+                availability
+        );
+        return response.data;
+        } catch (error) {
+            console.error('Erro ao atualizar disponibilidade:', error);
+            throw error;
+        }
     },
 
-    updateEmployeeAvailability: async (employeeId, availability) => {
-        return await api.put(`/availability/${employeeId}`, availability );
+    createEmployeeAvailability: async (employeeId, availability) => {
+        try {
+            const response = await api.post(
+                `/employees/${employeeId}/availabilities`,
+                availability
+        );
+        return response.data;
+        } catch (error) {
+            console.error('Erro ao criar disponibilidade:', error);
+            console.error('Payload enviado:', availability);
+            console.error('Resposta:', error.response?.data);
+            throw error;
+        }
+    },
+
+    deleteEmployeeAvailability: async (employeeId, availabilityId) => {
+        try {
+            await api.delete(`/employees/${employeeId}/availabilities/${availabilityId}`);
+            return { success: true };
+        } catch (error) {
+            console.error('Erro ao deletar disponibilidade:', error);
+            throw error;
+        }
+    },
+
+    updateEmployeeAvailability: async (employeeId, availabilityId, availability) => {
+        try {
+            const response = await api.patch(
+                `/employees/${employeeId}/availabilities/${availabilityId}`,
+                availability
+        );
+        return response.data;
+        } catch (error) {
+            console.error('Erro ao atualizar disponibilidade:', error);
+            throw error;
+        }
+    },
+
+    replaceAllAvailabilities: async (employeeId, availabilities) => {
+        try {
+            const current = await AvailabilityApi.getAvailabilityEmployee(employeeId);
+            if (current && current.length > 0) {
+                await Promise.all(
+                current.map(av => AvailabilityApi.deleteEmployeeAvailability(employeeId, av.id))
+                );
+        }
+        const created = [];
+            availabilities.forEach(schemasDay => {
+                schemasDay.forEach( async (schema) => {
+                    const newAv = await AvailabilityApi.createEmployeeAvailability(employeeId, schema);
+                    created.push(newAv);
+                })
+            });
+            return created;
+        } catch (error) {
+            console.error('Erro ao substituir disponibilidades:', error);
+            throw error;
+        }
     },
 
     addNewEmployee: async (employeeData) => {
-        return await api.post('/employees', employeeData);
+        try {
+            const response = await api.post('/employees', employeeData);
+            return response.data;
+        } catch (error) {
+            console.error('Erro ao criar funcionário:', error);
+            console.error('Resposta:', error.response?.data);
+            throw error;
+        }
     }
 }
 

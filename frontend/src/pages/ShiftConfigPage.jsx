@@ -136,15 +136,16 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         return shiftsSchedule;
     }
 
-    const createSchedule = () => {
+    const createSchedule = async () => {
         const shiftsSchedule = handleShiftsSchedule();
         console.log('shiftsSchedule', shiftsSchedule);
         const week = {
-            startDateWeek: startDate,
-            openDaysMask: openDaysMask,
-            approved: false
+            start_date: startDate.toISOString().split('T')[0],
+            open_days: openDaysMask
         }
-        const responseWeek = ShiftConfigApi.submitWeekData(week);
+        console.log('Semana que vai ser criada', week);
+        const responseWeek = await ShiftConfigApi.submitWeekData(week);
+        console.log('Semana criada', responseWeek.data);
         ShiftConfigApi.createShcedule(responseWeek.data, shiftsSchedule);
         onPageChange(7);
     }

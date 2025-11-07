@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
-import {AvailabilityApi} from '../services/api.js';
+import {AvailabilityApi, StaffApi} from '../services/api.js';
 import { employeesAvailability } from '../MockData.js';
 
 function AvailabilityPage({
@@ -18,6 +18,7 @@ function AvailabilityPage({
   const [isActive, setIsActive] = useState(selectEditEmployee?.active ?? true);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [paintMode, setPaintMode] = useState(true);
+  const [error, setError] = useState(null);
 
   const initializeAvailability = () => {
     const initial = {};
@@ -34,12 +35,17 @@ function AvailabilityPage({
   const updateAvaibility = (schemas) => {
     const updateAvailability = initializeAvailability();
     schemas.forEach(schema => {
-      let startTime = parseInt(schema.startTime.split(':')[0]);
-      const endTime = parseInt(schema.endTime.split(':')[0]);
+      let start_time = parseInt(schema.start_time.split(':')[0]);
+      let end_time = schema.end_time;
+      if (end_time === '23:59:59') {
+        end_time = 24;
+      } else {
+        end_time = parseInt(schema.end_time.split(':')[0])
+      }
       const weekday = days[schema.weekday];
-      Array.from({ length: endTime-startTime }).forEach(() => {
-        const slotsTime = `${startTime.toString().padStart(2, '0')}:00`;
-        startTime = startTime + 1;
+      Array.from({ length: end_time-start_time }).forEach(() => {
+        const slotsTime = `${start_time.toString().padStart(2, '0')}:00`;
+        start_time = start_time + 1;          
         updateAvailability[weekday][slotsTime] = true;
       });
     });
@@ -51,8 +57,7 @@ function AvailabilityPage({
     if (!selectEditEmployee?.id) return;
     async function fetchEmployee() {
       try {
-        const response = await AvailabilityApi.getAvailabilityEmployee(selectEditEmployee.id);
-        const ListSchemas = response.data;
+        const ListSchemas = await AvailabilityApi.getAvailabilityEmployee(selectEditEmployee.id);
         updateAvaibility(ListSchemas);
       } catch (err) {
         console.error(err);
@@ -97,7 +102,7 @@ function AvailabilityPage({
     onPageChange(1);
   };
 
-  const handleAvaibilitySchemas = () => {
+  const convertAvailabilityToSchemas = () => {
     const SlotsDay = [];
     days.forEach((day, index) => {
       let slotsActive = [];
@@ -110,8 +115,8 @@ function AvailabilityPage({
           slotsActive.push(hour);
         } else if (!slot && slotPrevious) {
           SlotsDay[index].push({
-            startTime: slotsActive[0],
-            endTime: hour
+            start_time: slotsActive[0],
+            end_time: hour
           });
           slotsActive = [];
         }
@@ -119,8 +124,8 @@ function AvailabilityPage({
       });
       if (slotPrevious && slotsActive.length > 0) {
           SlotsDay[index].push({
-            startTime: slotsActive[0],
-            endTime: '24:00:00'
+            start_time: slotsActive[0],
+            end_time: '23:59:59'
           });
       }
     })
@@ -130,8 +135,8 @@ function AvailabilityPage({
       schemas.forEach((slot, index) => {
         availabilitySchemas[day][index] = {
           weekday: day,
-          startTime: slot.startTime,
-          endTime: slot.endTime
+          start_time: slot.start_time,
+          end_time: slot.end_time
         }
       })
     })
@@ -140,35 +145,39 @@ function AvailabilityPage({
   }
 
   const handleSave = async () => {
-      if (selectEditEmployee?.id) {
-        const availabilitySchemas = handleAvaibilitySchemas();
-        console.log('days:', days);
-        console.log('availabilitySchemas:', availabilitySchemas);
-        days.map((day, index) => {
-          availabilitySchemas[index].map(schema => {
-            AvailabilityApi.updateEmployeeAvailability(selectEditEmployee.id, schema );
-            console.log('Funcionário atualizado:', {id: selectEditEmployee.id, name: name, active: isActive, schema});
-          })
-        })
-      } else {
-        const availabilitySchemas = handleAvaibilitySchemas();
-        const Data = {
+    if (!name.trim()) {
+      setError('Nome do funcionário é obrigatório');
+      return;
+    }
+    setError(null);
+    try {
+      const availabilitySchemas = convertAvailabilityToSchemas();
+      console.log('Schemas gerados:', availabilitySchemas);
+
+      let employeeId = selectEditEmployee?.id;
+      if (!employeeId) {
+        console.log('Criando novo funcionário...');
+        const newEmployee = await AvailabilityApi.addNewEmployee({
           name: name,
-          active: isActive,
-        };
-        console.log('Funcionário atualizado:', { name: name, active: isActive, availabilitySchemas})
-        const response = await AvailabilityApi.addNewEmployee(Data);
-        const newEmployeeId = response.data.id;
-        console.log('Novo funcionário adicionado:', Data);
-        days.map((day, index) => {
-          availabilitySchemas[index].map(schema => {
-            AvailabilityApi.addNewEmployee(newEmployeeId, schema );
-            console.log('Funcionário atualizado:', {id: newEmployeeId, name: name, active: isActive, schema});
-          })
-        })
+          active: isActive
+        });
+        employeeId = newEmployee.id;
+        console.log('Funcionário criado:', newEmployee);
+      } else {
+        console.log('Atualizando funcionário existente...');
+        await StaffApi.updateEmployeeData(employeeId, { name, active: isActive });
       }
+      console.log('Salvando disponibilidades...');
+      await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
+      
+      console.log(' Funcionário e disponibilidades salvos com sucesso!');
       setSelectEditEmployee(null);
       onPageChange(1);
+
+    } catch (err) {
+      console.error('Erro ao salvar:', err);
+      setError(err.response?.data?.detail || 'Erro ao salvar funcionário. Verifique o console.');
+    }
   };
     
   if (isLoading) {
