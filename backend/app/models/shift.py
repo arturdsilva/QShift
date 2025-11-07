@@ -18,7 +18,7 @@ from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 
 from .base import Base
-
+import app.domain.shift as domain
 
 class Shift(Base):
     __tablename__ = "shift"
@@ -68,3 +68,6 @@ class Shift(Base):
         foreign_keys="[ShiftAssignment.user_id, ShiftAssignment.shift_id]",
         overlaps="employee,assignments",
     )
+
+    def to_domain(self):
+        return domain.Shift(self.id, self.weelday, self.start_time, self.end_time, self.min_staff)

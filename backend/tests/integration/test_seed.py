@@ -1,7 +1,8 @@
 from fastapi.testclient import TestClient
 from app.main import app
+import pytest
 
-
+@pytest.mark.integration
 def test_seed_happy_flow():
     c = TestClient(app)
     

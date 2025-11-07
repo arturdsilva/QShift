@@ -1,54 +1,17 @@
 from uuid import UUID
-from fastapi import APIRouter, status, Response, Depends, HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException
 from sqlalchemy.orm import Session
+from typing import Tuple
 
 import app.schemas.schedule as schemas
+import app.services.schedule as schedule_service
 from app.models import ShiftAssignment, Employee
 from app.models.shift import Shift
-from app.models.week import Week
 from app.api.dependencies import current_user_id
 from app.core.db import get_session
+from app.services.schedule import ScheduleGenerator
 
 router = APIRouter(prefix="/weeks/{week_id}/schedule", tags=["schedule"])
-
-
-def _build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
-    shifts = (
-        db.query(Shift).filter(Shift.week_id == week_id, Shift.user_id == user_id).all()
-    )
-    schedule_shifts_out = []
-    shift: Shift
-    for shift in shifts:
-        assignments = (
-            db.query(ShiftAssignment)
-            .filter(
-                ShiftAssignment.shift_id == shift.id,
-                ShiftAssignment.user_id == user_id,
-            )
-            .all()
-        )
-        schedule_shift_employees_out = []
-        for assignment in assignments:
-            employee = (
-                db.query(Employee).filter(Employee.id == assignment.employee_id).first()
-            )
-            schedule_shift_employees_out.append(
-                schemas.ScheduleShiftEmployeeOut(
-                    employee_id=employee.id, name=str(employee.name)
-                )
-            )
-        schedule_shifts_out.append(
-            schemas.ScheduleShiftOut(
-                shift_id=shift.id,
-                weekday=shift.weekday,
-                start_time=shift.start_time,
-                end_time=shift.end_time,
-                min_staff=shift.min_staff,
-                employees=schedule_shift_employees_out,
-            )
-        )
-    return schemas.ScheduleOut(shifts=schedule_shifts_out)
-
 
 # CREATE
 @router.post(
@@ -60,12 +23,6 @@ def create_schedule(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    week = db.query(Week).filter(Week.user_id == user_id, Week.id == week_id).first()
-    if week is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Week not found"
-        )
-
     for schedule_shift in payload.shifts:
         if db.get(Shift, schedule_shift.shift_id) is None:
             raise HTTPException(
@@ -85,7 +42,7 @@ def create_schedule(
 
     db.commit()
 
-    return _build_schedule_schema_from_db(week_id, user_id, db)
+    return schedule_service.build_schedule_schema_from_db(week_id, user_id, db)
 
 
 # READ
@@ -95,4 +52,22 @@ def read_schedule(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    return _build_schedule_schema_from_db(week_id, user_id, db)
+    return schedule_service.build_schedule_schema_from_db(week_id, user_id, db)
+
+
+# GENERATE PREVIEW SCHEDULE
+@router.get("", response_model=Tuple[bool, schemas.ScheduleOut], status_code=status.HTTP_200_OK)
+def generate_preview_schedule(
+    week_id: UUID,
+    user_id: UUID = Depends(current_user_id),
+    db: Session = Depends(get_session),
+):
+    schedule_generator = ScheduleGenerator.from_db(db=db, user_id=user_id, week_id=week_id)
+    possible = schedule_generator.check_possibility()
+
+    if possible:
+        schedule_out = schedule_generator.generate_schedule()
+    else:
+        schedule_out = None
+
+    return possible, schedule_out
