@@ -239,7 +239,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                                                         e.target.value
                                                     )}
                                                     className="w-full px-2 py-1 bg-slate-700 text-white text-xs rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
-                                                    placeholder="Qtd funcionários"
+                                                    placeholder="Number of employees"
                                                 />
                                             </div>
                                         ) : (

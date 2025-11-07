@@ -55,8 +55,13 @@ export const StaffApi = {
         }
     },
 
-    toggleActive: async (employeeId, isActive) => {
-        return await api.patch(`/employees/${employeeId}/toggle-active`, {active: isActive});
+    deleteEmployee : async (employee_id) => {
+        try {
+            return await api.delete(`/employees/${employee_id}`);
+        } catch (error) {
+            console.error('Erro ao remover o funcionário:', error);
+            throw error;
+        }
     }
 };
 
@@ -172,5 +177,11 @@ export const GeneratedScheduleApi = {
 export const LoginApi = {
     authenticateUser: async (username, password) => {
         return await api.post('/login', {username, password});
+    }
+}
+
+export const CalendarApi = {
+    getWeeks: async () => {
+        return await api.get('/weeks');
     }
 }

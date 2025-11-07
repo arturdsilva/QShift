@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {Users, Plus, ArrowRight} from 'lucide-react';
+import {Users, Plus, ArrowRight, Trash2} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 import {StaffApi} from '../services/api.js';
@@ -13,23 +13,32 @@ function StaffPage({
     employees,
     setEmployees
   }) {
-    useEffect(() => {
-    async function employeeData() {
-        setIsLoading(true);
-        try {
-        const staffResponse = await StaffApi.getAll();
-        setEmployees(staffResponse.data);
+  useEffect(() => {
+  async function employeeData() {
+      setIsLoading(true);
+      try {
+      const staffResponse = await StaffApi.getAll();
+      setEmployees(staffResponse.data);
 
-        console.log('Fetched Employees:', staffResponse.data);
-        } catch (error) {
-        console.error('Erro ao carregar dados da API:', error);
-        } finally {
-            setIsLoading(false);
-        }
+      console.log('Fetched Employees:', staffResponse.data);
+      } catch (error) {
+      console.error('Erro ao carregar dados da API:', error);
+      } finally {
+          setIsLoading(false);
+      }
+  }
+  employeeData();
+  }, []);
+  
+  const handleDeleteEmployee = async (employeeId) => {
+    try {
+      await StaffApi.deleteEmployee(employeeId);
+      setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== employeeId));
+      console.log('Funcionário removido com sucesso');
+    } catch (error) {
+      console.error('Erro ao deletar funcionário:', error);
     }
-    employeeData();
-    }, []);
-
+  };
 
   const handleAddEmployee = () => {
       console.log('Add employee');
@@ -48,6 +57,7 @@ function StaffPage({
       console.warn('Funcionário não encontrado:', employeeId);
     }
   };
+  
   const handleToggleActive = async (employeeId, currentStatus) => {
     const emp = employees.find(e => e.id === employeeId);
     if (emp) {
@@ -61,12 +71,14 @@ function StaffPage({
   };
 
   const handleAdvance = () => {
+      setIsLoading(true);
       onPageChange(2);
+
   };
 
   if (isLoading) {
       return (
-          <BaseLayout showSidebar={false} currentPage={7} onPageChange={onPageChange}>
+          <BaseLayout showSidebar={false} currentPage={1} onPageChange={onPageChange}>
               <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
                       <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -82,16 +94,16 @@ function StaffPage({
       
       <div className="space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {/* Cards dos funcionários existentes */}
-          {employees.map((employee) => (
-            <div
-              key={employee.id}
-              className="bg-slate-800 rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-200"
-            >
+        {employees.map((employee) => (
+          <div 
+            key={employee.id}
+            className='flex bg-slate-800 rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-200 overflow-hidden'
+          >
+            <div className="flex-1">
               {/* Área clicável para edição */}
               <div
                 onClick={() => handleEditEmployee(employee.id)}
-                className="p-6 cursor-pointer hover:bg-slate-750 transition-colors rounded-t-lg"
+                className="p-6 cursor-pointer hover:bg-slate-750 transition-colors"
               >
                 <div className="text-lg font-medium text-white mb-1">
                   {employee.name}
@@ -120,7 +132,19 @@ function StaffPage({
                 </label>
               </div>
             </div>
-          ))}
+            
+            {/* Botão de delete */}
+            <div className="flex items-stretch border-l border-slate-700">
+              <button
+                onClick={() => handleDeleteEmployee(employee.id)}
+                className="px-4 bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white transition-all duration-200 group flex items-center justify-center"
+                title="Delete employee"
+              >
+                <Trash2 className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              </button>
+            </div>
+          </div>
+        ))}
           
           {/* Card para adicionar novo funcionário */}
           <button

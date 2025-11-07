@@ -1,7 +1,9 @@
+import { useState, useEffect } from 'react';
 import { Calendar, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout';
 import CalendarTable from '../components/CalendarTable';
 import Header from '../components/Header';
+import {CalendarApi} from '../services/api.js';
 
 function CalendarPage ({ 
   onPageChange,
@@ -14,8 +16,26 @@ function CalendarPage ({
   selectedDays,
   setSelectedDays,
   startDate,
-  setStartDate
+  setStartDate,
+  isLoading,
+  setIsLoading
   }) {
+  const [generatedWeeks, setGeneratedWeeks] = useState([]);
+  useEffect(() => {
+    async function getWeeks() {
+        try {
+        const weekResponse = await CalendarApi.getWeeks();
+        setGeneratedWeeks(weekResponse.data);
+
+        console.log('Semanas recebidas com sucesso:', weekResponse.data);
+        } catch (error) {
+        console.error('Erro ao carregar dados da API:', error);
+        } finally {
+          setIsLoading(false)
+        }
+    }
+  getWeeks();
+  }, []);
 
   const handlePrevMonth = () => {
     if (currentMonth === 1) {
@@ -69,10 +89,23 @@ function CalendarPage ({
     onPageChange(1);
   };
 
-const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'
+  ];
+
+  if (isLoading) {
+      return (
+          <BaseLayout showSidebar={false} currentPage={2} onPageChange={onPageChange}>
+              <div className="flex items-center justify-center min-h-screen">
+                  <div className="text-center">
+                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                      <p className="text-slate-400">Loading...</p>
+                  </div>
+              </div>
+          </BaseLayout>
+      );
+  }
 
   return (
     <BaseLayout 
@@ -113,6 +146,7 @@ const months = [
         selectedWeek={selectedWeek}
         onToggleDay={toggleDay}
         onToggleWeek={toggleWeek}
+        generatedWeeks={generatedWeeks}
       />
       <div className="flex mt-4">
         <div className="flex-1 justify-start flex">

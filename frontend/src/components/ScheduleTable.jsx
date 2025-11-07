@@ -154,63 +154,106 @@ function ScheduleTable({
                 </tr>
               </thead>
               <tbody>
-                {Array.from({ length: maxSlots }).map((_, rowIndex) => (
-                  <tr key={rowIndex} className="border-t border-slate-700">
-                    {days_of_week.map(day => {
-                        const dayData = scheduleData[day];
-                        const slot = dayData[rowIndex];
-                        const employees = slot ? (slot.employees || []) : [];
-                        const isUnderStaffed = slot ? employees.length < slot.minEmployees : false;
-                        
-                        return (
-                        <React.Fragment key={day}>
-                            {visibleSlots[day] && (
-                              <td
-                              
-                              className="px-3 py-3 bg-slate-750 border-r border-slate-600 text-xs">
-                                  {slot ? (
-                                  <div>
-                                      <div className="font-medium text-white">
-                                      {slot.startTime}-{slot.endTime}
-                                      </div>
-                                  </div>
-                                  ) : (
-                                  <div className="text-slate-700">—</div>
-                                  )}
-                              </td>                              
-                            )}
-                            <td
-                            onClick={() => slot && editMode && handleEmployeeSelector(slot, day)}
-                            className={`px-2 py-3 border-r border-slate-600 last:border-r-0 
-                              ${editMode && slot ? 'cursor-pointer hover:bg-slate-700' : ''} 
-                              ${isUnderStaffed ? 'bg-red-900 bg-opacity-50' : ''}`}
-                            >
-                            <div className="min-h-[80px] flex flex-col gap-1">
-                                {slot ? (
-                                <>
-                                    {employees.length > 0 ? (
-                                    employees.map((emp, i) => (
-                                        <div
-                                        key={i}
-                                        className="px-2 py-1.5 bg-blue-600/50 text-white text-xs rounded text-center font-medium"
-                                        >
-                                        {emp.name}
+                {Array.from({ length: maxSlots }).map((_, rowIndex) => {
+                  return(
+                    <tr key={rowIndex} className="border-t border-slate-700">
+                      {days_of_week.map(day => {
+                          const dayData = scheduleData[day];
+                          const slot = dayData[rowIndex];
+                          const employees = slot ? (slot.employees || []) : [];
+                          const isUnderStaffed = slot ? employees.length < slot.minEmployees : false;
+                          
+                          return (
+                              <React.Fragment key={day}>
+                                  {visibleSlots[day] && (
+                                    <td
+                                    
+                                    className="px-3 py-3 bg-slate-750 border-r border-slate-600 text-xs">
+                                        {slot ? (
+                                        <div>
+                                            <div className="font-medium text-white">
+                                            {slot.startTime}-{slot.endTime}
+                                            </div>
                                         </div>
-                                    ))
-                                    ) : (
-                                    <div className="text-slate-500 text-center text-xs py-6">{slot && editMode ? "click" : "—"}</div>
-                                    )}
-                                </>
-                                ) : (
-                                  <div className="text-slate-700 text-center py-6">—</div>
-                                )}
-                            </div>
-                            </td>
-                        </React.Fragment>
-                        );
-                    })}
-                  </tr>
-                ))}
+                                        ) : (
+                                        <div className="text-slate-700">—</div>
+                                        )}
+                                    </td>                              
+                                  )}
+                                  <td
+                                  onClick={() => slot && editMode && handleEmployeeSelector(slot, day)}
+                                  className={`px-2 py-3 border-r border-slate-600 last:border-r-0 
+                                    ${editMode && slot ? 'cursor-pointer hover:bg-slate-700' : ''} 
+                                    ${isUnderStaffed ? 'bg-red-900 bg-opacity-50' : ''}`}
+                                  >
+                                  <div className="min-h-[80px] flex flex-col gap-1">
+                                      {slot ? (
+                                      <>
+                                        {isUnderStaffed && (
+                                          <div className="text-xs text-red-400 font-medium mb-1">
+                                            {employees.length}/{slot.minEmployees}
+                                          </div>
+                                        )}
+                                        {employees.length > 0 ? (
+                                        employees.map((emp, i) => 
+                                          {
+                                            return(
+                                              <div
+                                              key={i}
+                                              className="px-2 py-1.5 bg-blue-600/50 text-white text-xs rounded text-center font-medium"
+                                              >
+                                              {emp.name}
+                                              </div>       
+                                            )
+                                          }
+
+                                        )
+                                        ) : (
+                                        <div className="text-slate-500 text-center text-xs py-6">{slot && editMode ? "click" : "—"}</div>
+                                        )}
+                                      </>
+                                      ) : (
+                                        <div className="text-slate-700 text-center py-6">—</div>
+                                      )}
+                                  </div>
+                                  </td>
+                              </React.Fragment>
+                          );
+                      })}
+                    </tr>
+                  )
+                })}
+                <tr className="border-t-2 border-slate-600 bg-slate-750">
+                  {days_of_week.map(day => {
+                    const assignedEmployees = [];
+                    employeeList.forEach(employee => {
+                      scheduleData[day].forEach(slot => slot.employees.some(emp=> {if (emp.id === employee.id) {assignedEmployees.push(emp)}}))
+                    })
+                    const onBreak = employeeList.filter(emp => {if (assignedEmployees.every(assigEmp => assigEmp.id !== emp.id)) {return emp}});
+                    return (
+                      <React.Fragment key={day}>
+                        {(visibleSlots[day] && day==='monday') && (
+                          <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
+                              Day off
+                          </th>
+                        )} 
+                        { visibleSlots[day] && day!=='monday' &&(
+                          <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
+                              —
+                          </th>
+                        )}
+                        <td key={day} className="px-2 py-3 border-r border-slate-600 text-center">
+                          <div className="text-slate-400 text-sm">
+                            {onBreak.length > 0 
+                              ? onBreak.map(emp => emp.name).join(', ')
+                              : "—"
+                            }
+                          </div>
+                        </td>
+                      </React.Fragment>
+                    )
+                  })}
+                </tr>
               </tbody>
             </table>
           </div>

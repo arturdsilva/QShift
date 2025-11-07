@@ -40,7 +40,8 @@ function CalendarTable({
     selectedDays,
     selectedWeek,
     onToggleDay,
-    onToggleWeek
+    onToggleWeek,
+    generatedWeeks
 }){
     const weeks = getMonthCalendar(currentYear, currentMonth);
     const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -58,46 +59,58 @@ function CalendarTable({
           <thead>
             <tr className="bg-slate-700">
               {weekDays.map(day => (
-                <th key={day} className="px-4 py-3 text-left text-sm font-bold text-slate-200">
+                <th key={day} className="px-4 py-3 text-center text-sm font-bold text-slate-200">
                   {day}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {weeks.map((week, weekIdx) => (
-              <tr 
-                key={weekIdx} 
-                className="border-t border-slate-700 hover:bg-slate-900 cursor-pointer"
-                onClick={() => onToggleWeek(week, weekIdx)}
-              >
-                {week.map((date, dayIdx) => {
-                  const isCurrentMonth = date.getMonth() + 1 === currentMonth;
-                  const selected = isSelectedDay(date);
-                  const isSelectedWeek = selectedWeek === weekIdx + 1;
-                  
-                  return (
-                    <td key={dayIdx} className="p-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleDay(date, isSelectedWeek);
-                        }}
-                        className={`w-20 px-4 py-3 rounded-lg text-center transition-all ${
-                          selected
-                            ? 'bg-blue-500 text-white font-semibold'
-                            : isCurrentMonth
-                            ? 'text-slate-200 hover:bg-slate-700'
-                            : 'text-slate-500'
-                        }`}
-                      >
-                        {date.getDate()}
-                      </button>
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
+            {weeks.map((week, weekIdx) => {
+              const alreadyExists = generatedWeeks.some(generatedWeek => week[0].toISOString().split('T')[0] === generatedWeek.start_date);
+              return (
+                <tr 
+                  key={weekIdx} 
+                  className={`border-t border-slate-700 transition text-center
+                    ${alreadyExists 
+                      ? "opacity-50 cursor-not-allowed bg-slate-800" 
+                      : "hover:bg-slate-900 cursor-pointer"
+                    }`}
+                  onClick={() => !alreadyExists && onToggleWeek(week, weekIdx)}
+                >
+                  {week.map((date, dayIdx) => {
+                    const isCurrentMonth = date.getMonth() + 1 === currentMonth;
+                    const selected = isSelectedDay(date);
+                    const isSelectedWeek = selectedWeek === weekIdx + 1;
+                    
+                    return (
+                      <td key={dayIdx} className="p-2">
+                        <button
+                          disabled={alreadyExists}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            !alreadyExists && onToggleDay(date, isSelectedWeek);
+                          }}
+                          className={`w-16 px-6 py-3 rounded-lg text-center transition
+                            ${
+                              selected
+                                ? "bg-blue-500 text-white font-semibold"
+                                : isCurrentMonth
+                                  ? alreadyExists
+                                    ? "text-slate-400 cursor-not-allowed"
+                                    : "text-slate-200 hover:bg-slate-700"
+                                  : "text-slate-500"
+                            }
+                          `}
+                        >
+                          {date.getDate()}
+                        </button>
+                      </td>
+                    );
+                  })}
+                </tr>
+              )
+            })}
           </tbody>
         </table>
       </div>

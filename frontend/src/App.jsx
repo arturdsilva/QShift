@@ -47,6 +47,8 @@ function App() {
       setSelectedDays={setSelectedDays}
       startDate={startDate}
       setStartDate={setStartDate}
+      isLoading={isLoading}
+      setIsLoading={setIsLoading}
     />,
     <ReportsPage onPageChange={setCurrentPage} />,
     <SettingsPage onPageChange={setCurrentPage} />,
