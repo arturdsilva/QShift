@@ -10,7 +10,8 @@ function GeneratedSchedule({
     employees,
     setEmployees,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    weekId
 }) {
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const [editMode, setEditMode] = useState(false);
@@ -18,8 +19,8 @@ function GeneratedSchedule({
     async function fetchData() {
         setIsLoading(true);
         try {
-        const scheduleResponse = await GeneratedScheduleApi.getGeneratedSchedule();
-        setScheduleData(scheduleResponse.data);
+        const scheduleResponse = await GeneratedScheduleApi.getGeneratedSchedule(weekId);
+        console.log('schedule', scheduleResponse.data);
 
         console.log('Fetched schedule:', scheduleResponse.data);
         } catch (error) {

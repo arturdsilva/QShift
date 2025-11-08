@@ -5,7 +5,7 @@ import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react
 import { ShiftConfigApi }   from '../services/api.js';
 import { week } from '../MockData.js';
 
-function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
+function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekId}) {
 
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const openDaysMask = [];
@@ -146,6 +146,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         console.log('Semana que vai ser criada', week);
         const responseWeek = await ShiftConfigApi.submitWeekData(week);
         console.log('Semana criada', responseWeek.data);
+        setWeekId(responseWeek.data);
         const requests = shiftsSchedule.map(shift =>
             ShiftConfigApi.createShift(responseWeek.data, shift)
         );
