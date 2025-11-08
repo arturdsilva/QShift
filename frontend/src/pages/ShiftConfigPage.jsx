@@ -232,31 +232,29 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekId}) {
                                                 <div className="flex gap-1">
                                                     <input
                                                         type="time"
-                                                        step="3600"
                                                         value={shift.config[dayIdx].start_time}
                                                         onChange={(e) => {
-                                                            const hour = e.target.value.split(':')[0];
                                                             updateShiftConfig(
-                                                            shift.id, 
-                                                            dayIdx, 
-                                                            'start_time', 
-                                                            `${hour}:00`
-                                                        )}}
+                                                                shift.id, 
+                                                                dayIdx, 
+                                                                'start_time', 
+                                                                e.target.value
+                                                            )
+                                                        }}
                                                         className="w-full px-2 py-1 bg-slate-700 text-white text-xs rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
                                                         placeholder="Begin"
                                                     />
                                                     <input
                                                         type="time"
-                                                        step="3600"
                                                         value={shift.config[dayIdx].end_time}
                                                         onChange={(e) => {
-                                                            const hour = e.target.value.split(':')[0];
                                                             updateShiftConfig(
-                                                            shift.id, 
-                                                            dayIdx, 
-                                                            'end_time', 
-                                                            `${hour}:00`
-                                                        )}}
+                                                                shift.id, 
+                                                                dayIdx, 
+                                                                'end_time', 
+                                                                e.target.value
+                                                            )
+                                                        }}
                                                         className="w-full px-2 py-1 bg-slate-700 text-white text-xs rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
                                                         placeholder="End"
                                                     />
