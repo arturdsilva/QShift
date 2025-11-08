@@ -127,8 +127,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekId}) {
                         weekday: shift.weekday,
                         start_time: shift.start_time,
                         end_time: shift.end_time,
-                        min_staff: Number(shift.min_staff),
-                        week_id: weekId
+                        min_staff: Number(shift.min_staff)
                     });
                 }
             });
