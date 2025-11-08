@@ -146,9 +146,11 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         console.log('Semana que vai ser criada', week);
         const responseWeek = await ShiftConfigApi.submitWeekData(week);
         console.log('Semana criada', responseWeek.data);
-        shiftsSchedule.forEach(shift => {
-            ShiftConfigApi.createShift(responseWeek.data, shift);
-        })
+        const requests = shiftsSchedule.map(shift =>
+            ShiftConfigApi.createShift(responseWeek.data, shift)
+        );
+        await Promise.all(requests);
+        console.log('Todos os turnos criados com sucesso!');
         onPageChange(7);
     }
  
