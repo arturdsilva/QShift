@@ -86,12 +86,14 @@ function GeneratedSchedule({
     const handleShiftsSchedule = () => {
         const shiftsSchedule = {shifts:[]};
         days_of_week.forEach(day => {
-            scheduleData[day].forEach(shift => {
-                shiftsSchedule.shifts.push({
-                    shift_id: shift.shift_id,
-                    employee_ids: shift.employees.map(employee => employee.employee_id)
-                })
-            }) 
+            if (scheduleData[day]) {
+                scheduleData[day].forEach(shift => {
+                    shiftsSchedule.shifts.push({
+                        shift_id: shift.id,
+                        employee_ids: shift.employees.map(employee => employee.id)
+                    });
+                });
+            }
         })
         return shiftsSchedule;
     }

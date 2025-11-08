@@ -184,8 +184,14 @@ export const GeneratedScheduleApi = {
         }
     },
     
-    approvedSchedule: async (schedule) => {
-        return await api.post('/schedule', schedule);
+    approvedSchedule: async (week_id, schedule) => {
+        try {
+            return await api.post(`/weeks/${week_id}/schedule`, schedule);
+        } catch (error) {
+            console.error('Erro ao enviar a escala aprovada:', error);
+            throw error;
+        }
+
     }
 }
 
