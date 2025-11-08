@@ -350,60 +350,15 @@ class ScheduleGenerator:
                 f"\033[91mWARNING:\033[0mNo feasible solution found for step 2. Status: ", solver2.StatusName()
             )
             chosen_after_2 = solver1
-            best_over_val = None
         else:
             chosen_after_2 = solver2
-            best_over_val = solver2.ObjectiveValue()
-
-        # Optional: tolerance to over-usage loss during the third step
-        over_tolerance = 0.2
-        if over_vars and best_over_val is not None:
-            model.Add(sum(over_vars) <= int((1.0 + over_tolerance) * best_over_val))
-
-        # Step 3: Schedule time consistency (penalizes shifts in different times for one employee over the week)
-
-        # time_anchor = {  # Anchor time for each employee
-        #     e: model.NewIntVar(self.min_start, self.max_start, f"time_anchor[{e}]")
-        #     for e in range(self.num_employees)
-        # }
-        #
-        # y = []  # Deviation from anchor time
-        # for e in range(self.num_employees):
-        #     for t in range(self.num_shifts):
-        #         M = 1440
-        #         y_et = model.NewIntVar(0, M, f"y[{e},{t}]")
-        #         model.Add(y_et + time_anchor[e] >= self.start_time_minutes[t] - (M - M * x[e][t]))
-        #         model.Add(y_et - time_anchor[e] >= - self.start_time_minutes[t] - (M - M * x[e][t]))
-        #         model.Add(y_et <= M * x[e][t])
-        #         y.append(y_et)
-        #
-        # # Use step 2 as a hint for step 3
-        # for e in range(self.num_employees):
-        #     for t in range(self.num_shifts):
-        #         model.AddHint(x[e][t], chosen_after_2.Value(x[e][t]))
-        #
-        # model.Minimize(sum(y))
-        # solver3 = cp_model.CpSolver()
-        # solver3.parameters.max_time_in_seconds = 15.0
-        # solver3.parameters.num_search_workers = self.num_search_workers
-        # status3 = solver3.Solve(model)
-        #
-        # if status3 == cp_model.OPTIMAL or status3 == cp_model.FEASIBLE:
-        #     final_solver = solver3
-        # else:
-        #     print(
-        #         f"\033[91mWARNING:\033[0mNo feasible solution found for step 3. Status: ",
-        #         solver3.StatusName(status3),
-        #     )
-        #     final_solver = chosen_after_2
-        final_solver = chosen_after_2
 
         # Building Schema (ScheduleOut)
         schedule_shifts_out: List[schemas.ScheduleShiftOut] = []
         for t in range(self.num_shifts):
             employees_out: List[schemas.ScheduleShiftEmployeeOut] = []
             for e in range(self.num_employees):
-                if final_solver.Value(x[e][t]) == 1:
+                if chosen_after_2.Value(x[e][t]) == 1:
                     employees_out.append(
                         schemas.ScheduleShiftEmployeeOut(
                             employee_id=self.employee_ids[e],
