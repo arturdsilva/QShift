@@ -135,7 +135,7 @@ class ScheduleGenerator:
     ) -> Tuple[List[UUID], List[str]]:
         from app.models import Employee
 
-        employees = db.query(Employee.id).filter(Employee.user_id == user_id).all()
+        employees = db.query(Employee).filter(Employee.user_id == user_id, Employee.active == True ).all()
         employee_ids = []
         employee_names = []
         for employee in employees:

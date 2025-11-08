@@ -21,7 +21,7 @@ class ShiftBase(BaseModel):
 
 
 class ShiftCreate(ShiftBase):
-    week_id: uuid.UUID = Field(..., description="Week on which the shift occurs")
+    pass
 
 
 class ShiftUpdate(BaseModel):

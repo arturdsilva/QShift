@@ -5,11 +5,10 @@ from datetime import time
 from typing import List
 from pydantic import BaseModel, Field
 import app.core.constants as constants
-
+from typing import Optional
 
 class ScheduleOut(BaseModel):
     shifts: List[ScheduleShiftOut]
-
 
 class ScheduleShiftOut(BaseModel):
     shift_id: uuid.UUID
@@ -21,7 +20,6 @@ class ScheduleShiftOut(BaseModel):
     )
     employees: List[ScheduleShiftEmployeeOut]
 
-
 class ScheduleShiftEmployeeOut(BaseModel):
     employee_id: uuid.UUID
     name: str = Field(
@@ -30,11 +28,13 @@ class ScheduleShiftEmployeeOut(BaseModel):
         description="Employee's name",
     )
 
-
 class ScheduleCreate(BaseModel):
     shifts: List[ScheduleShiftCreate]
-
 
 class ScheduleShiftCreate(BaseModel):
     shift_id: uuid.UUID
     employee_ids: List[uuid.UUID]
+
+class SchedulePreviewOut(BaseModel):
+    possible: bool
+    schedule: Optional[ScheduleOut] = None

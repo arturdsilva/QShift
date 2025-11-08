@@ -3,55 +3,120 @@ import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
 import { useState, useEffect } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
-import { initialSchedule, initialScheduleEmpty, week } from '../MockData.js';
+import {initialScheduleEmpty} from '../MockData.js';
 
 function GeneratedSchedule({
     onPageChange,
     employees,
     setEmployees,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    weekData
 }) {
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const [editMode, setEditMode] = useState(false);
-    console.log('employees', employees);
-    useEffect(() => {
-    async function fetchData() {
-        setIsLoading(true);
-        try {
-        const scheduleResponse = await GeneratedScheduleApi.getGeneratedSchedule();
-        setScheduleData(scheduleResponse.data);
+    const [isPossible, setIsPossible] = useState(true);
+    const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
 
-        console.log('Fetched schedule:', scheduleResponse.data);
-        } catch (error) {
-        console.error('Erro ao carregar dados da API:', error);
-        setScheduleData(initialSchedule);
-        } finally {
-            setIsLoading(false);
-        }
+    const convertScheduleData = (shifts) => {
+        const scheduleModified = {
+            monday: [],
+            tuesday: [],
+            wednesday: [],
+            thursday: [],
+            friday: [],
+            saturday: [],
+            sunday: []
+        };
+        shifts.forEach(shift => {
+            const dayName = days_of_week[shift.weekday];
+            scheduleModified[dayName].push({
+                id: shift.shift_id,
+                startTime: shift.start_time.slice(0, 5),
+                endTime: shift.end_time.slice(0, 5),
+                minEmployees: shift.min_staff,
+                employees: shift.employees.map(emp => ({
+                    id: emp.employee_id,
+                    name: emp.name
+                }))
+            });
+        });
+        setScheduleData(scheduleModified);
     }
 
-    fetchData();
-    }, []);
+    useEffect(() => {
+        async function generateSchedule() {
+            setIsLoading(true);
+            try {
+                const response = await GeneratedScheduleApi.generateSchedulePreview(weekData.id);
+                
+                if (response.data.possible && response.data.schedule) {
+                    convertScheduleData(response.data.schedule.shifts);
+                    setIsPossible(true);
+                    console.log('A escala possible:', response.data.possible);
+                    console.log('A escala criada:', response.data.schedule);
+                    console.log('Turnos:', response.data.schedule.shifts);
+                } else {
+                    setIsPossible(false);
+                    alert('Não foi possível gerar uma escala viável com as configurações atuais.');
+                }
+            } catch (error) {
+                console.error('Erro ao gerar escala:', error);
+                alert('Erro ao gerar escala. Verifique as configurações de turnos e funcionários.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        
+        if (weekData.id) {
+            generateSchedule();
+        }
+    }, [weekData.id]);
 
-    function handleCancel() {
+    const handleCancel = async () => {
+        if (weekData) {
+            try {
+                const response = await GeneratedScheduleApi.deleteSchedule(weekData.id);
+                console.log('A escala foi deletada com sucesso');
+            } catch (error) {
+                console.error('Erro ao deletar escala:', error);
+            }
+        }
         onPageChange(1);
     };
 
-    function handleEdit() {
+    const handleEdit = () => {
         setEditMode(!editMode);
         onPageChange(7);
     };
 
+    const handleShiftsSchedule = () => {
+        const shiftsSchedule = {shifts:[]};
+        days_of_week.forEach(day => {
+            if (scheduleData[day]) {
+                scheduleData[day].forEach(shift => {
+                    shiftsSchedule.shifts.push({
+                        shift_id: shift.id,
+                        employee_ids: shift.employees.map(employee => employee.id)
+                    });
+                });
+            }
+        })
+        console.log('shiftsSchedule', shiftsSchedule);
+        return shiftsSchedule;
+    }
+
+
     async function handleApproved() {
-    try {
-        const response = await GeneratedScheduleApi.approvedSchedule(scheduleData);
-        console.log('Escala criada com sucesso:', response.data);
-        onPageChange(1);
-    } catch (error) {
-        console.error('Erro ao aprovar a escala:', error);
-        onPageChange(1);
-    }};
+        const shiftsSchedule = handleShiftsSchedule();
+        try {
+            const response = await GeneratedScheduleApi.approvedSchedule(weekData.id, shiftsSchedule);
+            console.log('Escala criada com sucesso:', response.data);
+            onPageChange(1);
+        } catch (error) {
+            console.error('Erro ao aprovar a escala:', error);
+            onPageChange(1);
+        }};
 
     if (isLoading) {
         return (
@@ -76,7 +141,7 @@ function GeneratedSchedule({
                     scheduleData={scheduleData}
                     setScheduleData={setScheduleData}
                     employeeList={employees}
-                    week={week}
+                    week={weekData}
                     editMode={editMode}
                 />
 

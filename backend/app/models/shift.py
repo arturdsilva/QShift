@@ -70,4 +70,4 @@ class Shift(Base):
     )
 
     def to_domain(self):
-        return domain.Shift(self.id, self.weelday, self.start_time, self.end_time, self.min_staff)
+        return domain.Shift(self.id, self.weekday, self.start_time, self.end_time, self.min_staff)

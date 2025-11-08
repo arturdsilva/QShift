@@ -19,6 +19,7 @@ function App() {
   const [startDate, setStartDate] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [weekData, setWeekData] = useState(null);
 
   const pages = [
     <LoginPage
@@ -63,6 +64,7 @@ function App() {
       onPageChange={setCurrentPage}
       selectedDays={selectedDays}
       startDate={startDate}
+      setWeekData={setWeekData}
     />,
     <GeneratedSchedule 
       onPageChange={setCurrentPage}
@@ -70,6 +72,7 @@ function App() {
       setEmployees={setEmployees}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
+      weekData={weekData}
     />
   ];
 

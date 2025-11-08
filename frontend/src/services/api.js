@@ -2,7 +2,7 @@ import axios from 'axios';
 import { week } from '../MockData';
 
 const api = axios.create({
-  baseURL: ' http://127.0.0.1:8000',
+  baseURL: ' http://127.0.0.1:8000/api/v1',
   timeout: 10000,
   headers: {'Content-Type': 'application/json'}
 });
@@ -20,14 +20,13 @@ api.interceptors.request.use(config => {
 });
 
 export const ShiftConfigApi = {
-    createShcedule: async (weekPath, shifts) => {
+    createShift: async (week_id, shiftData) => {
         try {
-            return await api.post(`${weekPath}/schedule`, shifts);
+            return await api.post(`/weeks/${week_id}/shifts`, shiftData);
         } catch (error) {
-            console.error('Erro ao criar uma escala:', error);
+            console.error('Erro ao criar um turno:', error);
             throw error;
         }
-
     },
 
     submitWeekData: async (week) => {
@@ -163,14 +162,41 @@ export const AvailabilityApi = {
 }
 
 export const GeneratedScheduleApi = {
-    getEmployees: async () => {
-        return await api.get('/employees');
+    deleteSchedule: async (week_id) => {
+        try {
+            return await api.delete(`/weeks/${week_id}`);
+        } catch (error) {
+            console.error('Erro ao deletar a semana da escala:', error);
+            throw error;
+        }
     },
-    getGeneratedSchedule: async () => {
-        return await api.get('/schedule');
+
+    generateSchedulePreview: async (week_id) => {
+        try {
+            return await api.get(`/weeks/${week_id}/schedule/preview`);
+        } catch (error) {
+            console.error('Erro ao gerar prévia da escala:', error);
+            throw error;
+        }
     },
-    approvedSchedule: async (schedule) => {
-        return await api.post('/schedule', schedule);
+
+    getGeneratedSchedule: async (week_id) => {
+        try {
+            return await api.get(`/weeks/${week_id}/schedule`);
+        } catch (error) {
+            console.error('Erro ao buscar escala:', error);
+            throw error;
+        }
+    },
+    
+    approvedSchedule: async (week_id, schedule) => {
+        try {
+            return await api.post(`/weeks/${week_id}/schedule`, schedule);
+        } catch (error) {
+            console.error('Erro ao enviar a escala aprovada:', error);
+            throw error;
+        }
+
     }
 }
 

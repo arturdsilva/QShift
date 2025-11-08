@@ -29,7 +29,7 @@ function EmployeeSelector({
           </span>
         </div>
         <div className='space-y-2 max-h-96 overflow-y-auto mb-6'>
-          {employeeList.map(emp => {
+          {employeeList.filter(emp => emp.active).map(emp => {
             const isSelected = assignedEmployees.some(assignedEmp => assignedEmp.id === emp.id);
             return (
               <button
@@ -70,13 +70,15 @@ function ScheduleTable({
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const maxSlots = Math.max(...days_of_week.map(day => scheduleData[day].length));
     const selecetedDaysMap = {};
-    const year = week.startDateWeek.getFullYear();
-    const month = week.startDateWeek.getMonth();
+    const [yearStartDate, monthStartDate, dayStartDate] = week.start_date.split('-').map(Number);
+    const startDate = new Date(yearStartDate, monthStartDate - 1, dayStartDate);
+    const year = startDate.getFullYear();
+    const month = startDate.getMonth();
     const lastDay = new Date(year, month+1, 0);
     days_of_week.forEach((day, index) => {
-      selecetedDaysMap[day] = index + week.startDateWeek.getDate() <= lastDay.getDate()
-        ? index + week.startDateWeek.getDate()
-        : index + week.startDateWeek.getDate() - lastDay.getDate();
+      selecetedDaysMap[day] = index + startDate.getDate() <= lastDay.getDate()
+        ? index + startDate.getDate()
+        : index + startDate.getDate() - lastDay.getDate();
     });
     const handleEmployeeSelector = (slot, day) => {
       setShowEmployeeSelector(true);

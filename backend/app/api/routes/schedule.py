@@ -56,7 +56,7 @@ def read_schedule(
 
 
 # GENERATE PREVIEW SCHEDULE
-@router.get("", response_model=Tuple[bool, schemas.ScheduleOut], status_code=status.HTTP_200_OK)
+@router.get("/preview", response_model=schemas.SchedulePreviewOut, status_code=status.HTTP_200_OK)
 def generate_preview_schedule(
     week_id: UUID,
     user_id: UUID = Depends(current_user_id),
@@ -70,4 +70,4 @@ def generate_preview_schedule(
     else:
         schedule_out = None
 
-    return possible, schedule_out
+    return schemas.SchedulePreviewOut(possible=possible, schedule=schedule_out)

@@ -3,9 +3,8 @@ import Header from '../components/Header';
 import { useState } from 'react';
 import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
 import { ShiftConfigApi }   from '../services/api.js';
-import { week } from '../MockData.js';
 
-function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
+function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekData}) {
 
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const openDaysMask = [];
@@ -22,13 +21,13 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         {
             id: 1,
             config: [
-                {weekday: 0, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[0]},
-                {weekday: 1, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[1]},
-                {weekday: 2, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[2]},
-                {weekday: 3, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[3]},
-                {weekday: 4, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[4]},
-                {weekday: 5, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[5]},
-                {weekday: 6, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[6]},
+                {weekday: 0, start_time: '', end_time: '', min_staff: null},
+                {weekday: 1, start_time: '', end_time: '', min_staff: null},
+                {weekday: 2, start_time: '', end_time: '', min_staff: null},
+                {weekday: 3, start_time: '', end_time: '', min_staff: null},
+                {weekday: 4, start_time: '', end_time: '', min_staff: null},
+                {weekday: 5, start_time: '', end_time: '', min_staff: null},
+                {weekday: 6, start_time: '', end_time: '', min_staff: null},
             ]
         }
     ]);
@@ -39,17 +38,16 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
     };
 
     const addTurn = () => {
-        //TODO: colocar o data em cada turno está relacionado com os dias selecionados
         const newShift = {
             id: Date.now(),
             config: [
-                {weekday: 0, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[0]},
-                {weekday: 1, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[1]},
-                {weekday: 2, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[2]},
-                {weekday: 3, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[3]},
-                {weekday: 4, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[4]},
-                {weekday: 5, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[5]},
-                {weekday: 6, startTime: '', endTime: '', employees: '', localDate: selectedDaysMap[6]},
+                {weekday: 0, start_time: '', end_time: '', min_staff: null},
+                {weekday: 1, start_time: '', end_time: '', min_staff: null},
+                {weekday: 2, start_time: '', end_time: '', min_staff: null},
+                {weekday: 3, start_time: '', end_time: '', min_staff: null},
+                {weekday: 4, start_time: '', end_time: '', min_staff: null},
+                {weekday: 5, start_time: '', end_time: '', min_staff: null},
+                {weekday: 6, start_time: '', end_time: '', min_staff: null},
             ]
         }
         setShifts([...shifts, newShift]);
@@ -82,41 +80,29 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         }));
     };
 
-    // TODO: Trocar quando for para usar arquivos ao invés de localStorage
-    // const fs = require('fs');
-    // const path = require('path');
-
     const saveConfigShift = () => {
         const configToSave = shifts.map(shift => ({
             id: shift.id,
             config: shift.config.map(dayConfig => ({
                 weekday: dayConfig.weekday,
-                startTime: dayConfig.startTime,
-                endTime: dayConfig.endTime,
-                employees: dayConfig.employees
+                start_time: dayConfig.start_time,
+                end_time: dayConfig.end_time,
+                min_staff: dayConfig.min_staff ? Number(dayConfig.min_staff) : null
             }))
         }));
-        // const configPath = path.join(__dirname, 'shiftConfigurations.json');
-        // fs.writeFileSync(configPath, JSON.stringify(configToSave, null, 2));
         localStorage.setItem('shiftConfigurations', JSON.stringify(configToSave));
         console.log("Configurações de turno salvas:", configToSave);
     };
 
     const restoreConfigShift = () => {
-        /* const configPath = path.join(__dirname, 'shiftConfigurations.json');
-        if (!fs.existsSync(configPath)) {
-            console.log("Nenhum arquivo de configuração encontrado.");
-            return;
-        }
-        const savedConfig = fs.readFileSync(configPath); */
         const savedConfig =  localStorage.getItem('shiftConfigurations');
         if (savedConfig) {
             const parsedConfig = JSON.parse(savedConfig);
             const restoredShifts = parsedConfig.map(shift => ({
                 ...shift,
-                config: shift.config.map((dayConfig, index) => ({
+                config: shift.config.map(dayConfig => ({
                     ...dayConfig,
-                    localDate: selectedDaysMap[index] || null
+                    min_staff: dayConfig.min_staff !== null ? Number(dayConfig.min_staff) : null
                 }))
             }));
             setShifts(restoredShifts);
@@ -126,30 +112,77 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
         }
     }
 
-    const handleShiftsSchedule = () => {
+    const handleShiftsSchedule = (weekId) => {
         let shiftsSchedule = [];
         shifts.forEach(weekShift => {
             weekShift.config.forEach(shift => {
-                shiftsSchedule.push(shift);
-            })
-        })
+                const isDaySelected = selectedDaysMap[shift.weekday] !== undefined;
+                
+                if (isDaySelected && 
+                    shift.start_time && 
+                    shift.end_time && 
+                    shift.min_staff) {
+                    shiftsSchedule.push({
+                        weekday: shift.weekday,
+                        start_time: shift.start_time,
+                        end_time: shift.end_time,
+                        min_staff: Number(shift.min_staff)
+                    });
+                }
+            });
+        });
+        
         return shiftsSchedule;
-    }
+    };
 
     const createSchedule = async () => {
-        const shiftsSchedule = handleShiftsSchedule();
-        console.log('shiftsSchedule', shiftsSchedule);
-        const week = {
-            start_date: startDate.toISOString().split('T')[0],
-            open_days: openDaysMask
+        try {
+            const week = {
+                start_date: startDate.toISOString().split('T')[0],
+                open_days: openDaysMask
+            };
+            console.log('Criando semana:', week);
+            const responseWeek = await ShiftConfigApi.submitWeekData(week);
+            console.log('Semana criada com sucesso:', responseWeek.data);
+            const weekData = responseWeek.data;
+            setWeekData(weekData);
+
+            const shiftsSchedule = handleShiftsSchedule(weekData.id);
+            console.log('Turnos a serem criados:', shiftsSchedule);
+            if (shiftsSchedule.length === 0) {
+                alert('Nenhum turno válido configurado. Preencha os horários e quantidade de funcionários.');
+                return;
+            }
+            
+            for (const shift of shiftsSchedule) {
+                try {
+                    console.log('Criando turno:', shift);
+                    const response = await ShiftConfigApi.createShift(weekData.id, shift);
+                    console.log('Turno criado:', response.data);
+                } catch (error) {
+                    console.error('Erro ao criar turno específico:', shift, error);
+                    throw error;
+                }
+            }
+            console.log('Todos os turnos criados com sucesso!');
+            alert('Escala criada com sucesso!');
+            onPageChange(7);
+            
+        } catch (error) {
+            console.error('Erro ao criar escala:', error);
+            
+            if (error.response) {
+                console.error('Resposta do servidor:', error.response.data);
+                alert(`Erro: ${error.response.data.detail || 'Erro ao criar escala'}`);
+            } else if (error.request) {
+                console.error('Sem resposta do servidor:', error.request);
+                alert('Erro: Servidor não respondeu. Verifique se o backend está rodando.');
+            } else {
+                console.error('Erro na configuração:', error.message);
+                alert(`Erro: ${error.message}`);
+            }
         }
-        console.log('Semana que vai ser criada', week);
-        const responseWeek = await ShiftConfigApi.submitWeekData(week);
-        console.log('Semana criada', responseWeek.data);
-        ShiftConfigApi.createShcedule(responseWeek.data, shiftsSchedule);
-        onPageChange(7);
-    }
- 
+    };
     return (
         <BaseLayout
             showSidebar={false}
@@ -198,31 +231,29 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                                                 <div className="flex gap-1">
                                                     <input
                                                         type="time"
-                                                        step="3600"
-                                                        value={shift.config[dayIdx].startTime}
+                                                        value={shift.config[dayIdx].start_time}
                                                         onChange={(e) => {
-                                                            const hour = e.target.value.split(':')[0];
                                                             updateShiftConfig(
-                                                            shift.id, 
-                                                            dayIdx, 
-                                                            'startTime', 
-                                                            `${hour}:00`
-                                                        )}}
+                                                                shift.id, 
+                                                                dayIdx, 
+                                                                'start_time', 
+                                                                e.target.value
+                                                            )
+                                                        }}
                                                         className="w-full px-2 py-1 bg-slate-700 text-white text-xs rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
                                                         placeholder="Begin"
                                                     />
                                                     <input
                                                         type="time"
-                                                        step="3600"
-                                                        value={shift.config[dayIdx].endTime}
+                                                        value={shift.config[dayIdx].end_time}
                                                         onChange={(e) => {
-                                                            const hour = e.target.value.split(':')[0];
                                                             updateShiftConfig(
-                                                            shift.id, 
-                                                            dayIdx, 
-                                                            'endTime', 
-                                                            `${hour}:00`
-                                                        )}}
+                                                                shift.id, 
+                                                                dayIdx, 
+                                                                'end_time', 
+                                                                e.target.value
+                                                            )
+                                                        }}
                                                         className="w-full px-2 py-1 bg-slate-700 text-white text-xs rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
                                                         placeholder="End"
                                                     />
@@ -231,11 +262,11 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate}) {
                                                     type="number"
                                                     min="0"
                                                     max="50"
-                                                    value={shift.config[dayIdx].employees}
+                                                    value={shift.config[dayIdx].min_staff}
                                                     onChange={(e) => updateShiftConfig(
                                                         shift.id, 
                                                         dayIdx, 
-                                                        'employees', 
+                                                        'min_staff', 
                                                         e.target.value
                                                     )}
                                                     className="w-full px-2 py-1 bg-slate-700 text-white text-xs rounded border border-slate-600 focus:border-blue-500 focus:outline-none"
