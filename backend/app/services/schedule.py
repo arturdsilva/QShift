@@ -307,15 +307,8 @@ class ScheduleGenerator:
             print(
                 "\033[91mWARNING:\033[0mNo feasible solution found for step 1. Status: ", solver1.StatusName()
             )
-            chosen_after_1 = cp_model.CpSolver()
-            chosen_after_1.parameters.max_time_in_seconds = 15.0
-            chosen_after_1.parameters.num_search_workers = self.num_search_workers
-            chosen_after_1.parameters.stop_after_first_solution = True
-            chosen_after_1.Solve(model)
-        else:
-            chosen_after_1 = solver1
 
-        best_fairness = chosen_after_1.ObjectiveValue()
+        best_fairness = solver1.ObjectiveValue()
 
         fairness_tol = 0.05  # Tolerance to fairness loss during the next steps
         model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
@@ -343,7 +336,7 @@ class ScheduleGenerator:
         # Use solution of step 1 as a hint for step 2
         for e in range(self.num_employees):
             for t in range(self.num_shifts):
-                model.AddHint(x[e][t], chosen_after_1.Value(x[e][t]))
+                model.AddHint(x[e][t], solver1.Value(x[e][t]))
 
         obj_over = sum(over_vars) if over_vars else 0
         model.Minimize(obj_over)
@@ -356,7 +349,7 @@ class ScheduleGenerator:
             print(
                 f"\033[91mWARNING:\033[0mNo feasible solution found for step 2. Status: ", solver2.StatusName()
             )
-            chosen_after_2 = chosen_after_1
+            chosen_after_2 = solver1
             best_over_val = None
         else:
             chosen_after_2 = solver2
