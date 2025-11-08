@@ -166,11 +166,20 @@ export const GeneratedScheduleApi = {
         return await api.get('/employees');
     },
 
+    generateSchedulePreview: async (week_id) => {
+        try {
+            return await api.get(`/weeks/${week_id}/schedule/preview`);
+        } catch (error) {
+            console.error('Erro ao gerar prévia da escala:', error);
+            throw error;
+        }
+    },
+
     getGeneratedSchedule: async (week_id) => {
         try {
-            return await api.post(`/weeks/${week_id}/schedule`);
+            return await api.get(`/weeks/${week_id}/schedule`);
         } catch (error) {
-            console.error('Erro ao criar uma escala:', error);
+            console.error('Erro ao buscar escala:', error);
             throw error;
         }
     },
