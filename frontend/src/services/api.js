@@ -20,14 +20,13 @@ api.interceptors.request.use(config => {
 });
 
 export const ShiftConfigApi = {
-    createShcedule: async (weekPath, shifts) => {
+    createShift: async (week_id, shidtData) => {
         try {
-            return await api.post(`${weekPath}/schedule`, shifts);
+            return await api.post(`/weeks/${week_id}/schedule`, shidtData);
         } catch (error) {
-            console.error('Erro ao criar uma escala:', error);
+            console.error('Erro ao criar uma semana:', error);
             throw error;
         }
-
     },
 
     submitWeekData: async (week) => {
@@ -166,9 +165,16 @@ export const GeneratedScheduleApi = {
     getEmployees: async () => {
         return await api.get('/employees');
     },
-    getGeneratedSchedule: async () => {
-        return await api.get('/schedule');
+
+    getGeneratedSchedule: async (week_id) => {
+        try {
+            return await api.post(`/weeks/${week_id}/schedule`);
+        } catch (error) {
+            console.error('Erro ao criar uma escala:', error);
+            throw error;
+        }
     },
+    
     approvedSchedule: async (schedule) => {
         return await api.post('/schedule', schedule);
     }
