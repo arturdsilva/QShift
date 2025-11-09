@@ -11,11 +11,68 @@ function ScheduleRecordsPage({
     employees,
     setEmployees,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    weeksList
 }) {
     const [editMode, setEditMode] = useState(false);
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
-    
+    const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const [week, setWeek] = useState(weeksList[0] || null);
+
+    const convertScheduleData = (shifts) => {
+        const scheduleModified = {
+            monday: [],
+            tuesday: [],
+            wednesday: [],
+            thursday: [],
+            friday: [],
+            saturday: [],
+            sunday: []
+        };
+        shifts.forEach(shift => {
+            const dayName = days_of_week[shift.weekday];
+            scheduleModified[dayName].push({
+                id: shift.shift_id,
+                startTime: shift.start_time.slice(0, 5),
+                endTime: shift.end_time.slice(0, 5),
+                minEmployees: shift.min_staff,
+                employees: shift.employees.map(emp => ({
+                    id: emp.employee_id,
+                    name: emp.name
+                }))
+            });
+        });
+        setScheduleData(scheduleModified);
+    }
+
+    useEffect(() => {
+        async function generateSchedule() {
+            setIsLoading(true);
+            try {
+                const response = await GeneratedScheduleApi.generateSchedulePreview(week.id);
+                
+                if (response.data.possible && response.data.schedule) {
+                    convertScheduleData(response.data.schedule.shifts);
+                    setIsPossible(true);
+                    console.log('A escala possible:', response.data.possible);
+                    console.log('A escala criada:', response.data.schedule);
+                    console.log('Turnos:', response.data.schedule.shifts);
+                } else {
+                    setIsPossible(false);
+                    alert('Não foi possível gerar uma escala viável com as configurações atuais.');
+                }
+            } catch (error) {
+                console.error('Erro ao gerar escala:', error);
+                alert('Erro ao gerar escala. Verifique as configurações de turnos e funcionários.');
+            } finally {
+                setIsLoading(false);
+            }
+        }
+        
+        if (week.id) {
+            generateSchedule();
+        }
+    }, [week.id]);
     const previousWeek = () => {
 
     };
@@ -67,7 +124,7 @@ function ScheduleRecordsPage({
                         scheduleData={scheduleData}
                         setScheduleData={setScheduleData}
                         employeeList={employees}
-                        week={weekData}
+                        week={week}
                         editMode={editMode}
                     />
                 */}
