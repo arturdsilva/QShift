@@ -51,7 +51,7 @@ function ScheduleRecordsPage({
     }
 
     const formatWeekPeriod = (week) => {
-        if (!week || !week.start_date) return 'No weekly schedule created';
+        if (!week || !week.start_date) return '';
         const [yearStartDate, monthStartDate, dayStartDate] = week.start_date.split('-').map(Number);
         const startDate = new Date(yearStartDate, monthStartDate - 1, dayStartDate);
         const endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
@@ -65,16 +65,15 @@ function ScheduleRecordsPage({
         return `${startDate.getDate()} ${startMonth} - ${endDate.getDate()} ${endMonth} ${startDate.getFullYear()}`;
     }
 
-
     useEffect(() => {
         console.log('entrou useEffect')
         async function generateSchedule() {
             if (!weekRecords?.id) {
-                setIsLoading(false); 
-                return;};
+                setIsLoading(false);
+                return;
+            };
             if (schedulesCache[weekRecords.id]) {
                 setScheduleData(schedulesCache[weekRecords.id]);
-                setIsLoading(false);
                 return;
             }
             setIsLoading(true);
@@ -97,10 +96,8 @@ function ScheduleRecordsPage({
                 setIsLoading(false);
             }
         }
-        
-        if (weekRecords?.id) {
-            generateSchedule();
-        }
+        generateSchedule();
+
     }, [weekRecords?.id]);
     console.log('saiu useEffect')
     const previousWeek = () => {
@@ -171,7 +168,7 @@ function ScheduleRecordsPage({
                     >
                         <ChevronLeft size={24} className="text-slate-300" />
                     </button>
-                    <div className="flex items-center gap-2 min-w-[250px] justify-center">
+                    <div className={`flex items-center gap-2 ${weekRecords ? `min-w-[250px] justify-center` : `justify-center`}`}>
                         <span className="text-lg text-slate-200 font-medium">
                             {formatWeekPeriod(weekRecords)}
                         </span>
@@ -195,18 +192,11 @@ function ScheduleRecordsPage({
                 </div>
             </Header>
             <div>
-                {isLoading ? (
-                    <div className="flex items-center justify-center py-12">
-                        <div className="text-center">
-                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-3"></div>
-                            <p className="text-slate-400">Loading...</p>
-                        </div>
-                    </div>
-                ) : !weekRecords ? (
+                {weeksList.length <= 0 ? (
                     <div className="flex items-center justify-center py-12">
                         <div className="text-center">
                             <p className="text-slate-400 text-lg">
-                                No schedule found for this week
+                                No weekly schedule created
                             </p>
                         </div>
                     </div>
@@ -229,34 +219,32 @@ function ScheduleRecordsPage({
                         />
                     </>
                 )}
-                    <div className="flex mt-4">
-                        {!editMode && (
-                            <div className="flex-1 justify-start flex">
-                                <div className='px-2 py-1.5 rounded text-center font-medium'>
-                                    <button
-                                        onClick={handleBack}
-                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                                    >
-                                        Back
-                                    </button>
-                                </div>
+                <div className="flex mt-4">
+                    {!editMode && (
+                        <div className="flex-1 justify-start flex">
+                            <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                <button
+                                    onClick={handleBack}
+                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                >
+                                    Back
+                                </button>
                             </div>
-                        )}
-                        {weekRecords && (
-                            <div className="justify-end flex flex-1">
-                                <div className='px-2 py-1.5 rounded text-center font-medium'>
-                                    <button
-                                        onClick={editMode ? handleSave : handleEdit}
-                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                                    >
-                                        {editMode ? `Save` : `Edit`}
-                                    </button>
-                                </div>
-                            </div>                            
-                        )}
-
-                    </div>
-
+                        </div>
+                    )}
+                    {weeksList.length > 0 && (
+                        <div className="justify-end flex flex-1">
+                            <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                <button
+                                    onClick={editMode ? handleSave : handleEdit}
+                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                >
+                                    {editMode ? `Save` : `Edit`}
+                                </button>
+                            </div>
+                        </div>                            
+                    )}
+                </div>
             </div>
         </BaseLayout>
     )
