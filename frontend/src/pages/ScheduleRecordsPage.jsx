@@ -1,7 +1,7 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
-import { CalendarRange, ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { CalendarRange, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
 import {initialScheduleEmpty} from '../MockData.js';
@@ -157,16 +157,32 @@ function ScheduleRecordsPage({
                     >
                         <ChevronRight size={24} className="text-slate-300" />
                     </button>
+                    <div className="text-sm text-slate-400 ml-4">
+                        {weeksList.length > 0 
+                        ? `Week ${currentIdxWeek + 1} of ${weeksList.length}`
+                        : `No week`
+                        }
+                    </div>
                 </div>
             </Header>
-            <div className="p-3">
-                <ScheduleTable
-                    scheduleData={scheduleData}
-                    setScheduleData={setScheduleData}
-                    employeeList={employees}
-                    week={weekRecords}
-                    editMode={editMode}
-                />
+            <div>
+                <>
+                    {editMode && (
+                        <div className="flex mb-2 p-2 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+                            <AlertTriangle className="w-5 h-5 text-yellow-200" />
+                            <p className="px-2.5 text-yellow-200 text-sm">
+                                Editing mode is active. Remember to save your changes.
+                            </p>
+                        </div>
+                    )}
+                    <ScheduleTable
+                        scheduleData={scheduleData}
+                        setScheduleData={setScheduleData}
+                        employeeList={employees}
+                        week={weekRecords}
+                        editMode={editMode}
+                    />
+                </>
                 {!editMode ? (
                     <div className="flex mt-4">
                         <div className="flex-1 justify-start flex">
