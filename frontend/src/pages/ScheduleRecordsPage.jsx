@@ -17,7 +17,7 @@ function ScheduleRecordsPage({
     const [editMode, setEditMode] = useState(false);
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const [week, setWeek] = useState(weeksList[0] || null);
+    const [week, setWeek] = useState(weeksList[0]);
 
     const convertScheduleData = (shifts) => {
         const scheduleModified = {
@@ -43,27 +43,22 @@ function ScheduleRecordsPage({
             });
         });
         setScheduleData(scheduleModified);
+        console.log('setou scheduleData', scheduleData)
     }
 
     useEffect(() => {
+        console.log('entrou useEffect')
         async function generateSchedule() {
-            setIsLoading(true);
             try {
-                const response = await GeneratedScheduleApi.generateSchedulePreview(week.id);
-                
-                if (response.data.possible && response.data.schedule) {
-                    convertScheduleData(response.data.schedule.shifts);
-                    setIsPossible(true);
-                    console.log('A escala possible:', response.data.possible);
-                    console.log('A escala criada:', response.data.schedule);
-                    console.log('Turnos:', response.data.schedule.shifts);
-                } else {
-                    setIsPossible(false);
-                    alert('Não foi possível gerar uma escala viável com as configurações atuais.');
+                const response = await GeneratedScheduleApi.getGeneratedSchedule(week.id);
+                console.log('GeneratedScheduleApi', response.data)
+                if (response.data) {
+                    convertScheduleData(response.data.shifts);
+                    console.log('Turnos:', response.data.shifts);
                 }
             } catch (error) {
-                console.error('Erro ao gerar escala:', error);
-                alert('Erro ao gerar escala. Verifique as configurações de turnos e funcionários.');
+                console.error('Erro ao receber a escala:', error);
+                alert('Nenhuma escala foi gerada ainda.');
             } finally {
                 setIsLoading(false);
             }
@@ -73,6 +68,7 @@ function ScheduleRecordsPage({
             generateSchedule();
         }
     }, [week.id]);
+    console.log('saiu useEffect')
     const previousWeek = () => {
 
     };
@@ -88,6 +84,8 @@ function ScheduleRecordsPage({
     const handleBack = () => {
         onPageChange(3)
     };
+
+    
 
     return (
         <BaseLayout
@@ -119,15 +117,13 @@ function ScheduleRecordsPage({
                 </div>
             </Header>
             <div className="p-3">
-                {/*
-                    <ScheduleTable
-                        scheduleData={scheduleData}
-                        setScheduleData={setScheduleData}
-                        employeeList={employees}
-                        week={week}
-                        editMode={editMode}
-                    />
-                */}
+                <ScheduleTable
+                    scheduleData={scheduleData}
+                    setScheduleData={setScheduleData}
+                    employeeList={employees}
+                    week={week}
+                    editMode={editMode}
+                />
                 {!editMode ? (
                     <div className="flex mt-4">
                         <div className="flex-1 justify-start flex">

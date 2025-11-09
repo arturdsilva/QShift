@@ -1,7 +1,8 @@
 import {Users, BarChart3, CalendarDays } from 'lucide-react';
+import { useState, useEffect } from 'react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
-import ReportsApi from '../services/api.js';
+import {ReportsApi} from '../services/api.js';
 
 function ReportsPage({ 
     onPageChange, 
@@ -33,6 +34,7 @@ function ReportsPage({
 
     const handleCard = (card) => {
         if (card.title === 'Generated Scales') {
+            setIsLoading(true);
             onPageChange(8);
         }
     }
