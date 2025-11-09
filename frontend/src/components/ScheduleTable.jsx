@@ -69,17 +69,26 @@ function ScheduleTable({
     const [selectedSlot, setSelectedSlot] = useState(null);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const maxSlots = Math.max(...days_of_week.map(day => scheduleData[day].length));
-    const selecetedDaysMap = {};
-    const [yearStartDate, monthStartDate, dayStartDate] = week.start_date.split('-').map(Number);
-    const startDate = new Date(yearStartDate, monthStartDate - 1, dayStartDate);
-    const year = startDate.getFullYear();
-    const month = startDate.getMonth();
-    const lastDay = new Date(year, month+1, 0);
-    days_of_week.forEach((day, index) => {
-      selecetedDaysMap[day] = index + startDate.getDate() <= lastDay.getDate()
-        ? index + startDate.getDate()
-        : index + startDate.getDate() - lastDay.getDate();
-    });
+
+    const hendleSelecetedDaysMap = () => {
+      if (!week) {
+        return {
+          'monday':null , 'tuesday': null, 'wednesday': null, 'thursday': null, 'friday': null, 'saturday': null, 'sunday': null
+        }
+      }
+      const selecetedDaysMap = {};
+      const [yearStartDate, monthStartDate, dayStartDate] = week.start_date.split('-').map(Number);
+      const startDate = new Date(yearStartDate, monthStartDate - 1, dayStartDate);
+      const year = startDate.getFullYear();
+      const month = startDate.getMonth();
+      const lastDay = new Date(year, month+1, 0);
+      days_of_week.forEach((day, index) => {
+        selecetedDaysMap[day] = index + startDate.getDate() <= lastDay.getDate()
+          ? index + startDate.getDate()
+          : index + startDate.getDate() - lastDay.getDate();
+      });
+      return selecetedDaysMap;
+    }
     const handleEmployeeSelector = (slot, day) => {
       setShowEmployeeSelector(true);
       setSelectedSlot({ slot, day });
@@ -136,23 +145,27 @@ function ScheduleTable({
             <table className="w-full">
               <thead>
                 <tr className="bg-slate-700">
-                  {days_of_week.map(day => (
-                    <React.Fragment key={day}>
-                      {visibleSlots[day] && (
-                        <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
-                            Time Slot
-                        </th>                        
-                      )}
-                      <th className="px-4 py-3 text-center text-sm font-bold text-slate-200 border-r border-slate-600 last:border-r-0">
-                        <div className="flex items-center justify-center gap-2">
-                            <span>{day}</span>
-                        </div>
-                        <div className="text-center text-sm font-bold text-slate-200 mt-1">
-                            <span>{selecetedDaysMap[day]}</span>
-                        </div>
-                      </th>
-                    </React.Fragment>
-                  ))}
+                  {days_of_week.map(day => {
+                    const selecetedDaysMap = hendleSelecetedDaysMap();
+
+                    return (
+                      <React.Fragment key={day}>
+                        {visibleSlots[day] && (
+                          <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
+                              Time Slot
+                          </th>                        
+                        )}
+                        <th className="px-4 py-3 text-center text-sm font-bold text-slate-200 border-r border-slate-600 last:border-r-0">
+                          <div className="flex items-center justify-center gap-2">
+                              <span>{day}</span>
+                          </div>
+                          <div className="text-center text-sm font-bold text-slate-200 mt-1">
+                              <span>{selecetedDaysMap[day]}</span>
+                          </div>
+                        </th>
+                      </React.Fragment>
+                    )
+                  })}
                 </tr>
               </thead>
               <tbody>

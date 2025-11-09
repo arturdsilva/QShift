@@ -4,7 +4,7 @@ import ScheduleTable from '../components/ScheduleTable';
 import { CalendarRange, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
-import {initialScheduleEmpty} from '../MockData.js';
+import {initialScheduleEmpty, week} from '../MockData.js';
 
 function ScheduleRecordsPage({
     onPageChange,
@@ -22,7 +22,7 @@ function ScheduleRecordsPage({
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const [schedulesCache, setShedulesCache] = useState({})
-
+    console.log('week', weekRecords)
     const convertScheduleData = (shifts) => {
         const scheduleModified = {
             monday: [],
@@ -51,6 +51,7 @@ function ScheduleRecordsPage({
     }
 
     const formatWeekPeriod = (week) => {
+        if (!week || !week.start_date) return 'No weekly schedule created';
         const [yearStartDate, monthStartDate, dayStartDate] = week.start_date.split('-').map(Number);
         const startDate = new Date(yearStartDate, monthStartDate - 1, dayStartDate);
         const endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
@@ -68,10 +69,15 @@ function ScheduleRecordsPage({
     useEffect(() => {
         console.log('entrou useEffect')
         async function generateSchedule() {
+            if (!weekRecords?.id) {
+                setIsLoading(false); 
+                return;};
             if (schedulesCache[weekRecords.id]) {
                 setScheduleData(schedulesCache[weekRecords.id]);
+                setIsLoading(false);
                 return;
             }
+            setIsLoading(true);
             try {
                 const response = await GeneratedScheduleApi.getGeneratedSchedule(weekRecords.id);
                 console.log('GeneratedScheduleApi', response.data)
@@ -92,15 +98,16 @@ function ScheduleRecordsPage({
             }
         }
         
-        if (weekRecords.id) {
+        if (weekRecords?.id) {
             generateSchedule();
         }
-    }, [weekRecords.id]);
+    }, [weekRecords?.id]);
     console.log('saiu useEffect')
     const previousWeek = () => {
         if (weeksList.length - 1 > currentIdxWeek) {
             setWeekRecords(weeksList[currentIdxWeek + 1]);
             setCurrentIdxWeek(currentIdxWeek + 1);
+            setEditMode(false);
         }
     };
 
@@ -108,6 +115,7 @@ function ScheduleRecordsPage({
         if (currentIdxWeek > 0) {
             setWeekRecords(weeksList[currentIdxWeek - 1]);
             setCurrentIdxWeek(currentIdxWeek - 1);
+            setEditMode(false);
         }
     };
 
@@ -181,53 +189,73 @@ function ScheduleRecordsPage({
                     <div className="text-sm text-slate-400 ml-4">
                         {weeksList.length > 0 
                         ? `Week ${currentIdxWeek + 1} of ${weeksList.length}`
-                        : `No week`
+                        : ``
                         }
                     </div>
                 </div>
             </Header>
             <div>
-                <>
-                    {editMode && (
-                        <div className="flex mb-2 p-2 bg-yellow-900/20 border border-yellow-700 rounded-lg">
-                            <AlertTriangle className="w-5 h-5 text-yellow-200" />
-                            <p className="px-2.5 text-yellow-200 text-sm">
-                                Editing mode is active. Remember to save your changes.
-                            </p>
-                        </div>
-                    )}
-                    <ScheduleTable
-                        scheduleData={scheduleData}
-                        setScheduleData={setScheduleData}
-                        employeeList={employees}
-                        week={weekRecords}
-                        editMode={editMode}
-                    />
-                </>
-                <div className="flex mt-4">
-                    {!editMode && (
-                        <div className="flex-1 justify-start flex">
-                            <div className='px-2 py-1.5 rounded text-center font-medium'>
-                                <button
-                                    onClick={handleBack}
-                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                                >
-                                    Back
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                    <div className="justify-end flex flex-1">
-                        <div className='px-2 py-1.5 rounded text-center font-medium'>
-                            <button
-                                onClick={editMode ? handleSave : handleEdit}
-                                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                            >
-                                {editMode ? `Save` : `Edit`}
-                            </button>
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-12">
+                        <div className="text-center">
+                            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-3"></div>
+                            <p className="text-slate-400">Loading...</p>
                         </div>
                     </div>
-                </div>
+                ) : !weekRecords ? (
+                    <div className="flex items-center justify-center py-12">
+                        <div className="text-center">
+                            <p className="text-slate-400 text-lg">
+                                No schedule found for this week
+                            </p>
+                        </div>
+                    </div>
+                ) : (
+                    <>
+                        {editMode && (
+                            <div className="flex mb-2 p-2 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+                                <AlertTriangle className="w-5 h-5 text-yellow-200" />
+                                <p className="px-2.5 text-yellow-200 text-sm">
+                                    Editing mode is active. Remember to save your changes.
+                                </p>
+                            </div>
+                        )}
+                        <ScheduleTable
+                            scheduleData={scheduleData}
+                            setScheduleData={setScheduleData}
+                            employeeList={employees}
+                            week={weekRecords}
+                            editMode={editMode}
+                        />
+                    </>
+                )}
+                    <div className="flex mt-4">
+                        {!editMode && (
+                            <div className="flex-1 justify-start flex">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={handleBack}
+                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                        {weekRecords && (
+                            <div className="justify-end flex flex-1">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={editMode ? handleSave : handleEdit}
+                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        {editMode ? `Save` : `Edit`}
+                                    </button>
+                                </div>
+                            </div>                            
+                        )}
+
+                    </div>
 
             </div>
         </BaseLayout>

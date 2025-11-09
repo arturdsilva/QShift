@@ -32,13 +32,13 @@ function ReportsPage({
 
     const reportCards = [
         { title: 'Employees', value: '', icon: Users},
-        { title: 'Generated Scales', value: 'XX', icon: CalendarDays}
+        { title: 'Generated Scales', value: '', icon: CalendarDays}
     ];
 
     const handleCard = (card) => {
         if (card.title === 'Generated Scales') {
             setWeekRecords(weeksList[currentIdxWeek]);
-            //setIsLoading(true);
+            setIsLoading(true);
             onPageChange(8);
         }
     }
