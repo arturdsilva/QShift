@@ -22,6 +22,8 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [weekData, setWeekData] = useState(null);
   const [weeksList, setWeeksList] = useState(null); 
+  const [weekRecords, setWeekRecords] = useState(null);
+  const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
 
   const pages = [
     <LoginPage
@@ -54,10 +56,13 @@ function App() {
       setIsLoading={setIsLoading}
     />,
     <ReportsPage 
-      onPageChange={setCurrentPage} 
+      onPageChange={setCurrentPage}
+      weeksList={weeksList} 
       setWeeksList={setWeeksList}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
+      setWeekRecords={setWeekRecords}
+      currentIdxWeek={currentIdxWeek}
     />,
     <SettingsPage onPageChange={setCurrentPage} />,
     <AvailabilityPage 
@@ -88,6 +93,10 @@ function App() {
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       weeksList={weeksList}
+      weekRecords={weekRecords}
+      setWeekRecords={setWeekRecords}
+      currentIdxWeek={currentIdxWeek}
+      setCurrentIdxWeek={setCurrentIdxWeek}
     />
   ];
 

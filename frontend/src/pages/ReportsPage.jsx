@@ -5,10 +5,13 @@ import Header from '../components/Header.jsx';
 import {ReportsApi} from '../services/api.js';
 
 function ReportsPage({ 
-    onPageChange, 
+    onPageChange,
+    weeksList,
     setWeeksList,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    setWeekRecords,
+    currentIdxWeek
 }) {
     useEffect(() => {
         setIsLoading(true);
@@ -34,7 +37,8 @@ function ReportsPage({
 
     const handleCard = (card) => {
         if (card.title === 'Generated Scales') {
-            setIsLoading(true);
+            setWeekRecords(weeksList[currentIdxWeek]);
+            //setIsLoading(true);
             onPageChange(8);
         }
     }

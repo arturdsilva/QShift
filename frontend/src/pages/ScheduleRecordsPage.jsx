@@ -12,12 +12,15 @@ function ScheduleRecordsPage({
     setEmployees,
     isLoading,
     setIsLoading,
-    weeksList
+    weeksList,
+    weekRecords,
+    setWeekRecords,
+    currentIdxWeek,
+    setCurrentIdxWeek
 }) {
     const [editMode, setEditMode] = useState(false);
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const [week, setWeek] = useState(weeksList[0]);
 
     const convertScheduleData = (shifts) => {
         const scheduleModified = {
@@ -50,7 +53,7 @@ function ScheduleRecordsPage({
         console.log('entrou useEffect')
         async function generateSchedule() {
             try {
-                const response = await GeneratedScheduleApi.getGeneratedSchedule(week.id);
+                const response = await GeneratedScheduleApi.getGeneratedSchedule(weekRecords.id);
                 console.log('GeneratedScheduleApi', response.data)
                 if (response.data) {
                     convertScheduleData(response.data.shifts);
@@ -64,17 +67,23 @@ function ScheduleRecordsPage({
             }
         }
         
-        if (week.id) {
+        if (weekRecords.id) {
             generateSchedule();
         }
-    }, [week.id]);
+    }, [weekRecords.id]);
     console.log('saiu useEffect')
     const previousWeek = () => {
-
+        if (weeksList.length - 1 > currentIdxWeek) {
+            setWeekRecords(weeksList[currentIdxWeek + 1]);
+            setCurrentIdxWeek(currentIdxWeek + 1);
+        }
     };
 
     const nextWeek = () => {
-
+        if (currentIdxWeek > 0) {
+            setWeekRecords(weeksList[currentIdxWeek - 1]);
+            setCurrentIdxWeek(currentIdxWeek - 1);
+        }
     };
 
     const handleEdit = () => {
@@ -85,7 +94,18 @@ function ScheduleRecordsPage({
         onPageChange(3)
     };
 
-    
+    if (isLoading) {
+        return (
+            <BaseLayout showSidebar={false} currentPage={8} onPageChange={onPageChange}>
+                <div className="flex items-center justify-center min-h-screen">
+                    <div className="text-center">
+                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                        <p className="text-slate-400">Loading...</p>
+                    </div>
+                </div>
+            </BaseLayout>
+        );
+    }
 
     return (
         <BaseLayout
@@ -121,7 +141,7 @@ function ScheduleRecordsPage({
                     scheduleData={scheduleData}
                     setScheduleData={setScheduleData}
                     employeeList={employees}
-                    week={week}
+                    week={weekRecords}
                     editMode={editMode}
                 />
                 {!editMode ? (
