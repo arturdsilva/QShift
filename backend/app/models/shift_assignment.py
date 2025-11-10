@@ -1,10 +1,7 @@
 from __future__ import annotations
 import uuid
 
-from datetime import datetime
 from sqlalchemy import (
-    DateTime,
-    ForeignKey,
     ForeignKeyConstraint,
     UniqueConstraint,
     func,
@@ -41,12 +38,6 @@ class ShiftAssignment(Base):
     user_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
     shift_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
     employee_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
-
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        server_default=func.now(),
-        nullable=False,
-    )
 
     shift: Mapped["Shift"] = relationship(
         "Shift",
