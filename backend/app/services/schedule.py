@@ -215,12 +215,6 @@ class ScheduleGenerator:
             for e in range(self.num_employees)
         ]
 
-        # Coverability of the number of employees for each shift
-        # for t in range(self.num_shifts):
-        #     model.Add(
-        #         sum(x[e][t] for e in range(self.num_employees)) == int(self.demand[t])
-        #     )
-
         # Availability
         for e in range(self.num_employees):
             for t in range(self.num_shifts):
@@ -292,8 +286,10 @@ class ScheduleGenerator:
             print(
                 "\033[91mWARNING:\033[0mNo feasible solution found for step 0. Status: ", solver0.StatusName()
             )
-        best0_int = sum(int(solver0.Value(v)) for v in deviation_from_required_staff.values())
-        model.Add(sum(deviation_from_required_staff.values()) <= best0_int)
+        else:
+            best0_int = sum(int(solver0.Value(v)) for v in deviation_from_required_staff.values())
+            if deviation_from_required_staff:
+                model.Add(sum(deviation_from_required_staff.values()) <= best0_int)
 
         # Step 1: Fairness
 
@@ -344,11 +340,9 @@ class ScheduleGenerator:
             chosen_after_1 = solver0
         else:
             chosen_after_1 = solver1
-
-        best_fairness = chosen_after_1.ObjectiveValue()
-
-        fairness_tol = 0.05  # Tolerance to fairness loss during the next step
-        model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
+            best_fairness = chosen_after_1.ObjectiveValue()
+            fairness_tol = 0.05  # Tolerance to fairness loss during the next step
+            model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
 
         # Step 2: penalizes more than one 1 shift by day by person
 
