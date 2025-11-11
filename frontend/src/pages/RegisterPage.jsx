@@ -12,6 +12,10 @@ function RegisterPage({onPageChange}) {
         onPageChange(0);
     }
 
+    const goToLogin = () => {
+        onPageChange(0);
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-slate-900">
             <div className="bg-slate-800 p-8 rounded-lg shadow-lg w-full max-w-md border border-slate-700">
@@ -58,6 +62,17 @@ function RegisterPage({onPageChange}) {
                 >
                     Register
                 </button>
+                <div className="mt-4 text-center">
+                    <p className="text-slate-400 text-sm">
+                        Already have an account?{' '}
+                        <button
+                            onClick={goToLogin}
+                            className="text-blue-500 hover:text-blue-400 font-medium hover:underline transition-colors cursor-pointer"
+                        >
+                            Login
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );
