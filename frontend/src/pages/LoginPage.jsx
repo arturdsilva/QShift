@@ -32,6 +32,10 @@ function LoginPage({
         }
     };
 
+    const goToRegister = () => {
+        onPageChange(9);
+    }
+
     if (isLoading) {
         return (
             <BaseLayout showSidebar={false} currentPage={0} onPageChange={onPageChange}>
@@ -79,6 +83,17 @@ function LoginPage({
                 >
                     Enter
                 </button>
+                <div className="mt-4 text-center">
+                    <p className="text-slate-400 text-sm">
+                        Don't have an account?{' '}
+                        <button
+                            onClick={goToRegister}
+                            className="text-blue-500 hover:text-blue-400 font-medium hover:underline transition-colors cursor-pointer"
+                        >
+                            Register
+                        </button>
+                    </p>
+                </div>
             </div>
         </div>
     );
