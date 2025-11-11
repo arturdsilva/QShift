@@ -179,7 +179,8 @@ class ScheduleGenerator:
                 )
                 for availability in availabilities:
                     if (
-                        availability.start_time <= shift.start_time
+                        availability.weekday == shift.weekday
+                        and availability.start_time <= shift.start_time
                         and availability.end_time >= shift.end_time
                     ):
                         availability_matrix[j][i] = True
@@ -214,12 +215,6 @@ class ScheduleGenerator:
             [model.NewBoolVar(f"x[{e},{t}]") for t in range(self.num_shifts)]
             for e in range(self.num_employees)
         ]
-
-        # Coverability of the number of employees for each shift
-        for t in range(self.num_shifts):
-            model.Add(
-                sum(x[e][t] for e in range(self.num_employees)) == int(self.demand[t])
-            )
 
         # Availability
         for e in range(self.num_employees):
@@ -256,15 +251,46 @@ class ScheduleGenerator:
     def generate_schedule(self) -> schemas.ScheduleOut:
         """
         Lexicographic optimization in a single model:
+          0) Penalizes not obeying the required number of employees per shift.
           1) Penalizes differences in total minutes worked per employee.
           2) Fixing (1), penalizes more than one shift by day by person.
-          3) Fixing (2), penalizes different times of schedules for one employee.
         """
+
         if self.num_shifts == 0:
             return schemas.ScheduleOut(shifts=[])
 
         model, x = self._build_feasibility_model()
         max_working_time = sum(self.shift_duration_min)
+
+        # Step 0: required number of employees per shift
+
+        max_deviation_from_required_staff = max(self.num_employees, max(self.demand))
+
+        deviation_from_required_staff = {}
+        deviation1 = {}
+        deviation2 = {}
+        for t in range(self.num_shifts):
+            deviation_from_required_staff[t] = model.NewIntVar(0, max_deviation_from_required_staff,
+                                                               f"deviation_from_required_staff[{t}]")
+            deviation1[t] = model.NewIntVar(0, max_deviation_from_required_staff, f"deviation1[{t}]")
+            deviation2[t] = model.NewIntVar(0, max_deviation_from_required_staff, f"deviation2[{t}]")
+            model.Add(sum(x[e][t] for e in range(self.num_employees)) - self.demand[t] == deviation1[t] - deviation2[t])
+            model.Add(deviation_from_required_staff[t] == deviation1[t] + deviation2[t])
+
+        model.Minimize(sum(deviation_from_required_staff.values()))
+        solver0 = cp_model.CpSolver()
+        solver0.parameters.max_time_in_seconds = 20.0
+        solver0.parameters.num_search_workers = self.num_search_workers
+        status0 = solver0.Solve(model)
+
+        if status0 != cp_model.OPTIMAL and status0 != cp_model.FEASIBLE:
+            print(
+                "\033[91mWARNING:\033[0mNo feasible solution found for step 0. Status: ", solver0.StatusName()
+            )
+        else:
+            best0_int = sum(int(solver0.Value(v)) for v in deviation_from_required_staff.values())
+            if deviation_from_required_staff:
+                model.Add(sum(deviation_from_required_staff.values()) <= best0_int)
 
         # Step 1: Fairness
 
@@ -298,6 +324,11 @@ class ScheduleGenerator:
             dev[e] = model.NewIntVar(0, 2 * total_minutes, f"dev[{e}]")
             model.Add(dev[e] == devp[e] + devm[e])
 
+        # Use solution of step 0 as a hint for step 1
+        for e in range(self.num_employees):
+            for t in range(self.num_shifts):
+                model.AddHint(x[e][t], solver0.Value(x[e][t]))
+
         model.Minimize(sum(dev.values()))
         solver1 = cp_model.CpSolver()
         solver1.parameters.max_time_in_seconds = 20.0
@@ -307,11 +338,12 @@ class ScheduleGenerator:
             print(
                 "\033[91mWARNING:\033[0mNo feasible solution found for step 1. Status: ", solver1.StatusName()
             )
-
-        best_fairness = solver1.ObjectiveValue()
-
-        fairness_tol = 0.05  # Tolerance to fairness loss during the next steps
-        model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
+            chosen_after_1 = solver0
+        else:
+            chosen_after_1 = solver1
+            best_fairness = chosen_after_1.ObjectiveValue()
+            fairness_tol = 0.05  # Tolerance to fairness loss during the next step
+            model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
 
         # Step 2: penalizes more than one 1 shift by day by person
 
@@ -336,7 +368,8 @@ class ScheduleGenerator:
         # Use solution of step 1 as a hint for step 2
         for e in range(self.num_employees):
             for t in range(self.num_shifts):
-                model.AddHint(x[e][t], solver1.Value(x[e][t]))
+                model.ClearHints()
+                model.AddHint(x[e][t], chosen_after_1.Value(x[e][t]))
 
         obj_over = sum(over_vars) if over_vars else 0
         model.Minimize(obj_over)
