@@ -1,21 +1,17 @@
 from __future__ import annotations
 import uuid
 
-from pydantic import BaseModel, Field, field_validator, SecretStr
+from pydantic import BaseModel, Field, field_validator, SecretStr, EmailStr
 from datetime import datetime
 
 
 class UserBase(BaseModel):
-    username: str = Field(..., max_length=200, description="User's login name")
+    email: EmailStr = Field(..., max_length=254, description="User's email")
 
-    @field_validator("username")
+    @field_validator("email")
     @classmethod
-    def _strip_and_non_empty(cls, v: str):
-        v2 = v.strip()
-        if not v2:
-            raise ValueError("username cannot be empty or whitespace")
-        # v2 = v2.lower() ?
-        return v2
+    def _normalize(cls, v: EmailStr) -> str:
+        return str(v).strip().lower()
 
 
 class UserCreate(UserBase):
@@ -23,20 +19,15 @@ class UserCreate(UserBase):
 
 
 class UserUpdate(BaseModel):
-    username: str | None = Field(None, max_length=200)
+    email: EmailStr | None = Field(None, max_length=254)
     password: SecretStr | None = Field(None, max_length=255)
 
-    @field_validator("username")
+    @field_validator("email")
     @classmethod
-    def _strip_and_non_empty(cls, v: str):
+    def _normalize(cls, v: EmailStr | None) -> str | None:
         if v is None:
             return None
-
-        v2 = v.strip()
-        if not v2:
-            raise ValueError("username cannot be empty or whitespace")
-        # v2 = v2.lower() ?
-        return v2
+        return str(v).strip().lower()
 
 
 class UserOut(UserBase):
