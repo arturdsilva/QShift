@@ -44,7 +44,7 @@ class WeekUpdate(BaseModel):
             if any(d < 0 or d > 6 for d in self.open_days):
                 raise ValueError("open_days must contain integers in [0,6]")
 
-        self.open_days = sorted(set(self.open_days))
+            self.open_days = sorted(set(self.open_days))
         return self
 
 

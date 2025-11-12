@@ -26,7 +26,7 @@ def test_seed_happy_flow():
     r = c.get(f"{API}/weeks/{week_id}/shifts")
     assert r.status_code == 200
     shifts = r.json()
-    assert len(shifts) == 13  # 6 days * 2 shifts
+    assert len(shifts) == 12  # 6 days * 2 shifts
 
     # 4) Availabilities
     total_av = 0

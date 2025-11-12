@@ -238,6 +238,15 @@ class ScheduleGenerator:
         if self.num_shifts == 0:
             return True
 
+        if self.num_employees == 0:
+            return False
+
+        has_any_availability = any(
+            any(row) for row in self.availability_matrix
+        )
+        if not has_any_availability:
+            return False
+
         model, _x = self._build_feasibility_model()
 
         solver = cp_model.CpSolver()
