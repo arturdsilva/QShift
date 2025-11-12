@@ -1,6 +1,6 @@
 export const DataBaseUser = {
     user_id: 1,
-    username: 'gui',
+    email: 'guicrfmoriya@gmail.com',
     password: '123'
 };
 

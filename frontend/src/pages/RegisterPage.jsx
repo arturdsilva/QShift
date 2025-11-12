@@ -2,60 +2,46 @@ import { useState } from 'react';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import {DataBaseUser} from '../MockData.js';
 import BaseLayout from '../layouts/BaseLayout.jsx';
-import {LoginApi} from '../services/api.js';
 
-function LoginPage({
-    onPageChange,
-    onLoginSucess,
-    isLoading,
-    setIsLoading
-}) {
+function RegisterPage({onPageChange}) {
+
     const [email, setEmail] = useState('');
+    const [confEmail, setConfEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
 
-    const handleLogin = async () => {
-        setIsLoading(true);
-        try {
-            const response = await LoginApi.authenticateUser(email, password);
-            localStorage.setItem("user_id", response.data.user_id);
-        } catch (err) {
-            console.error(err);
-            if (email === DataBaseUser.email && password === DataBaseUser.password) {
-                localStorage.setItem("user_id", DataBaseUser.user_id);
-                onPageChange(1);
-                setIsLoading(false);
-                console.log('User logged in:', DataBaseUser.email);
-            }
-            else {
-                alert('Invalid email or password');
-                setIsLoading(false);
-            }
+    const handleRegister = (e) => {
+        e.preventDefault();
+        setError('');
+        if (!email || !password || !confEmail) {
+            setError('Fill in all fields');
+            return;
+        } else if (email !== confEmail) {
+            setError('The emails are not the same');
+            return;
         }
-    };
+        // TODO: api request para register:
+        //const responseRegister = RegisterApi.registerUser(email, senha);
+        //if (reponseRegister.("já tem usuário com esse email")) { setError('This email address is already in use'); return;} else {alert('User registered successfully')}
 
-    const goToRegister = () => {
-        onPageChange(9);
+        onPageChange(0);
     }
 
-    if (isLoading) {
-        return (
-            <BaseLayout showSidebar={false} currentPage={0} onPageChange={onPageChange}>
-                <div className="flex items-center justify-center min-h-screen">
-                    <div className="text-center">
-                        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                        <p className="text-slate-400">Loading...</p>
-                    </div>
-                </div>
-            </BaseLayout>
-        );
+    const goToLogin = () => {
+        onPageChange(0);
     }
 
     return (
-        <AuthLayout title="Login">
-            <form onSubmit={(e) => { e.preventDefault(); handleLogin(); }}>
+        <AuthLayout title="Register">
+            <form onSubmit={handleRegister}>
+                {error && (
+                    <div className="mb-4 p-3 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+                        {error}
+                    </div>
+                )}
                 <div>
                     <label className="block text-sm font-medium text-slate-300 mb-2" htmlFor="email">
-                        email
+                        Email
                     </label>
                     <input
                         type="email"
@@ -63,6 +49,19 @@ function LoginPage({
                         placeholder="Enter your email"
                         className="w-full px-4 py-2 mb-4 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                         onChange={(e) => setEmail(e.target.value)}
+                        required
+                    />
+                </div>
+                <div>
+                    <label className="block text-sm font-medium text-slate-300 mb-2" htmlFor="confirm-email">
+                        Confirm Email
+                    </label>
+                    <input
+                        type="email"
+                        id="confirm-email"
+                        placeholder="Confirm your email"
+                        className="w-full px-4 py-2 mb-4 rounded-lg bg-slate-700 border border-slate-600 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onChange={(e) => setConfEmail(e.target.value)}
                         required
                     />
                 </div>
@@ -83,17 +82,17 @@ function LoginPage({
                     type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition-colors"
                 >
-                    Enter
+                    Register
                 </button>
             </form>
             <div className="mt-4 text-center">
                 <p className="text-slate-400 text-sm">
-                    Don't have an account?{' '}
+                    Already have an account?{' '}
                     <button
-                        onClick={goToRegister}
+                        onClick={goToLogin}
                         className="text-blue-500 hover:text-blue-400 font-medium hover:underline transition-colors cursor-pointer"
                     >
-                        Register
+                        Login
                     </button>
                 </p>
             </div>
@@ -101,4 +100,4 @@ function LoginPage({
     );
 }
 
-export default LoginPage;
+export default RegisterPage;

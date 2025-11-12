@@ -8,6 +8,7 @@ import ShiftConfigPage from './pages/ShiftConfigPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
 import ScheduleRecordsPage from './pages/ScheduleRecordsPage.jsx';
+import RegisterPage from './pages/RegisterPage.jsx';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -97,7 +98,10 @@ function App() {
       setWeekRecords={setWeekRecords}
       currentIdxWeek={currentIdxWeek}
       setCurrentIdxWeek={setCurrentIdxWeek}
-    />
+    />,
+    <RegisterPage
+      onPageChange={setCurrentPage}
+    /> 
   ];
 
   return pages[currentPage];
