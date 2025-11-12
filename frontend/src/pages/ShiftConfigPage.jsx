@@ -112,74 +112,114 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekData}) {
         }
     }
 
-    const handleShiftsSchedule = (weekId) => {
+    const handleShiftsSchedule = () => {
         let shiftsSchedule = [];
+        const errors = [];
         shifts.forEach(weekShift => {
-            weekShift.config.forEach(shift => {
+            weekShift.config.forEach((shift, index)=> {
+                const labelShift = `${daysOfWeek[shift.weekday]} Shift ${index + 1}`;
                 const isDaySelected = selectedDaysMap[shift.weekday] !== undefined;
-                
-                if (isDaySelected && 
-                    shift.start_time && 
-                    shift.end_time && 
-                    shift.min_staff) {
-                    shiftsSchedule.push({
-                        weekday: shift.weekday,
-                        start_time: shift.start_time,
-                        end_time: shift.end_time,
-                        min_staff: Number(shift.min_staff)
-                    });
+                if (isDaySelected && (shift.start_time || shift.end_time || shift.min_staff)) {
+                    const hasAnyField = shift.start_time || shift.end_time || shift.min_staff;
+                    const hasAllFields = shift.start_time && shift.end_time && shift.min_staff;
+                    if (hasAnyField && !hasAllFields) {
+                        let missingFields = [];
+                        if (!shift.start_time) missingFields.push('hora de início');
+                        if (!shift.end_time) missingFields.push('hora final');
+                        if (!shift.min_staff) missingFields.push('número de funcionários');
+                        errors.push(`${labelShift}: Falta ${missingFields.join(', ')}`);
+                        return;
+                    }
+
+                    if (shift.start_time && shift.end_time && shift.start_time >= shift.end_time) {
+                        errors.push(`${labelShift}: O horário de término deve ser posterior ao horário de início.`)
+                        return;
+                    }
+                    if (shift.min_staff && Number(shift.min_staff) < 0) {
+                        errors.push(`${labelShift}: O número mínimo de funcionários deve ser superior a 0.`)
+                        return;
+                    }
+                    
+                    if (hasAllFields) {
+                        shiftsSchedule.push({
+                            weekday: shift.weekday,
+                            start_time: shift.start_time,
+                            end_time: shift.end_time,
+                            min_staff: Number(shift.min_staff)
+                        });
+                    }
                 }
             });
         });
+        if (errors.length > 0) {
+            return { success: false, errors };
+        }
+
+        if (shiftsSchedule.length === 0) {
+            return {
+                sucess: false,
+                errors: ['Por favor, configure pelo menos um turno completo (com horário de início, horário de término e número de funcionários).']
+            }
+        }
         
-        return shiftsSchedule;
+        return {sucess: true, data: shiftsSchedule};
     };
 
     const createSchedule = async () => {
-        try {
-            const week = {
-                start_date: startDate.toISOString().split('T')[0],
-                open_days: openDaysMask
-            };
-            console.log('Criando semana:', week);
-            const responseWeek = await ShiftConfigApi.submitWeekData(week);
-            console.log('Semana criada com sucesso:', responseWeek.data);
-            const weekData = responseWeek.data;
-            setWeekData(weekData);
+        const result = handleShiftsSchedule();
+        if (!result.sucess) {
+            const errorMessage = result.errors.join('\n\n');
+            alert(`Por favor, corrija os seguintes problemas:\n\n${errorMessage}`);
+            return;
+        }
 
-            const shiftsSchedule = handleShiftsSchedule(weekData.id);
-            console.log('Turnos a serem criados:', shiftsSchedule);
-            if (shiftsSchedule.length === 0) {
-                alert('Nenhum turno válido configurado. Preencha os horários e quantidade de funcionários.');
-                return;
-            }
-            
-            for (const shift of shiftsSchedule) {
-                try {
-                    console.log('Criando turno:', shift);
-                    const response = await ShiftConfigApi.createShift(weekData.id, shift);
-                    console.log('Turno criado:', response.data);
-                } catch (error) {
-                    console.error('Erro ao criar turno específico:', shift, error);
-                    throw error;
+        const shiftsSchedule = result.data;
+        if (shiftsSchedule) {
+            try {
+                const week = {
+                    start_date: startDate.toISOString().split('T')[0],
+                    open_days: openDaysMask
+                };
+                console.log('Criando semana:', week);
+                const responseWeek = await ShiftConfigApi.submitWeekData(week);
+                console.log('Semana criada com sucesso:', responseWeek.data);
+                const weekData = responseWeek.data;
+                setWeekData(weekData);
+
+
+                console.log('Turnos a serem criados:', shiftsSchedule);
+                if (shiftsSchedule.length === 0) {
+                    alert('Nenhum turno válido configurado. Preencha os horários e quantidade de funcionários.');
+                    return;
                 }
-            }
-            console.log('Todos os turnos criados com sucesso!');
-            alert('Escala criada com sucesso!');
-            onPageChange(7);
-            
-        } catch (error) {
-            console.error('Erro ao criar escala:', error);
-            
-            if (error.response) {
-                console.error('Resposta do servidor:', error.response.data);
-                alert(`Erro: ${error.response.data.detail || 'Erro ao criar escala'}`);
-            } else if (error.request) {
-                console.error('Sem resposta do servidor:', error.request);
-                alert('Erro: Servidor não respondeu. Verifique se o backend está rodando.');
-            } else {
-                console.error('Erro na configuração:', error.message);
-                alert(`Erro: ${error.message}`);
+                
+                for (const shift of shiftsSchedule) {
+                    try {
+                        console.log('Criando turno:', shift);
+                        const response = await ShiftConfigApi.createShift(weekData.id, shift);
+                        console.log('Turno criado:', response.data);
+                    } catch (error) {
+                        console.error('Erro ao criar turno específico:', shift, error);
+                        throw error;
+                    }
+                }
+                console.log('Todos os turnos criados com sucesso!');
+                alert('Escala criada com sucesso!');
+                onPageChange(7);
+                
+            } catch (error) {
+                console.error('Erro ao criar escala:', error);
+                
+                if (error.response) {
+                    console.error('Resposta do servidor:', error.response.data);
+                    alert(`Erro: ${error.response.data.detail || 'Erro ao criar escala'}`);
+                } else if (error.request) {
+                    console.error('Sem resposta do servidor:', error.request);
+                    alert('Erro: Servidor não respondeu. Verifique se o backend está rodando.');
+                } else {
+                    console.error('Erro na configuração:', error.message);
+                    alert(`Erro: ${error.message}`);
+                }
             }
         }
     };
