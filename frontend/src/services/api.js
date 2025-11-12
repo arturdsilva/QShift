@@ -197,6 +197,15 @@ export const GeneratedScheduleApi = {
             throw error;
         }
 
+    },
+
+    deleteShiftsSchedule: async (week_id) => {
+        try {
+            return await api.delete(`/weeks/${week_id}/schedule`);
+        } catch (error) {
+            console.error('Erro ao deletar a lista de turnos da escala:', error);
+            throw error;
+        }
     }
 }
 
