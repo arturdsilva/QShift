@@ -1,7 +1,7 @@
 export const DataBaseUser = {
     user_id: 1,
     email: 'guicrfmoriya@gmail.com',
-    password: '123'
+    password: '124'
 };
 
 export const employeesMock = [
