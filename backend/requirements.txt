@@ -4,7 +4,7 @@ uvicorn[standard]
 
 # Authentication
 PyJWT
-passlib[bcript]
+passlib[bcrypt]
 python-multipart
 
 # Database
@@ -13,7 +13,7 @@ psycopg[binary]
 alembic
 
 # Config
-pydantic
+pydantic[email]
 pydantic-settings
 python-dotenv
 
