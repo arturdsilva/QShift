@@ -7,11 +7,10 @@ const api = axios.create({
 });
 
 api.interceptors.request.use(config => {
-    const userId = localStorage.getItem("user_id");
-    if (userId) {
-        config.headers['X-User-ID'] = userId;
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
     }
-    // TODO: Adicionar token de autenticação se necessário
 
     return config;
 }, error => {
