@@ -56,6 +56,32 @@ def read_schedule(
     return schedule_service.build_schedule_schema_from_db(week_id, user_id, db)
 
 
+# DELETE
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
+def delete_schedule(
+    week_id: UUID,
+    user_id: UUID = Depends(current_user_id),
+    db: Session = Depends(get_session),
+):
+    week = db.query(Week).filter(Week.user_id == user_id, Week.id == week_id).first()
+
+    if week is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Week not found"
+        )
+
+    shift_ids_tuple = db.query(Shift.id).filter(Shift.week_id == week_id).all()
+    shift_ids = []
+    for shift_id_tuple in shift_ids_tuple:
+        shift_ids.append(shift_id_tuple[0])
+
+    db.query(ShiftAssignment).filter(ShiftAssignment.shift_id.in_(shift_ids)).delete(
+        synchronize_session=False
+    )
+
+    db.commit()
+
+
 # GENERATE PREVIEW SCHEDULE
 @router.get(
     "/preview",
