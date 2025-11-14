@@ -7,8 +7,7 @@ from app.core.security import decode_token
 
 DEMO_USER_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 def current_user_id(token: str | None = Depends(oauth2_scheme)) -> uuid.UUID:
     if settings.AUTH_MODE == "demo":
