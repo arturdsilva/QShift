@@ -13,6 +13,7 @@ function ScheduleRecordsPage({
     isLoading,
     setIsLoading,
     weeksList,
+    setWeeksList,
     weekRecords,
     setWeekRecords,
     currentIdxWeek,
@@ -162,6 +163,38 @@ function ScheduleRecordsPage({
         onPageChange(3)
     };
 
+    const handleDeleteSchedule = async () => {
+        setIsLoading(true);
+        try {
+            await GeneratedScheduleApi.deleteSchedule(weekRecords.id);
+            setSchedulesCache(prev => {
+                const updatedCache = { ...prev };
+                delete updatedCache[weekRecords.id];
+                return updatedCache;
+            })
+            if (weeksList.length === 1) {
+                setWeekRecords(null);
+                setCurrentIdxWeek(0);
+                onPageChange(3);
+            } else {
+                const newWeeksList = weeksList.filter(week => week.id !== weekRecords.id);
+                setWeeksList(newWeeksList);
+                if (currentIdxWeek === 0) {
+                    setWeekRecords(newWeeksList[0]);
+                } else {
+                    setWeekRecords(newWeeksList[currentIdxWeek - 1]);
+                    setCurrentIdxWeek(currentIdxWeek - 1);
+                }
+            }
+        } catch (error) {
+            console.log('Erro ao deletar a escala:', error);
+            throw error;
+        } finally {
+            setEditMode(false);            
+            setIsLoading(false);
+        }
+    }
+
     if (isLoading) {
         return (
             <BaseLayout showSidebar={false} currentPage={8} onPageChange={onPageChange}>
@@ -278,7 +311,7 @@ function ScheduleRecordsPage({
                         <div className="justify-end flex flex-1">
                             <div className='px-5 py-1.5 rounded text-center font-medium'>
                                 <button
-                                    onClick={handleEdit}
+                                    onClick={handleDeleteSchedule}
                                     className="items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                                 >
                                     {`Delete`}

@@ -94,6 +94,7 @@ function App() {
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       weeksList={weeksList}
+      setWeeksList={setWeeksList}
       weekRecords={weekRecords}
       setWeekRecords={setWeekRecords}
       currentIdxWeek={currentIdxWeek}
