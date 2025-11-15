@@ -1,14 +1,18 @@
 from __future__ import annotations
-from fastapi import APIRouter, Depends, status, HTTPException
+from fastapi import APIRouter, Depends, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import date, time, timedelta
 
 from app.core.db import get_session
-from app.api.dependencies import current_user_id
-from app.models import User, Employee, Week, Shift, Availability, ShiftAssignment
+from app.core.security import create_access_token, hash_password
+from app.models import User, Employee, Week, Shift, Availability
 from app.core.logging import logger
 
 router = APIRouter(prefix="/dev", tags=["dev"])
+
+DEMO_EMAIL = "demo@test.com"
+DEMO_PASSWORD = "123"
 
 
 def next_monday(d: date) -> date:
@@ -16,9 +20,9 @@ def next_monday(d: date) -> date:
 
 
 @router.post("/seed", status_code=status.HTTP_200_OK)
-def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
+def seed(db: Session = Depends(get_session)):
     """
-    Populate (or ensure) consistent demo data for the current user.
+    Populate (or ensure) consistent demo data for the demo user.
     - User(email='demo@qshift.local')
     - 5 active employees
     - Week starting next Monday, open_days = Mon..Sat
@@ -26,22 +30,25 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
     - Availabilities Mon-Fri 09:00-18:00 for all employees
     """
 
-    logger.info(f"Seeding started for user {user_id}")
+    logger.info(f"Seeding started")
 
     # 0) Clear demo user
-    db.query(User).filter_by(id=user_id).delete(synchronize_session=False)
+    db.query(User).filter(func.lower(User.email) == DEMO_EMAIL).delete(
+        synchronize_session=False
+    )
     logger.info("Demo user cleared")
 
     # 1) USER
-    user = User(id=user_id, email="demo@qshift.local", password_hash="x")
+    user = User(email=DEMO_EMAIL, password_hash=hash_password(DEMO_PASSWORD))
     db.add(user)
     db.flush()
+    access_token = create_access_token(sub=str(user.id))
     logger.info("Demo user created")
 
     # 2) EMPLOYEES
     names: list[str] = ["Artur", "Arthur", "Angelo", "Gabriel", "Guilherme"]
     for n in names:
-        db.add(Employee(user_id=user_id, name=n, active=True))
+        db.add(Employee(user_id=user.id, name=n, active=True))
     db.flush()
     logger.info("Seed employees created")
 
@@ -49,7 +56,7 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
     start = next_monday(date.today())
     # Mon..Sat => [0,1,2,3,4,5]  (0=Mon ... 6=Sun),
     week = Week(
-        user_id=user_id,
+        user_id=user.id,
         start_date=start,
         open_days=[0, 1, 2, 3, 4, 5],
         approved=False,
@@ -66,7 +73,7 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
         db.add_all(
             [
                 Shift(
-                    user_id=user_id,
+                    user_id=user.id,
                     week_id=week.id,
                     weekday=wd,
                     local_date=local_date,
@@ -75,7 +82,7 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
                     min_staff=min_staff,
                 ),
                 Shift(
-                    user_id=user_id,
+                    user_id=user.id,
                     week_id=week.id,
                     weekday=wd,
                     local_date=local_date,
@@ -85,15 +92,15 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
                 ),
             ]
         )
-        logger.info("Seed shifts created")
+    logger.info("Seed shifts created")
 
     # 5) AVAILABILITIES (Mon–Fri 09–18 for all active employees)
-    employees = db.query(Employee).filter_by(user_id=user_id, active=True).all()
+    employees = db.query(Employee).filter_by(user_id=user.id, active=True).all()
     for emp in employees:
         for wd in [0, 1, 2, 3, 4]:  # Mon..Fri
             db.add(
                 Availability(
-                    user_id=user_id,
+                    user_id=user.id,
                     employee_id=emp.id,
                     weekday=wd,
                     start_time=time(9, 0),
@@ -103,7 +110,8 @@ def seed(db: Session = Depends(get_session), user_id=Depends(current_user_id)):
     logger.info("Seed availabilities created")
 
     return {
-        "user_id": str(user_id),
+        "user_id": str(user.id),
+        "access_token": access_token,
         "week_id": str(week.id),
         "week_start": str(week.start_date),
         "open_days": week.open_days,
