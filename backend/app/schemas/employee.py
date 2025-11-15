@@ -1,5 +1,6 @@
 from __future__ import annotations
 import uuid
+from typing import List
 
 from pydantic import BaseModel, Field, field_validator
 import app.core.constants as constants
@@ -45,3 +46,22 @@ class EmployeeOut(EmployeeBase):
     user_id: uuid.UUID
 
     model_config = {"from_attributes": True}
+
+
+class EmployeeYearReport(BaseModel):
+    name: str | None = Field(None, max_length=constants.MAX_EMPLOYEE_NAME_LENGTH)
+    months_data: List[EmployeeMonthReport]
+
+
+class EmployeeMonthReport(BaseModel):
+    name: str | None = Field(None, max_length=constants.MAX_EMPLOYEE_NAME_LENGTH)
+    month_data: EmployeeMonthData
+
+
+class EmployeeMonthData(BaseModel):
+    hours_worked: float
+    num_days_off: int
+    num_days_worked: int
+    num_morning_shifts: int
+    num_afternoon_shifts: int
+    num_night_shifts: int

@@ -1,11 +1,19 @@
 from uuid import UUID
 from fastapi import APIRouter, Depends, status, Response, HTTPException
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.core.db import get_session
 from app.api.dependencies import current_user_id
 from app.models.employee import Employee
-from app.schemas.employee import EmployeeCreate, EmployeeUpdate, EmployeeOut
+import app.services.employee as employee_service
+from app.schemas.employee import (
+    EmployeeCreate,
+    EmployeeUpdate,
+    EmployeeOut,
+    EmployeeMonthReport,
+    EmployeeYearReport,
+)
 
 router = APIRouter(prefix="/employees", tags=["employees"])
 
@@ -108,3 +116,75 @@ def delete_employee(
     db.delete(employee)
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# GET MONTH REPORT
+@router.get(
+    "/{employee_id}/report",
+    response_model=EmployeeMonthReport,
+    status_code=status.HTTP_200_OK,
+)
+def get_employee_month_report(
+    employee_id: UUID,
+    year: int,
+    month: int,
+    db: Session = Depends(get_session),
+):
+    if month < 1 or month > 12:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Month must be between 1 and 12",
+        )
+
+    if year <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Year must be a positive integer",
+        )
+
+    employee_name = (
+        db.execute(select(Employee.name).where(Employee.id == employee_id))
+        .scalars()
+        .first()
+    )
+
+    if employee_name is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
+        )
+
+    return employee_service.build_employee_month_report(
+        employee_id, employee_name, year, month, db
+    )
+
+
+@router.get(
+    "/{employee_id}/report",
+    response_model=EmployeeYearReport,
+    status_code=status.HTTP_200_OK,
+)
+def get_employee_year_report(
+    employee_id: UUID,
+    year: int,
+    db: Session = Depends(get_session),
+):
+    if year <= 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Year must be a positive integer",
+        )
+
+    employee_name = (
+        db.execute(select(Employee.name).where(Employee.id == employee_id))
+        .scalars()
+        .first()
+    )
+
+    if employee_name is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
+        )
+
+    return employee_service.build_employee_year_report(
+        employee_id, employee_name, year, db
+    )
