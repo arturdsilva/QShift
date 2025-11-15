@@ -68,8 +68,6 @@ function EmployeeReportsPage({
         } else {
         setCurrentMonth(currentMonth - 1);
         }
-        setSelectedDays([]);
-        setSelectedWeek(null);
     };
 
     const handleNextMonth = () => {
@@ -79,8 +77,14 @@ function EmployeeReportsPage({
         } else {
         setCurrentMonth(currentMonth + 1);
         }
-        setSelectedDays([]);
-        setSelectedWeek(null);
+    };
+
+    const handlePrevYear = () => {
+        setCurrentYear(currentYear - 1);
+    };
+
+    const handleNextYear = () => {
+        setCurrentYear(currentYear + 1);
     };
 
     return (
@@ -111,6 +115,27 @@ function EmployeeReportsPage({
                         <ChevronRight size={24} className="text-slate-300" />
                     </button>
                 </div>
+                <div className="flex items-center gap-4 ml-8">
+                    <button
+                        onClick={handlePrevYear}
+                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+                        title="Previous Year"
+                    >
+                        <ChevronLeft size={24} className="text-slate-300" />
+                    </button>
+                    
+                    <span className="text-xl text-slate-200 font-medium min-w-[200px] text-center">
+                        {currentYear}
+                    </span>
+                    
+                    <button
+                        onClick={handleNextYear}
+                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
+                        title="Next Year"
+                    >
+                        <ChevronRight size={24} className="text-slate-300" />
+                    </button>
+                </div>
             </Header>
             <div className='flex gap-8 p-2'>
                 <EmployeeSelector
@@ -123,7 +148,9 @@ function EmployeeReportsPage({
                 <div className=''>
                     <div className='flex gap-2 flex-wrap'>
                         {/* Aqui dentro colocar as quatro estatísticas de dados interassantes em formas de cards: 
-                        Número de folgas no mês, dias trabalhados no mês, 
+                        Número de folgas no mês, 
+                        dias trabalhados no mês, 
+                        Horas trabalhadas no mês,
                         números de turnos de manhã, 
                         números de turnos da tarde
                          */}
@@ -142,7 +169,9 @@ function EmployeeReportsPage({
                             Uma toolbar para seleção do do dado a ser exibido no gráfico
                         </div>
                         <div className=''>
-                            Gráfico de barras mostrando os dias trablahados no mês ||
+                            Gráfico de barras mostrando: 
+                            Dias trablahados no mês ||
+                            Horas trabalhadas no mês ||
                             Folgas no mês ||
                             Turnos da manha no mês ||
                             Turnos da tarde no mês
