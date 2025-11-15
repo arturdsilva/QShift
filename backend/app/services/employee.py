@@ -55,7 +55,7 @@ def _build_employee_month_data(
     if not shifts:
         return EmployeeMonthData(
             hours_worked=0.0,
-            num_days_off=0,
+            num_days_off=(end_date - start_date).days + 1,
             num_days_worked=0,
             num_morning_shifts=0,
             num_afternoon_shifts=0,
