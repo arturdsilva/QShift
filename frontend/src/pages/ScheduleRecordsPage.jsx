@@ -246,32 +246,57 @@ function ScheduleRecordsPage({
                         />
                     </>
                 )}
-                <div className="flex mt-4">
-                    {!editMode && (
-                        <div className="flex-1 justify-start flex">
-                            <div className='px-2 py-1.5 rounded text-center font-medium'>
+                {!editMode ? (
+                    <div className="flex mt-4">
+
+                            <div className="flex-1 justify-start flex">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={handleBack}
+                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+
+                        {weeksList.length > 0 && (
+                            <div className="justify-end flex flex-1">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={handleEdit}
+                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        {`Edit`}
+                                    </button>
+                                </div>
+                            </div>                            
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex mt-4">
+                        <div className="justify-end flex flex-1">
+                            <div className='px-5 py-1.5 rounded text-center font-medium'>
                                 <button
-                                    onClick={handleBack}
-                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    onClick={handleEdit}
+                                    className="items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                                 >
-                                    Back
+                                    {`Delete`}
                                 </button>
                             </div>
                         </div>
-                    )}
-                    {weeksList.length > 0 && (
-                        <div className="justify-end flex flex-1">
+                        <div className="justify-end flex">
                             <div className='px-2 py-1.5 rounded text-center font-medium'>
                                 <button
-                                    onClick={editMode ? handleSave : handleEdit}
-                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    onClick={handleSave}
+                                    className="items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                                 >
-                                    {editMode ? `Save` : `Edit`}
+                                    {`Save`}
                                 </button>
                             </div>
-                        </div>                            
-                    )}
-                </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </BaseLayout>
     )
