@@ -7,7 +7,11 @@ import app.core.constants as constants
 
 
 class EmployeeBase(BaseModel):
-    name: str = Field(..., max_length=constants.MAX_EMPLOYEE_NAME_LENGTH, description="Employee's name")
+    name: str = Field(
+        ...,
+        max_length=constants.MAX_EMPLOYEE_NAME_LENGTH,
+        description="Employee's name",
+    )
     active: bool = Field(
         True, description="If True, the employee will be included on the schedule"
     )
