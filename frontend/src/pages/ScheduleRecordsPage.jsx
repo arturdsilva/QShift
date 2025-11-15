@@ -13,6 +13,7 @@ function ScheduleRecordsPage({
     isLoading,
     setIsLoading,
     weeksList,
+    setWeeksList,
     weekRecords,
     setWeekRecords,
     currentIdxWeek,
@@ -138,23 +139,22 @@ function ScheduleRecordsPage({
 
 
     const handleSave = async () => {
-        /*setIsLoading(true);
+        setIsLoading(true);
         try {
             const shiftsSchedule = handleShiftsSchedule();
             await GeneratedScheduleApi.deleteShiftsSchedule(weekRecords.id);
-            await GeneratedScheduleApi.approvedSchedule(weekRecords.id, shiftsSchedule);
             setSchedulesCache(prev => ({
                 ...prev,
                 [weekRecords.id] : scheduleData
             }))
-
+            await GeneratedScheduleApi.approvedSchedule(weekRecords.id, shiftsSchedule);
             setEditMode(false);
         } catch (error) {
             console.error('Erro ao salvar a escala:', error);
             throw error;
         } finally {
             setIsLoading(false);
-        }*/
+        }
 
         setEditMode(false);
     }
@@ -162,6 +162,38 @@ function ScheduleRecordsPage({
     const handleBack = () => {
         onPageChange(3)
     };
+
+    const handleDeleteSchedule = async () => {
+        setIsLoading(true);
+        try {
+            await GeneratedScheduleApi.deleteSchedule(weekRecords.id);
+            setSchedulesCache(prev => {
+                const updatedCache = { ...prev };
+                delete updatedCache[weekRecords.id];
+                return updatedCache;
+            })
+            if (weeksList.length === 1) {
+                setWeekRecords(null);
+                setCurrentIdxWeek(0);
+                onPageChange(3);
+            } else {
+                const newWeeksList = weeksList.filter(week => week.id !== weekRecords.id);
+                setWeeksList(newWeeksList);
+                if (currentIdxWeek === 0) {
+                    setWeekRecords(newWeeksList[0]);
+                } else {
+                    setWeekRecords(newWeeksList[currentIdxWeek - 1]);
+                    setCurrentIdxWeek(currentIdxWeek - 1);
+                }
+            }
+        } catch (error) {
+            console.log('Erro ao deletar a escala:', error);
+            throw error;
+        } finally {
+            setEditMode(false);            
+            setIsLoading(false);
+        }
+    }
 
     if (isLoading) {
         return (
@@ -247,32 +279,57 @@ function ScheduleRecordsPage({
                         />
                     </>
                 )}
-                <div className="flex mt-4">
-                    {!editMode && (
-                        <div className="flex-1 justify-start flex">
-                            <div className='px-2 py-1.5 rounded text-center font-medium'>
+                {!editMode ? (
+                    <div className="flex mt-4">
+
+                            <div className="flex-1 justify-start flex">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={handleBack}
+                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        Back
+                                    </button>
+                                </div>
+                            </div>
+
+                        {weeksList.length > 0 && (
+                            <div className="justify-end flex flex-1">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={handleEdit}
+                                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    >
+                                        {`Edit`}
+                                    </button>
+                                </div>
+                            </div>                            
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex mt-4">
+                        <div className="justify-end flex flex-1">
+                            <div className='px-5 py-1.5 rounded text-center font-medium'>
                                 <button
-                                    onClick={handleBack}
-                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    onClick={handleDeleteSchedule}
+                                    className="items-center gap-2 px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                                 >
-                                    Back
+                                    {`Delete`}
                                 </button>
                             </div>
                         </div>
-                    )}
-                    {weeksList.length > 0 && (
-                        <div className="justify-end flex flex-1">
+                        <div className="justify-end flex">
                             <div className='px-2 py-1.5 rounded text-center font-medium'>
                                 <button
-                                    onClick={editMode ? handleSave : handleEdit}
-                                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                                    onClick={handleSave}
+                                    className="items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
                                 >
-                                    {editMode ? `Save` : `Edit`}
+                                    {`Save`}
                                 </button>
                             </div>
-                        </div>                            
-                    )}
-                </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </BaseLayout>
     )
