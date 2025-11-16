@@ -110,7 +110,7 @@ function App() {
     <EmployeeReportsPage
       onPageChange={setCurrentPage}
       isLoading={isLoading}
-      setLoading={setIsLoading}
+      setIsLoading={setIsLoading}
       employeesList={employees}
       currentEmployee={currentEmployee}
       setCurrentEmployee={setCurrentEmployee}
