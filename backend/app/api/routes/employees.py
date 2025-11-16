@@ -120,7 +120,7 @@ def delete_employee(
 
 # GET MONTH REPORT
 @router.get(
-    "/{employee_id}/report",
+    "/{employee_id}/report/{year}/{month}",
     response_model=EmployeeMonthReport,
     status_code=status.HTTP_200_OK,
 )
@@ -159,7 +159,7 @@ def get_employee_month_report(
 
 
 @router.get(
-    "/{employee_id}/report",
+    "/{employee_id}/report/{year}",
     response_model=EmployeeYearReport,
     status_code=status.HTTP_200_OK,
 )
