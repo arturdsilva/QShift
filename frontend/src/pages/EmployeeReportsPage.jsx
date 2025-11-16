@@ -70,13 +70,13 @@ function EmployeeReportsPage({
         ]
     };
 
-    const createStatsCards = () => {
+    const createStatsCards = (employeeStats) => {
         return STATS_CONFIG.map(config => ({
             ...config,
             ...METRIC_COLORS[config.key],
             value: config.suffix 
-                ? `${employaeeYearStats.months_data[currentMonth - 1].month_data[config.key]}${config.suffix}` 
-                : employaeeYearStats.months_data[currentMonth - 1].month_data[config.key]
+                ? `${employeeStats.months_data[currentMonth - 1][config.key]}${config.suffix}` 
+                : employeeStats.months_data[currentMonth - 1][config.key]
         }));
     }
 
@@ -91,10 +91,12 @@ function EmployeeReportsPage({
                     currentEmployee.id,
                     currentYear
                 );
-                setEmployeeYearStats(response.data);
-                const statsCards = createStatsCards();
-                setStatsCards(statsCards);
-                console.log('Estatísticas do funcionário recebidas com sucesso:', response.data);
+                if (response.data) {
+                    setEmployeeYearStats(response.data);
+                    const statsCards = createStatsCards(response.data);
+                    setStatsCards(statsCards);
+                    console.log('Estatísticas do funcionário recebidas com sucesso:', response.data);
+                }
             } catch (error) {
                 console.error('Erro ao buscar estatísticas do funcionário:', error);
             } finally {
@@ -104,7 +106,7 @@ function EmployeeReportsPage({
         if (currentEmployee) {
             fetchEmployeeStats();
         }
-    }, [currentEmployee, currentYear]);
+    }, [currentEmployee, currentMonth, currentYear]);
 
     const handleToggleEmployee = (employee, month, year) => {
         console.log("Selecionando relatório do funcionário:", employee, month, year);
