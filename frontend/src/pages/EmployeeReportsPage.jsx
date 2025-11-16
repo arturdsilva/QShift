@@ -2,6 +2,7 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
 import {BarChart3, ChevronLeft, ChevronRight} from 'lucide-react';
+import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES } from '../constants/employeeStats';
 
 function EmployeeSelector({
     employeesList,
@@ -48,6 +49,42 @@ function EmployeeReportsPage({
         {id: 1, name: "employee x"}
     ];
 
+    const [employeeStats, setEmployeeStats] = useState({
+        name: "employee x",
+        month_data: {
+            hours_worked: 4,
+            num_days_off: 22,
+            num_days_worked: 176,
+            num_morning_shifts: 11,
+            num_afternoon_shifts: 11,
+            num_night_shifts: 0
+        }
+    });
+
+    const employeeYearStats = {
+        name: "employee x",
+        months_data: [
+            {
+                name: "employee x",
+                month_data: {
+                    hours_worked: 4,
+                    num_days_off: 22,
+                    num_days_worked: 176,
+                    num_morning_shifts: 11,
+                    num_afternoon_shifts: 11,
+                    num_night_shifts: 0
+                }
+            }
+        ]
+    };
+
+    const statsCards = STATS_CONFIG.map(config => ({
+    ...config,
+    ...METRIC_COLORS[config.key],
+    value: config.suffix 
+        ? `${employeeStats[config.key]}${config.suffix}` 
+        : employeeStats[config.key]
+    }));
 
     const [currentEmployee, setCurrentEmployee] = useState(employeesList[0]);
     const handleToggleEmployee = (employee, month, year) => {
@@ -145,23 +182,18 @@ function EmployeeReportsPage({
                     month={currentMonth}
                     year={currentYear}
                 />
-                <div className=''>
-                    <div className='flex gap-2 flex-wrap'>
-                        {/* Aqui dentro colocar as quatro estatísticas de dados interassantes em formas de cards: 
-                        Número de folgas no mês, 
-                        dias trabalhados no mês, 
-                        Horas trabalhadas no mês,
-                        números de turnos de manhã, 
-                        números de turnos da tarde
-                         */}
-
-                        {/* Exemplo de card */}
-                        <div
-                            className="bg-slate-800 rounded-lg p-3 w-48 border border-slate-700 overflow-hidden"
-                        >
-                            <p className="text-sm text-slate-500">title</p>
-                            <p className="text-4xl font-bold text-slate-400 mb-2">Value</p>
-                        </div>
+                <div className='flex-1'>
+                    <div className='flex gap-4 flex-wrap mb-8'>
+                        {statsCards.map(card => (
+                            <div 
+                                key={card.key}
+                                className={`bg-slate-800 rounded-lg p-4 w-56 border border-slate-700 hover:${card.borderColor} transition-colors`}
+                            >
+                                <p className="text-sm text-slate-400 mb-1">{card.label}</p>
+                                <p className={`text-5xl font-bold ${card.textColor} mb-1`}>{card.value}</p>
+                                <p className="text-xs text-slate-500">{months[currentMonth - 1]} {currentYear}</p>
+                            </div>
+                        ))}
                     </div>
 
                     <div className='mt-8'>
