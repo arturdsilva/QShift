@@ -1,8 +1,9 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import {BarChart3, ChevronLeft, ChevronRight} from 'lucide-react';
 import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES } from '../constants/employeeStatsConfig.js';
+import { EmployeeReportsApi } from '../services/api.js';
 
 function EmployeeSelector({
     employeesList,
@@ -49,20 +50,9 @@ function EmployeeReportsPage({
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [selectedMetric, setSelectedMetric] = useState('daysWorked');
+    const [employeeYearStats, setEmployeeYearStats] = useState(null);
 
-    const [employeeStats, setEmployeeStats] = useState({
-        name: "employee x",
-        month_data: {
-            hoursWorked: 4,
-            daysOff: 22,
-            daysWorked: 176,
-            morningShifts: 11,
-            afternoonShifts: 11,
-            nightShifts: 0
-        }
-    });
-
-    const employeeYearStats = {
+    const employaeeYearStats = {
         name: "employee x",
         months_data: [
             {
@@ -79,14 +69,38 @@ function EmployeeReportsPage({
         ]
     };
 
+    useEffect(() => {
+        if (!currentEmployee && employeesList.length > 0) {
+            setCurrentEmployee(employeesList[0]);
+        }
+        async function fetchEmployeeStats() {
+            setLoading(true);
+            try {
+                const response = await EmployeeReportsApi.getEmployeeYearStats(
+                    currentEmployee.id,
+                    currentYear
+                );
+                setEmployeeYearStats(response.data);
+                console.log('Estatísticas do funcionário recebidas com sucesso:', response.data);
+            } catch (error) {
+                console.error('Erro ao buscar estatísticas do funcionário:', error);
+            } finally {
+                setLoading(false);
+            }
+        }
+        if (currentEmployee) {
+            fetchEmployeeStats();
+        }
+    }, [currentEmployee, currentYear]);
+
     const statsCards = STATS_CONFIG.map(config => ({
     ...config,
     ...METRIC_COLORS[config.key],
     value: config.suffix 
-        ? `${employeeStats.month_data[config.key]}${config.suffix}` 
-        : employeeStats.month_data[config.key]
+        ? `${employeeYearStats.months_data[currentMonth - 1].month_data[config.key]}${config.suffix}` 
+        : employeeYearStats.months_data[currentMonth - 1].month_data[config.key]
     }));
-    
+
     const handleToggleEmployee = (employee, month, year) => {
         console.log("Selecionando relatório do funcionário:", employee, month, year);
         setCurrentEmployee(employee);
