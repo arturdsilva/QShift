@@ -43,8 +43,9 @@ function ReportsPage({
             setIsLoading(true);
             onPageChange(8);
         } else if (card.title === 'Employees') {
-            onPageChange(10);
+            setIsLoading(true);
             setCurrentEmployee(employees[0]);
+            onPageChange(10);
         }
     }
 
