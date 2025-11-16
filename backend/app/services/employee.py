@@ -113,7 +113,7 @@ def build_employee_year_report(
     employee_id: UUID, employee_name: str, year: int, db: Session
 ) -> EmployeeYearReport:
     months_data = []
-    for month in range(1, 12):
+    for month in range(1, 13):
         months_data.append(_build_employee_month_data(employee_id, year, month, db))
 
     return EmployeeYearReport(name=employee_name, months_data=months_data)
