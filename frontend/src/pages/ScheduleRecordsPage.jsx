@@ -77,7 +77,6 @@ function ScheduleRecordsPage({
                 setScheduleData(schedulesCache[weekRecords.id]);
                 return;
             }
-            setIsLoading(true);
             try {
                 const response = await GeneratedScheduleApi.getGeneratedSchedule(weekRecords.id);
                 console.log('GeneratedScheduleApi', response.data)

@@ -166,48 +166,6 @@ function EmployeeReportsPage({
             onPageChange={onPageChange}
         >
             <Header title={"Employees Reports"} icon={BarChart3} >
-                <div className="flex items-center ml-48">
-                    <button
-                        onClick={handlePrevMonth}
-                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-                        title="Previous month"
-                    >
-                        <ChevronLeft size={24} className="text-slate-300" />
-                    </button>
-                    
-                    <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
-                        {months[currentMonth - 1]}
-                    </span>
-                    
-                    <button
-                        onClick={handleNextMonth}
-                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-                        title="Next month"
-                    >
-                        <ChevronRight size={24} className="text-slate-300" />
-                    </button>
-                </div>
-                <div className="flex items-center gap-4 ml-8">
-                    <button
-                        onClick={handlePrevYear}
-                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-                        title="Previous Year"
-                    >
-                        <ChevronLeft size={24} className="text-slate-300" />
-                    </button>
-                    
-                    <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
-                        {currentYear}
-                    </span>
-                    
-                    <button
-                        onClick={handleNextYear}
-                        className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
-                        title="Next Year"
-                    >
-                        <ChevronRight size={24} className="text-slate-300" />
-                    </button>
-                </div>
             </Header>
             <div className='flex gap-4'>
                 <div className=''>
@@ -244,7 +202,52 @@ function EmployeeReportsPage({
                     </div>
 
                     <div className='bg-slate-800 rounded-lg px-4 py-1.5 border border-slate-700'>
-                        <h3 className='text-lg font-semibold text-slate-200 mb-2'>Select Metric to Display</h3>
+                        <div className='flex items-center justify-between mb-4'>
+                            <h3 className='text-lg font-semibold text-slate-200 mb-2'>Select Metric to Display</h3>       
+                            <div className="flex items-center ml-64">
+                                <button
+                                    onClick={handlePrevMonth}
+                                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                                    title="Previous month"
+                                >
+                                    <ChevronLeft size={24} className="text-slate-300" />
+                                </button>
+                                
+                                <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
+                                    {months[currentMonth - 1]}
+                                </span>
+                                
+                                <button
+                                    onClick={handleNextMonth}
+                                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                                    title="Next month"
+                                >
+                                    <ChevronRight size={24} className="text-slate-300" />
+                                </button>
+                            </div>
+                            <div className="flex items-center">
+                                <button
+                                    onClick={handlePrevYear}
+                                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                                    title="Previous Year"
+                                >
+                                    <ChevronLeft size={24} className="text-slate-300" />
+                                </button>
+                                
+                                <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
+                                    {currentYear}
+                                </span>
+                                
+                                <button
+                                    onClick={handleNextYear}
+                                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                                    title="Next Year"
+                                >
+                                    <ChevronRight size={24} className="text-slate-300" />
+                                </button>
+                            </div>             
+                        </div>
+
                         <div className='flex gap-1.5 flex-wrap'>
                             {STATS_CONFIG.map(metric => (
                                 <button
