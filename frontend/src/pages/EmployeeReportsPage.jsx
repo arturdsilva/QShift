@@ -2,7 +2,7 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
 import {BarChart3, ChevronLeft, ChevronRight} from 'lucide-react';
-import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES } from '../constants/employeeStats';
+import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES } from '../constants/employeeStatsConfig.js';
 
 function EmployeeSelector({
     employeesList,
@@ -45,6 +45,7 @@ function EmployeeReportsPage({
     // Dados mockados para demonstração
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [selectedMetric, setSelectedMetric] = useState('daysWorked');
     const employeesList = [
         {id: 1, name: "employee x"}
     ];
@@ -52,12 +53,12 @@ function EmployeeReportsPage({
     const [employeeStats, setEmployeeStats] = useState({
         name: "employee x",
         month_data: {
-            hours_worked: 4,
-            num_days_off: 22,
-            num_days_worked: 176,
-            num_morning_shifts: 11,
-            num_afternoon_shifts: 11,
-            num_night_shifts: 0
+            hoursWorked: 4,
+            daysOff: 22,
+            daysWorked: 176,
+            morningShifts: 11,
+            afternoonShifts: 11,
+            nightShifts: 0
         }
     });
 
@@ -67,12 +68,12 @@ function EmployeeReportsPage({
             {
                 name: "employee x",
                 month_data: {
-                    hours_worked: 4,
-                    num_days_off: 22,
-                    num_days_worked: 176,
-                    num_morning_shifts: 11,
-                    num_afternoon_shifts: 11,
-                    num_night_shifts: 0
+                    hoursWorked: 4,
+                    daysOff: 22,
+                    daysWorked: 176,
+                    morningShifts: 11,
+                    afternoonShifts: 11,
+                    nightShifts: 0
                 }
             }
         ]
@@ -82,8 +83,8 @@ function EmployeeReportsPage({
     ...config,
     ...METRIC_COLORS[config.key],
     value: config.suffix 
-        ? `${employeeStats[config.key]}${config.suffix}` 
-        : employeeStats[config.key]
+        ? `${employeeStats.month_data[config.key]}${config.suffix}` 
+        : employeeStats.month_data[config.key]
     }));
 
     const [currentEmployee, setCurrentEmployee] = useState(employeesList[0]);
@@ -194,6 +195,25 @@ function EmployeeReportsPage({
                                 <p className="text-xs text-slate-500">{months[currentMonth - 1]} {currentYear}</p>
                             </div>
                         ))}
+                    </div>
+
+                    <div className='bg-slate-800 rounded-lg px-4 py-1.5 border border-slate-700'>
+                        <h3 className='text-lg font-semibold text-slate-200 mb-2'>Select Metric to Display</h3>
+                        <div className='flex gap-2 flex-wrap'>
+                            {STATS_CONFIG.map(metric => (
+                                <button
+                                    key={metric.key}
+                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                        selectedMetric === metric.key
+                                        ? `${METRIC_COLORS[metric.key].bgButton} text-white shadow-lg`
+                                        : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                                    } `}
+                                    onClick={() => setSelectedMetric(metric.key)}
+                                >
+                                    {metric.label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
                     <div className='mt-8'>
