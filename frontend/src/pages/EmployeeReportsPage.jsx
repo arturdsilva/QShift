@@ -194,9 +194,9 @@ function EmployeeReportsPage({
                                 key={card.key}
                                 className={`bg-slate-800 rounded-lg p-3 w-40 border border-slate-700 hover:${card.borderColor} transition-colors`}
                             >
-                                <p className="text-sm text-slate-400">{card.label}</p>
-                                <p className={`text-5xl font-bold ${card.textColor}`}>{card.value}</p>
-                                <p className="text-xs text-slate-500">{months[currentMonth - 1]} {currentYear}</p>
+                                <p className="text-sm text-slate-300">{card.label}</p>
+                                <p className={`text-4xl font-bold ${card.textColor} max-w-full break-all leading-none`}>{card.value}</p>
+                                <p className="text-xs text-slate-400">{months[currentMonth - 1]} {currentYear}</p>
                             </div>
                         ))}
                     </div>
