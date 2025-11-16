@@ -2,8 +2,9 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect, use } from 'react';
 import {BarChart3, ChevronLeft, ChevronRight, ArrowLeft} from 'lucide-react';
-import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES } from '../constants/employeeStatsConfig.js';
+import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES, COLORS_CHART } from '../constants/employeeStatsConfig.js';
 import { EmployeeReportsApi } from '../services/api.js';
+import BarChart from '../components/BarChart.jsx';
 
 function EmployeeSelector({
     employeesList,
@@ -285,6 +286,61 @@ function EmployeeReportsPage({
                         <h3 className='text-xl font-bold text-slate-200 px-6 py-2 border-b border-slate-700'>
                             {METRIC_TITLES[selectedMetric]} - {currentYear}
                         </h3>
+                        <div style={{ height: '400px', padding: '24px' }}>
+                            {(() => {
+                                const data = {
+                                    labels: months,
+                                    datasets: [
+                                        {
+                                            label: METRIC_TITLES[selectedMetric],
+                                            data: employeeYearStats.monthsData.map((monthData) => (
+                                                monthData[selectedMetric]
+                                            )),
+                                            backgroundColor: months.map((_, index) => {
+                                                return(index + 1 === currentMonth
+                                                ? METRIC_COLORS[selectedMetric].bgActiveHex
+                                                : METRIC_COLORS[selectedMetric].bgInactiveHex);
+                                            })
+                                        }
+                                    ]
+                                };
+                                const options = {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {color: COLORS_CHART.textColorAxis},
+                                            grid: {color: COLORS_CHART.gridColor}
+                                        },
+                                        x: {
+                                            ticks: {color: COLORS_CHART.textColorAxis },
+                                            grid: {display: false}
+                                        }
+                                    },
+                                    plugins: {
+                                        legend: {
+                                            display: false
+                                        },
+                                        tooltip: {
+                                            backgroundColor: COLORS_CHART.bgChart,
+                                            displayColors: false,
+                                            titleColor: METRIC_COLORS[selectedMetric].textColorAxis,
+                                            bodyColor: METRIC_COLORS[selectedMetric].textColorHex,
+                                            borderColor: METRIC_COLORS[selectedMetric].borderColorHex,
+                                            borderWidth: 1
+                                        }
+                                    }
+                                };
+                                return (<BarChart
+                                            key={`chart-${selectedMetric}-${currentYear}`} 
+                                            data={data} 
+                                            options={options} 
+                                        />
+                                );
+                            })()}
+                        </div>
+
                     </div>
                 </div>
             </div>
