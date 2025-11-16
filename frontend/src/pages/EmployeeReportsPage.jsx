@@ -1,6 +1,6 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import {BarChart3, ChevronLeft, ChevronRight, ArrowLeft} from 'lucide-react';
 import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES, COLORS_CHART } from '../constants/employeeStatsConfig.js';
 import { EmployeeReportsApi } from '../services/api.js';
@@ -14,11 +14,11 @@ function EmployeeSelector({
     year
 }) {
   return (
-      <div className='bg-slate-800 p-6 rounded-lg shadow-xl max-w-md border border-slate-700'>
-        <div className='flex items-center justify-between mb-4'>
+      <div className='bg-slate-800 p-4 rounded-lg shadow-xl max-w-md border border-slate-700'>
+        <div className='flex items-center justify-between mb-3'>
           <h3 className='text-xl font-bold text-slate-200'>Employees</h3>
         </div>
-        <div className='space-y-2 max-h-96 overflow-y-auto mb-6'>
+        <div className='space-y-2 max-h-96 overflow-y-auto mb-3 px-3'>
           {employeesList.map(emp => {
             const isSelected = emp.id === currentEmployee.id;
             return (
@@ -47,29 +47,11 @@ function EmployeeReportsPage({
     currentEmployee,
     setCurrentEmployee
 }) {
-    // Dados mockados para demonstração
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [selectedMetric, setSelectedMetric] = useState('daysWorked');
     const [employeeYearStats, setEmployeeYearStats] = useState(null);
     const [statsCards, setStatsCards] = useState([]);
-
-    const employaeeYearStats = {
-        name: "employee x",
-        months_data: [
-            {
-                name: "employee x",
-                month_data: {
-                    hoursWorked: 4,
-                    daysOff: 22,
-                    daysWorked: 176,
-                    morningShifts: 11,
-                    afternoonShifts: 11,
-                    nightShifts: 0
-                }
-            }
-        ]
-    };
 
     const convertEmployeeStatsFormat = (stats) => {
         return {
@@ -100,7 +82,6 @@ function EmployeeReportsPage({
             setCurrentEmployee(employeesList[0]);
         }
         async function fetchEmployeeStats() {
-            setIsLoading(true);
             try {
                 const response = await EmployeeReportsApi.getEmployeeYearStats(
                     currentEmployee.id,
@@ -128,7 +109,6 @@ function EmployeeReportsPage({
     const handleToggleEmployee = (employee, month, year) => {
         console.log("Selecionando relatório do funcionário:", employee, month, year);
         setCurrentEmployee(employee);
-        // No futuro vou implmentar um fetch para pegar os dados estatísticos do funcionário selecionado e vou vou tornar essa função assíncrona
     }
 
     const months = [
@@ -168,7 +148,7 @@ function EmployeeReportsPage({
 
     if (isLoading) {
         return (
-            <BaseLayout showSidebar={false} currentPage={8} onPageChange={onPageChange}>
+            <BaseLayout showSidebar={false} currentPage={10} onPageChange={onPageChange}>
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -186,7 +166,7 @@ function EmployeeReportsPage({
             onPageChange={onPageChange}
         >
             <Header title={"Employees Reports"} icon={BarChart3} >
-                <div className="flex items-center gap-4 ml-8">
+                <div className="flex items-center ml-48">
                     <button
                         onClick={handlePrevMonth}
                         className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
@@ -195,7 +175,7 @@ function EmployeeReportsPage({
                         <ChevronLeft size={24} className="text-slate-300" />
                     </button>
                     
-                    <span className="text-xl text-slate-200 font-medium min-w-[200px] text-center">
+                    <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
                         {months[currentMonth - 1]}
                     </span>
                     
@@ -216,7 +196,7 @@ function EmployeeReportsPage({
                         <ChevronLeft size={24} className="text-slate-300" />
                     </button>
                     
-                    <span className="text-xl text-slate-200 font-medium min-w-[200px] text-center">
+                    <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
                         {currentYear}
                     </span>
                     
@@ -229,7 +209,7 @@ function EmployeeReportsPage({
                     </button>
                 </div>
             </Header>
-            <div className='flex gap-5'>
+            <div className='flex gap-4'>
                 <div className=''>
                     <EmployeeSelector
                         employeesList={employeesList}
@@ -250,14 +230,14 @@ function EmployeeReportsPage({
                 </div>
 
                 <div className='flex-1'>
-                    <div className='flex gap-2 flex-wrap mb-5'>
+                    <div className='flex gap-2 flex-wrap mb-4'>
                         {statsCards.map(card => (
                             <div 
                                 key={card.key}
-                                className={`bg-slate-800 rounded-lg p-4 w-56 border border-slate-700 hover:${card.borderColor} transition-colors`}
+                                className={`bg-slate-800 rounded-lg p-3 w-40 border border-slate-700 hover:${card.borderColor} transition-colors`}
                             >
-                                <p className="text-sm text-slate-400 mb-1">{card.label}</p>
-                                <p className={`text-5xl font-bold ${card.textColor} mb-1`}>{card.value}</p>
+                                <p className="text-sm text-slate-400">{card.label}</p>
+                                <p className={`text-5xl font-bold ${card.textColor}`}>{card.value}</p>
                                 <p className="text-xs text-slate-500">{months[currentMonth - 1]} {currentYear}</p>
                             </div>
                         ))}
@@ -265,11 +245,11 @@ function EmployeeReportsPage({
 
                     <div className='bg-slate-800 rounded-lg px-4 py-1.5 border border-slate-700'>
                         <h3 className='text-lg font-semibold text-slate-200 mb-2'>Select Metric to Display</h3>
-                        <div className='flex gap-2 flex-wrap'>
+                        <div className='flex gap-1.5 flex-wrap'>
                             {STATS_CONFIG.map(metric => (
                                 <button
                                     key={metric.key}
-                                    className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                                    className={`px-1.5 py-2 rounded-lg text-sm font-medium transition-all ${
                                         selectedMetric === metric.key
                                         ? `${METRIC_COLORS[metric.key].bgButton} text-white shadow-lg`
                                         : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
@@ -282,7 +262,7 @@ function EmployeeReportsPage({
                         </div>
                     </div>
 
-                    <div className='mt-2 bg-slate-800 rounded-lg border border-slate-700'>
+                    <div className='mt-1.5 bg-slate-800 rounded-lg border border-slate-700'>
                         <h3 className='text-xl font-bold text-slate-200 px-6 py-2 border-b border-slate-700'>
                             {METRIC_TITLES[selectedMetric]} - {currentYear}
                         </h3>

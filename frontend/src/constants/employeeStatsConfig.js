@@ -14,10 +14,10 @@ export const METRIC_COLORS = {
     textColorHex: '#60a5fa',
     bgActive: 'bg-blue-500',
     bgActiveHex: '#3b82f6',
-    bgInactive: 'bg-blue-600',
-    bgInactiveHex: '#2563eb',
-    bgButton: 'bg-blue-600',
-    bgButtonHex: '#2563eb'
+    bgInactive: 'bg-blue-900',
+    bgInactiveHex: '#1e3a8a',
+    bgButton: 'bg-blue-500',
+    bgButtonHex: '#3b82f6'
   },
 
   daysWorked: {
@@ -28,10 +28,10 @@ export const METRIC_COLORS = {
     textColorHex: '#4ade80',
     bgActive: 'bg-green-500',
     bgActiveHex: '#22c55e',
-    bgInactive: 'bg-green-600',
-    bgInactiveHex: '#16a34a',
-    bgButton: 'bg-green-600',
-    bgButtonHex: '#16a34a'
+    bgInactive: 'bg-emerald-900',
+    bgInactiveHex: '#064e3b',
+    bgButton: 'bg-green-500',
+    bgButtonHex: '#22c55e'
   },
 
   hoursWorked: {
@@ -41,11 +41,11 @@ export const METRIC_COLORS = {
     textColor: 'text-purple-400',
     textColorHex: '#c084fc',
     bgActive: 'bg-purple-500',
-    bgActiveHex: '#a855f7',
-    bgInactive: 'bg-purple-600',
-    bgInactiveHex: '#9333ea',
-    bgButton: 'bg-purple-600',
-    bgButtonHex: '#9333ea'
+    bgActiveHex: '#8b5cf6',
+    bgInactive: 'bg-indigo-900',
+    bgInactiveHex: '#312e81',
+    bgButton: 'bg-purple-500',
+    bgButtonHex: '#8b5cf6'
   },
 
   monrningShifts: {
@@ -54,40 +54,40 @@ export const METRIC_COLORS = {
     borderColorHex: '#eab308',
     textColor: 'text-yellow-400',
     textColorHex: '#facc15',
-    bgActive: 'bg-yellow-500',
-    bgActiveHex: '#eab308',
-    bgInactive: 'bg-yellow-600',
-    bgInactiveHex: '#ca8a04',
-    bgButton: 'bg-yellow-600',
-    bgButtonHex: '#ca8a04'
+    bgActive: 'bg-yellow-400',
+    bgActiveHex: '#facc15',
+    bgInactive: 'bg-yellow-700',
+    bgInactiveHex: '#a16207',
+    bgButton: 'bg-yellow-400',
+    bgButtonHex: '#facc15'
   },
 
   afternoonShifts: {
     color: 'orange',
     borderColor: 'border-orange-500',
     borderColorHex: '#f97316',
-    textColor: 'text-orange-400',
-    textColorHex: '#fb923c',
+    textColor: 'text-orange-500',
+    textColorHex: '#f97316',
     bgActive: 'bg-orange-500',
     bgActiveHex: '#f97316',
-    bgInactive: 'bg-orange-600',
-    bgInactiveHex: '#ea580c',
-    bgButton: 'bg-orange-600',
-    bgButtonHex: '#ea580c'
+    bgInactive: 'bg-orange-900',
+    bgInactiveHex: '#7c2d12',
+    bgButton: 'bg-orange-500',
+    bgButtonHex: '#f97316'
   },
 
   nightShifts: {
     color: 'red',
     borderColor: 'border-red-500',
     borderColorHex: '#ef4444',
-    textColor: 'text-red-400',
-    textColorHex: '#f87171',
+    textColor: 'text-red-500',
+    textColorHex: '#ef4444',
     bgActive: 'bg-red-500',
     bgActiveHex: '#ef4444',
     bgInactive: 'bg-red-600',
-    bgInactiveHex: '#dc2626',
-    bgButton: 'bg-red-600',
-    bgButtonHex: '#dc2626'
+    bgInactiveHex: '#7f1d1d',
+    bgButton: 'bg-red-500',
+    bgButtonHex: '#ef4444'
   }
 };
 
