@@ -1,7 +1,7 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect, use } from 'react';
-import {BarChart3, ChevronLeft, ChevronRight} from 'lucide-react';
+import {BarChart3, ChevronLeft, ChevronRight, ArrowLeft} from 'lucide-react';
 import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES } from '../constants/employeeStatsConfig.js';
 import { EmployeeReportsApi } from '../services/api.js';
 
@@ -145,6 +145,10 @@ function EmployeeReportsPage({
         setCurrentYear(currentYear + 1);
     };
 
+    const handleBack = () => {
+        onPageChange(3);
+    };
+
     if (isLoading) {
         return (
             <BaseLayout showSidebar={false} currentPage={8} onPageChange={onPageChange}>
@@ -209,13 +213,25 @@ function EmployeeReportsPage({
                 </div>
             </Header>
             <div className='flex gap-5'>
-                <EmployeeSelector
-                    employeesList={employeesList}
-                    currentEmployee={currentEmployee}
-                    onToggleEmployee={handleToggleEmployee}
-                    month={currentMonth}
-                    year={currentYear}
-                />
+                <div className=''>
+                    <EmployeeSelector
+                        employeesList={employeesList}
+                        currentEmployee={currentEmployee}
+                        onToggleEmployee={handleToggleEmployee}
+                        month={currentMonth}
+                        year={currentYear}
+                    />
+                    <div className="flex-1 justify-start flex mt-4">
+                        <button
+                            onClick={handleBack}
+                            className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                        >
+                            Back
+                            <ArrowLeft size={20} />
+                        </button>
+                    </div>
+                </div>
+
                 <div className='flex-1'>
                     <div className='flex gap-2 flex-wrap mb-5'>
                         {statsCards.map(card => (
