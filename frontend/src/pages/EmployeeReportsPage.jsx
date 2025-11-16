@@ -41,7 +41,7 @@ function EmployeeSelector({
 function EmployeeReportsPage({
     onPageChange,
     isLoading,
-    setLoading,
+    setIsLoading,
     employeesList,
     currentEmployee,
     setCurrentEmployee
@@ -84,8 +84,7 @@ function EmployeeReportsPage({
         };
     }
 
-    const createStatsCards = (employeeStats) => {
-        const employeeStatsFormatted = convertEmployeeStatsFormat(employeeStats);
+    const createStatsCards = (employeeStatsFormatted) => {
         return STATS_CONFIG.map(config => ({
             ...config,
             ...METRIC_COLORS[config.key],
@@ -100,22 +99,24 @@ function EmployeeReportsPage({
             setCurrentEmployee(employeesList[0]);
         }
         async function fetchEmployeeStats() {
-            setLoading(true);
+            setIsLoading(true);
             try {
                 const response = await EmployeeReportsApi.getEmployeeYearStats(
                     currentEmployee.id,
                     currentYear
                 );
                 if (response.data) {
-                    setEmployeeYearStats(response.data);
-                    const statsCards = createStatsCards(response.data);
+                    console.log("Raw employee stats data:", response.data);
+                    const employeeStatsFormatted = convertEmployeeStatsFormat(response.data);
+                    setEmployeeYearStats(employeeStatsFormatted);
+                    const statsCards = createStatsCards(employeeStatsFormatted);
                     setStatsCards(statsCards);
                     console.log('Estatísticas do funcionário recebidas com sucesso:', response.data);
                 }
             } catch (error) {
                 console.error('Erro ao buscar estatísticas do funcionário:', error);
             } finally {
-                setLoading(false);
+                setIsLoading(false);
             }
         }
         if (currentEmployee) {
