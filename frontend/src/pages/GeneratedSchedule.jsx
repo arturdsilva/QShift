@@ -3,6 +3,7 @@ import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
 import { useState, useEffect } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
+import {initialScheduleEmpty} from '../constants/schedule.js';
 
 function GeneratedSchedule({
     onPageChange,
@@ -12,7 +13,7 @@ function GeneratedSchedule({
     setIsLoading,
     weekData
 }) {
-    const [scheduleData, setScheduleData] = useState(null);
+    const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const [editMode, setEditMode] = useState(false);
     const [isPossible, setIsPossible] = useState(true);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
