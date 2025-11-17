@@ -3,7 +3,6 @@ import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 import {AvailabilityApi, StaffApi} from '../services/api.js';
-import { employeesAvailability } from '../MockData.js';
 
 function AvailabilityPage({
     onPageChange,
@@ -61,7 +60,8 @@ function AvailabilityPage({
         updateAvaibility(ListSchemas);
       } catch (err) {
         console.error(err);
-        updateAvaibility(employeesAvailability[selectEditEmployee.id].availability);
+        alert('Error loading employee data. Please check the console.');
+        onPageChange(1);
       } finally {
       setIsLoading(false);
       console.log('página carregada', isLoading);

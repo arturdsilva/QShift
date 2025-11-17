@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import {Users, Plus, ArrowRight, Trash2} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';

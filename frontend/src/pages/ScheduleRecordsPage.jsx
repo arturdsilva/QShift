@@ -4,7 +4,6 @@ import ScheduleTable from '../components/ScheduleTable';
 import { CalendarRange, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
-import {initialScheduleEmpty, week} from '../MockData.js';
 
 function ScheduleRecordsPage({
     onPageChange,
@@ -20,7 +19,7 @@ function ScheduleRecordsPage({
     setCurrentIdxWeek
 }) {
     const [editMode, setEditMode] = useState(false);
-    const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
+    const [scheduleData, setScheduleData] = useState(null);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
     const [schedulesCache, setSchedulesCache] = useState({})
     console.log('week', weekRecords)

@@ -1,8 +1,6 @@
 import { useState } from 'react';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import {RegisterApi} from '../services/api.js'
-import {DataBaseUser} from '../MockData.js';
-import BaseLayout from '../layouts/BaseLayout.jsx';
 
 function RegisterPage({onPageChange}) {
 

@@ -3,7 +3,7 @@ import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
 import { useState, useEffect } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
-import {initialScheduleEmpty} from '../MockData.js';
+import {initialScheduleEmpty} from '../constants/schedule.js';
 
 function GeneratedSchedule({
     onPageChange,
@@ -17,7 +17,6 @@ function GeneratedSchedule({
     const [editMode, setEditMode] = useState(false);
     const [isPossible, setIsPossible] = useState(true);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
-    const [isProcessing, setIsProcessing] = useState(false);
 
     const convertScheduleData = (shifts) => {
         const scheduleModified = {

@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import AuthLayout from '../layouts/AuthLayout.jsx';
-import {DataBaseUser} from '../MockData.js';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import {LoginApi} from '../services/api.js';
 
