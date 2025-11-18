@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { logout } from './auth.js';
+import { logout } from '../utils/auth.js';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,

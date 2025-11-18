@@ -10,7 +10,7 @@ import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
 import ScheduleRecordsPage from './pages/ScheduleRecordsPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import EmployeeReportsPage from './pages/EmployeeReportsPage.jsx';
-import { registerNavigation } from './services/auth.js';
+import { registerNavigation } from './utils/auth.js';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
