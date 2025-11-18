@@ -1,4 +1,4 @@
-import { use, useState } from 'react'
+import { useEffect, useState } from 'react'
 import CalendarPage from './pages/CalendarPage.jsx';
 import StaffPage from './pages/StaffPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
@@ -10,6 +10,7 @@ import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
 import ScheduleRecordsPage from './pages/ScheduleRecordsPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import EmployeeReportsPage from './pages/EmployeeReportsPage.jsx';
+import { registerNavigation } from './services/auth.js';
 
 function App() {
   const [currentPage, setCurrentPage] = useState(0);
@@ -28,6 +29,10 @@ function App() {
   const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
   const [currentEmployee, setCurrentEmployee] = useState(null);
 
+  useEffect(() => {
+    registerNavigation(setCurrentPage);
+  }, []);
+  
   const pages = [
     <LoginPage
       onPageChange={setCurrentPage}

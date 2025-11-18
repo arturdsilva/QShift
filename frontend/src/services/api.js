@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { logout } from './auth.js';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -16,6 +17,17 @@ api.interceptors.request.use(config => {
 }, error => {
     return Promise.reject(error);
 });
+
+api.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            alert('Session expired. Please log in again.');
+            logout();
+        }
+        return Promise.reject(error);
+    }
+);          
 
 export const ShiftConfigApi = {
     createShift: async (week_id, shiftData) => {
