@@ -100,12 +100,11 @@ function StaffPage({
             className='flex bg-slate-800 rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-200 overflow-hidden'
           >
             <div className="flex-1">
-              {/* Área clicável para edição */}
               <div
                 onClick={() => handleEditEmployee(employee.id)}
                 className="p-6 cursor-pointer hover:bg-slate-750 transition-colors"
               >
-                <div className="text-lg font-medium text-white mb-1">
+                <div className="text-lg font-medium text-white mb-1 max-w-full break-all leading-none">
                   {employee.name}
                 </div>
                 <div className="text-sm text-slate-400">
@@ -113,9 +112,8 @@ function StaffPage({
                 </div>
               </div>
               
-              {/* Seção do checkbox */}
               <div className="px-6 pb-4 pt-2 border-t border-slate-700">
-                <label className="flex items-center gap-3 cursor-pointer group">
+                <label className="flex items-center gap-3 cursor-pointer group items-stretch">
                   <div className="relative">
                     <input
                       type="checkbox"
@@ -133,7 +131,6 @@ function StaffPage({
               </div>
             </div>
             
-            {/* Botão de delete */}
             <div className="flex items-stretch border-l border-slate-700">
               <button
                 onClick={() => handleDeleteEmployee(employee.id)}
@@ -146,7 +143,6 @@ function StaffPage({
           </div>
         ))}
           
-          {/* Card para adicionar novo funcionário */}
           <button
             onClick={handleAddEmployee}
             className="bg-slate-800 rounded-lg border-2 border-dashed border-slate-700 hover:border-indigo-500 hover:bg-slate-750 transition-all duration-200 p-6 flex flex-col items-center justify-center gap-3 min-h-[160px] group"

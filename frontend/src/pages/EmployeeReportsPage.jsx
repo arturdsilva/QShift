@@ -29,7 +29,7 @@ function EmployeeSelector({
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
               >
                 <div className='flex items-center justify-between'>
-                  <span className='font-medium'>{emp.name}</span>
+                  <span className='font-medium max-w-full break-all leading-none'>{emp.name}</span>
                 </div>
               </button>
             );

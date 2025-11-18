@@ -39,7 +39,7 @@ function EmployeeSelector({
                   : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
               >
                 <div className='flex items-center justify-between'>
-                  <span className='font-medium'>{emp.name}</span>
+                  <span className='font-medium max-w-full break-all leading-none'>{emp.name}</span>
                   {isSelected && <Check size={20}/>}
                 </div>
               </button>
@@ -215,7 +215,7 @@ function ScheduleTable({
                                             return(
                                               <div
                                               key={i}
-                                              className="px-2 py-1.5 bg-blue-600/50 text-white text-xs rounded text-center font-medium"
+                                              className="px-2 py-1.5 bg-blue-600/50 text-white text-xs rounded text-center font-medium max-w-full break-all leading-none"
                                               >
                                               {emp.name}
                                               </div>       
@@ -258,7 +258,7 @@ function ScheduleTable({
                           </th>
                         )}
                         <td key={day} className="px-2 py-3 border-r border-slate-600 text-center">
-                          <div className="text-slate-400 text-sm">
+                          <div className="text-slate-400 text-sm max-w-full break-all leading-none">
                             {onBreak.length > 0 
                               ? onBreak.map(emp => emp.name).join(', ')
                               : "—"
