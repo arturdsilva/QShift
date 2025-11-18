@@ -167,16 +167,21 @@ function AvailabilityPage({
         console.log('Atualizando funcionário existente...');
         await StaffApi.updateEmployeeData(employeeId, { name, active: isActive });
       }
-      console.log('Salvando disponibilidades...');
-      await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
-      
-      console.log(' Funcionário e disponibilidades salvos com sucesso!');
-      setSelectEditEmployee(null);
-      onPageChange(1);
-
+      try {
+        console.log('Salvando disponibilidades...');
+        await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
+        console.log('Funcionário e disponibilidades salvos com sucesso!');
+        setSelectEditEmployee(null);
+        onPageChange(1);
+      } catch (err) {
+        console.error('Erro ao salvar disponibilidades:', err);
+        await StaffApi.deleteEmployee(employeeId);
+        alert('Erro ao salvar disponibilidades. Tente novamente.');
+        return;
+      }
     } catch (err) {
       console.error('Erro ao salvar:', err);
-      setError(err.response?.data?.detail || 'Erro ao salvar funcionário. Verifique o console.');
+      setError(err.response?.data?.detail || 'Erro ao salvar funcionário. Tente novamente.');
     }
   };
     
