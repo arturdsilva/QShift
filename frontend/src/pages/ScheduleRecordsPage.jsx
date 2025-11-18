@@ -1,9 +1,10 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
-import { CalendarRange, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { CalendarRange, ChevronLeft, ChevronRight, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import {GeneratedScheduleApi} from '../services/api.js'
+import {GeneratedScheduleApi} from '../services/api.js';
+import { exportToCSV } from '../utils/exportSchedule.js';
 
 function ScheduleRecordsPage({
     onPageChange,
@@ -161,6 +162,20 @@ function ScheduleRecordsPage({
         onPageChange(3)
     };
 
+    const handleExportCSV = () => {
+        if (!scheduleData || !weekRecords) {
+            alert('No schedule data to export');
+            return;
+        }
+        try {
+            exportToCSV(scheduleData, weekRecords, employees);
+            console.log('Schedule exported to CSV successfully');
+        } catch (error) {
+            console.error('Error exporting to CSV:', error);
+            alert('Error exporting schedule to CSV. Please try again.');
+        }
+    };
+
     const handleDeleteSchedule = async () => {
         setIsLoading(true);
         try {
@@ -292,7 +307,17 @@ function ScheduleRecordsPage({
                             </div>
 
                         {weeksList.length > 0 && (
-                            <div className="justify-end flex flex-1">
+                            <div className="justify-end flex flex-1 gap-2">
+                                <div className='px-2 py-1.5 rounded text-center font-medium'>
+                                    <button
+                                        onClick={handleExportCSV}
+                                        className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                                        title="Export schedule to CSV"
+                                    >
+                                        <FileSpreadsheet size={20} />
+                                        Export CSV
+                                    </button>
+                                </div>
                                 <div className='px-2 py-1.5 rounded text-center font-medium'>
                                     <button
                                         onClick={handleEdit}
