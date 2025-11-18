@@ -1,9 +1,10 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {GeneratedScheduleApi} from '../services/api.js'
 import {initialScheduleEmpty} from '../constants/schedule.js';
+import { usePrompt } from '../hooks/usePrompt.js';
 
 function GeneratedSchedule({
     onPageChange,
@@ -17,6 +18,39 @@ function GeneratedSchedule({
     const [editMode, setEditMode] = useState(false);
     const [isPossible, setIsPossible] = useState(true);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
+    const previewStatusRef = useRef({ 
+        isPersisted: false, 
+        isDeleted: false 
+    });
+
+    const cleanupPreview = useCallback(async () => {
+        if (!weekData?.id || 
+            previewStatusRef.current.isPersisted || 
+            previewStatusRef.current.isDeleted) {
+            return;
+        }
+        try {
+            previewStatusRef.current.isDeleted = true;
+            await GeneratedScheduleApi.deleteSchedule(weekData?.id);
+            console.log('Preview deletado com sucesso');
+        } catch (error) {
+            console.error('Erro ao deletar preview:', error);
+            previewStatusRef.current.isDeleted = true;
+        }
+    }, [weekData?.id]);
+
+    const shouldBlockNavigation = weekData?.id &&
+        !previewStatusRef.current.isPersisted &&
+        !previewStatusRef.current.isDeleted;
+
+    const markPreviewAsPersisted = useCallback(() => {
+        previewStatusRef.current.isPersisted = true;
+    }, []);
+
+    usePrompt(
+        shouldBlockNavigation,
+        cleanupPreview
+    );
 
     const convertScheduleData = (shifts) => {
         const scheduleModified = {
@@ -49,32 +83,19 @@ function GeneratedSchedule({
             setIsLoading(true);
             try {
                 const response = await GeneratedScheduleApi.generateSchedulePreview(weekData.id);
-                
                 if (response.data.possible && response.data.schedule) {
                     convertScheduleData(response.data.schedule.shifts);
                     setIsPossible(true);
-                    console.log('A escala possible:', response.data.possible);
                     console.log('A escala criada:', response.data.schedule);
-                    console.log('Turnos:', response.data.schedule.shifts);
                 } else {
                     setIsPossible(false);
                     alert('Não foi possível gerar uma escala viável com as configurações atuais. Verifique as configurações de turnos e funcionários.');
-                    try {
-                        await GeneratedScheduleApi.deleteSchedule(weekData.id);
-                        console.log('Semana deletada devido ao erro na geração da escala');
-                    } catch (deleteError) {
-                        console.error('Erro ao deletar semana:', deleteError);
-                    }
+                    await cleanupPreview();
                     onPageChange(1);
                 }
             } catch (error) {
                 console.error('Erro ao gerar escala:', error);
-                try {
-                    await GeneratedScheduleApi.deleteSchedule(weekData.id);
-                    console.log('Semana deletada devido ao erro na geração da escala');
-                } catch (deleteError) {
-                    console.error('Erro ao deletar semana:', deleteError);
-                }
+                await cleanupPreview();
                 onPageChange(1);
             } finally {
                 setIsLoading(false);
@@ -84,17 +105,19 @@ function GeneratedSchedule({
         if (weekData.id) {
             generateSchedule();
         }
-    }, [weekData.id]);
+    }, [weekData.id, cleanupPreview]);
 
     const handleCancel = async () => {
         if (weekData) {
             try {
+                previewStatusRef.current.isDeleted = true;
                 const response = await GeneratedScheduleApi.deleteSchedule(weekData.id);
                 console.log('A escala foi deletada com sucesso');
             } catch (error) {
                 console.error('Erro ao deletar escala:', error);
             }
         }
+        // Usa onPageChange direto, pois cancelar é ação intencional
         onPageChange(1);
     };
 
@@ -125,22 +148,26 @@ function GeneratedSchedule({
         try {
             const response = await GeneratedScheduleApi.approvedSchedule(weekData.id, shiftsSchedule);
             console.log('Escala criada com sucesso:', response.data);
+            // Marca como persistido antes de navegar para não bloquear
+            markPreviewAsPersisted();
             onPageChange(1);
         } catch (error) {
             console.error('Erro ao aprovar a escala:', error);
             alert('Erro ao aprovar a escala. A semana será removida.');
             try {
+                previewStatusRef.current.isDeleted = true;
                 await GeneratedScheduleApi.deleteSchedule(weekData.id);
                 console.log('Semana deletada devido ao erro na aprovação');
             } catch (deleteError) {
                 console.error('Erro ao deletar semana:', deleteError);
             }
             onPageChange(1);
-        }};
+        }
+    }
 
     if (isLoading) {
         return (
-            <BaseLayout showSidebar={false} currentPage={7} onPageChange={onPageChange}>
+            <BaseLayout showSidebar={false} currentPage={7}>
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -154,6 +181,7 @@ function GeneratedSchedule({
         <BaseLayout
             showSidebar={false}
             currentPage={7}
+            onPageChange={onPageChange}
         >
             <Header title="Generated Schedule" />
             <div className="p-3">
