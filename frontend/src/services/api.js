@@ -27,7 +27,20 @@ api.interceptors.response.use(
         }
         return Promise.reject(error);
     }
-);          
+);
+
+async function fetchApi(path, options = {}) {
+    const token = localStorage.getItem("token");
+
+    return fetch(`${import.meta.env.VITE_BASE_URL}${path}`, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...options.headers
+        }
+    });
+}
 
 export const ShiftConfigApi = {
     createShift: async (week_id, shiftData) => {
@@ -174,18 +187,10 @@ export const AvailabilityApi = {
 export const GeneratedScheduleApi = {
     deleteSchedule: async (week_id) => {
         try {
-            const token = localStorage.getItem('token');
-
-            const response = await fetch(
-                `${import.meta.env.VITE_BASE_URL}/weeks/${week_id}`,
+            await fetchApi(`/weeks/${week_id}`,
                 {
                     method: "DELETE",
                     keepalive: true,
-                    headers: {
-                        "Content-Type": "application/json",
-                        "Accept": "application/json",
-                        ...(token ? { "Authorization": `Bearer ${token}` } : {})
-                    }
                 }
             );
         } catch (error) {
