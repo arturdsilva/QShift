@@ -6,12 +6,11 @@ function BaseLayout({
     showSidebar = true,
     showSelectionPanel = false,
     selectionPanelData,
-    currentPage,
-    onPageChange
+    currentPage
 }) {
     return (
         <div className="flex h-screen bg-slate-900">
-            {showSidebar && <Sidebar currentPage={currentPage} onPageChange={onPageChange}/>}
+            {showSidebar && <Sidebar currentPage={currentPage}/>}
 
             <div  className="flex-1 flex overflow-hidden">
                 <div className="flex-1 p-8 overflow-auto">

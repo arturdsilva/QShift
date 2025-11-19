@@ -1,11 +1,16 @@
 import { CalendarRange, BarChart3, LogOut } from 'lucide-react';
-import { logout } from '../utils/auth.js';
+import { useNavigate } from 'react-router-dom';
 
-function Sidebar({currentPage, onPageChange}){
-    const navItems = [
-        {icon: CalendarRange, label: "Create Schedule", index:1},
-        {icon: BarChart3, label: "Reports", index:3}
-    ]
+function Sidebar({currentPage}){
+  const navigate = useNavigate();
+  const navItems = [
+        {icon: CalendarRange, label: "Create Schedule", path:"/staff"},
+        {icon: BarChart3, label: "Reports", path:"/reports"}
+  ];
+  const logout = () => {
+    localStorage.removeItem("access_token");
+    navigate('/login');
+  };
 
   return (
       <div className="w-48 bg-slate-800 border-r border-slate-700 flex flex-col p-4">
@@ -16,7 +21,7 @@ function Sidebar({currentPage, onPageChange}){
             return (
               <button
                 key={item.index}
-                onClick={() => onPageChange(item.index)}
+                onClick={() => navigate(item.path)}
                 className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-2 transition-colors w-full mb-2 ${
                   isActive 
                     ? 'bg-blue-600 text-white' 

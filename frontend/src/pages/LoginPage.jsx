@@ -1,14 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import {LoginApi} from '../services/api.js';
 
 function LoginPage({
-    onPageChange,
-    onLoginSucess,
     isLoading,
     setIsLoading
 }) {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
@@ -18,7 +18,7 @@ function LoginPage({
             const response = await LoginApi.authenticateUser(email, password);
             localStorage.setItem('token', response.data.access_token);
             console.log('User logged in:', email);
-            onPageChange(1);
+            navigate('/staff');
         } catch (err) {
             console.error(err);
             if (err.response && err.response.status === 401) {
@@ -29,12 +29,12 @@ function LoginPage({
     };
 
     const goToRegister = () => {
-        onPageChange(9);
+        navigate('/register');
     }
 
     if (isLoading) {
         return (
-            <BaseLayout showSidebar={false} currentPage={0} onPageChange={onPageChange}>
+            <BaseLayout showSidebar={false} currentPage={0}>
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>

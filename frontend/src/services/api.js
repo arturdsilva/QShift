@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { logout } from '../utils/auth.js';
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_BASE_URL,
@@ -23,7 +22,8 @@ api.interceptors.response.use(
     (error) => {
         if (error.response?.status === 401) {
             alert('Session expired. Please log in again.');
-            logout();
+            localStorage.removeItem("access_token");
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }

@@ -1,5 +1,3 @@
-import { ArrowRight } from 'lucide-react';
-
 function getMonthCalendar(year, month) {
     const firstDay = new Date(year, month-1, 1);
     const lastDay = new Date(year, month, 0);

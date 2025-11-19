@@ -1,18 +1,20 @@
 import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {Users, Plus, ArrowRight, Trash2} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 import {StaffApi} from '../services/api.js';
 
 function StaffPage({ 
-    onPageChange,
     selectEditEmployee,
     setSelectEditEmployee,
     isLoading,
     setIsLoading,
     employees,
     setEmployees
-  }) {
+}) {
+  const navigate = useNavigate();
+
   useEffect(() => {
   async function employeeData() {
       setIsLoading(true);
@@ -43,7 +45,7 @@ function StaffPage({
   const handleAddEmployee = () => {
       console.log('Add employee');
       setSelectEditEmployee(null);
-      onPageChange(5);
+      navigate('/availability');
   };
 
   const handleEditEmployee = (employeeId) => {
@@ -52,7 +54,7 @@ function StaffPage({
     if (emp) {
       console.log('entrou', emp);
       setSelectEditEmployee(emp);
-      onPageChange(5);
+      navigate('/availability');
     } else {
       console.warn('Funcionário não encontrado:', employeeId);
     }
@@ -72,13 +74,13 @@ function StaffPage({
 
   const handleAdvance = () => {
       setIsLoading(true);
-      onPageChange(2);
+      navigate('/calendar');
 
   };
 
   if (isLoading) {
       return (
-          <BaseLayout showSidebar={false} currentPage={1} onPageChange={onPageChange}>
+          <BaseLayout showSidebar={false} currentPage={1}>
               <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
                       <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -89,7 +91,7 @@ function StaffPage({
       );
   }
   return (
-    <BaseLayout currentPage={1} onPageChange={onPageChange}>
+    <BaseLayout currentPage={1}>
       <Header title="Employee Management" icon={Users} />
       
       <div className="space-y-4">

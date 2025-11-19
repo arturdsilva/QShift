@@ -1,6 +1,7 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {BarChart3, ChevronLeft, ChevronRight, ArrowLeft} from 'lucide-react';
 import { METRIC_COLORS, STATS_CONFIG, METRIC_TITLES, COLORS_CHART } from '../constants/employeeStatsConfig.js';
 import { EmployeeReportsApi } from '../services/api.js';
@@ -40,13 +41,13 @@ function EmployeeSelector({
 }
 
 function EmployeeReportsPage({
-    onPageChange,
     isLoading,
     setIsLoading,
     employeesList,
     currentEmployee,
     setCurrentEmployee
 }) {
+    const navigate = useNavigate();
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth() + 1);
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
     const [selectedMetric, setSelectedMetric] = useState('daysWorked');
@@ -143,12 +144,12 @@ function EmployeeReportsPage({
     };
 
     const handleBack = () => {
-        onPageChange(3);
+        navigate('/reports');
     };
 
     if (isLoading) {
         return (
-            <BaseLayout showSidebar={false} currentPage={10} onPageChange={onPageChange}>
+            <BaseLayout showSidebar={false} currentPage={10}>
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -163,7 +164,6 @@ function EmployeeReportsPage({
         <BaseLayout 
             showSidebar={false}
             currentPage={10}
-            onPageChange={onPageChange}
         >
             <Header title={"Employees Reports"} icon={BarChart3} >
             </Header>

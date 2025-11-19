@@ -1,16 +1,17 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 import {AvailabilityApi, StaffApi} from '../services/api.js';
 
 function AvailabilityPage({
-    onPageChange,
     selectEditEmployee,
     setSelectEditEmployee,
     isLoading,
     setIsLoading
 }) {
+  const navigate = useNavigate();
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
   const [name, setName] = useState(selectEditEmployee?.name || '');
@@ -61,7 +62,7 @@ function AvailabilityPage({
       } catch (err) {
         console.error(err);
         alert('Error loading employee data. Please check the console.');
-        onPageChange(1);
+        navigate('/staff');
       } finally {
       setIsLoading(false);
       console.log('página carregada', isLoading);
@@ -99,7 +100,7 @@ function AvailabilityPage({
   
   const handleCancel = () => {
     setSelectEditEmployee(null);
-    onPageChange(1);
+    navigate('/staff');
   };
 
   const convertAvailabilityToSchemas = () => {
@@ -172,7 +173,7 @@ function AvailabilityPage({
         await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
         console.log('Funcionário e disponibilidades salvos com sucesso!');
         setSelectEditEmployee(null);
-        onPageChange(1);
+        navigate('/staff');
       } catch (err) {
         console.error('Erro ao salvar disponibilidades:', err);
         await StaffApi.deleteEmployee(employeeId);
@@ -187,7 +188,7 @@ function AvailabilityPage({
     
   if (isLoading) {
       return (
-          <BaseLayout showSidebar={false} currentPage={5} onPageChange={onPageChange}>
+          <BaseLayout showSidebar={false} currentPage={5}>
               <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
                       <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -202,7 +203,7 @@ function AvailabilityPage({
     <BaseLayout 
         showSidebar={false}
         currentPage={5} 
-        onPageChange={onPageChange}>
+    >
       <Header title="Employee availability" icon={Calendar} />
       
       <div className="space-y-6" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
