@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import AuthLayout from '../layouts/AuthLayout.jsx';
 import {RegisterApi} from '../services/api.js'
 
-function RegisterPage({onPageChange}) {
-
+function RegisterPage({}) {
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [confEmail, setConfEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -24,7 +25,7 @@ function RegisterPage({onPageChange}) {
             const responseRegister = await RegisterApi.registerUser(email, password);
             if (responseRegister.data) {
                 alert('User registered successfully');
-                onPageChange(0);
+                navigate('/login');
             }
         } catch (error) {
             if (error.response?.data?.detail === "Email already registered") {
@@ -37,7 +38,7 @@ function RegisterPage({onPageChange}) {
     }
 
     const goToLogin = () => {
-        onPageChange(0);
+        navigate('/login');
     }
 
     return (

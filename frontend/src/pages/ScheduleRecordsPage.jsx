@@ -3,11 +3,11 @@ import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
 import { CalendarRange, ChevronLeft, ChevronRight, AlertTriangle, FileSpreadsheet } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {GeneratedScheduleApi} from '../services/api.js';
 import { exportToCSV } from '../utils/exportSchedule.js';
 
 function ScheduleRecordsPage({
-    onPageChange,
     employees,
     setEmployees,
     isLoading,
@@ -19,6 +19,7 @@ function ScheduleRecordsPage({
     currentIdxWeek,
     setCurrentIdxWeek
 }) {
+    const navigate = useNavigate();
     const [editMode, setEditMode] = useState(false);
     const [scheduleData, setScheduleData] = useState(null);
     const days_of_week = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'];
@@ -159,7 +160,7 @@ function ScheduleRecordsPage({
     }
 
     const handleBack = () => {
-        onPageChange(3)
+        navigate('/reports');
     };
 
     const handleExportCSV = () => {
@@ -188,7 +189,7 @@ function ScheduleRecordsPage({
             if (weeksList.length === 1) {
                 setWeekRecords(null);
                 setCurrentIdxWeek(0);
-                onPageChange(3);
+                navigate('/reports');
             } else {
                 const newWeeksList = weeksList.filter(week => week.id !== weekRecords.id);
                 setWeeksList(newWeeksList);
@@ -210,7 +211,7 @@ function ScheduleRecordsPage({
 
     if (isLoading) {
         return (
-            <BaseLayout showSidebar={false} currentPage={8} onPageChange={onPageChange}>
+            <BaseLayout showSidebar={false} currentPage={8}>
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -227,7 +228,6 @@ function ScheduleRecordsPage({
             showSelectionPanel = {true}
             selectionPanelData = {null}
             currentPage = {8}
-            onPageChange = {onPageChange}
         >
             <Header title={"Schedule Records"} icon={CalendarRange}>
                 <div className="flex items-center gap-4 ml-8">

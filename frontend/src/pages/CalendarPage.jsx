@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Calendar, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft} from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout';
 import CalendarTable from '../components/CalendarTable';
@@ -6,7 +7,6 @@ import Header from '../components/Header';
 import {CalendarApi} from '../services/api.js';
 
 function CalendarPage ({ 
-  onPageChange,
   currentMonth,
   setCurrentMonth,
   currentYear,
@@ -20,6 +20,7 @@ function CalendarPage ({
   isLoading,
   setIsLoading
   }) {
+  const navigate = useNavigate();
   const [generatedWeeks, setGeneratedWeeks] = useState([]);
   useEffect(() => {
     async function getWeeks() {
@@ -83,12 +84,12 @@ function CalendarPage ({
   const handleAdvance = () => {
     if (selectedWeek && selectedDays.length > 0) {
       console.log('Avançando com:', { selectedWeek, selectedDays });
-      onPageChange(6);
+      navigate('/shift-config');
     }
   };
 
   const handleBack = () => {
-    onPageChange(1);
+    navigate('/staff');
   };
 
   const months = [
@@ -98,7 +99,7 @@ function CalendarPage ({
 
   if (isLoading) {
       return (
-          <BaseLayout showSidebar={false} currentPage={2} onPageChange={onPageChange}>
+          <BaseLayout showSidebar={false} currentPage={2}>
               <div className="flex items-center justify-center min-h-screen">
                   <div className="text-center">
                       <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -115,7 +116,6 @@ function CalendarPage ({
       showSelectionPanel={true}
       selectionPanelData={{ startDate, selectedDays }}
       currentPage={2}
-      onPageChange={onPageChange}
     >
       <Header title="Calendar" icon={Calendar}>
         <div className="flex items-center gap-4 ml-8">

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import CalendarPage from './pages/CalendarPage.jsx';
 import StaffPage from './pages/StaffPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
@@ -11,10 +11,8 @@ import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
 import ScheduleRecordsPage from './pages/ScheduleRecordsPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import EmployeeReportsPage from './pages/EmployeeReportsPage.jsx';
-import { registerNavigation } from './utils/auth.js';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState(0);
   const now = new Date();
   const [currentMonth, setCurrentMonth] = useState(now.getMonth() + 1);
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
@@ -29,10 +27,6 @@ function App() {
   const [weekRecords, setWeekRecords] = useState(null);
   const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
   const [currentEmployee, setCurrentEmployee] = useState(null);
-
-  useEffect(() => {
-    registerNavigation(setCurrentPage);
-  }, []);
 
   return (
     <BrowserRouter>
@@ -49,16 +43,13 @@ function App() {
         <Route 
           path="/register" 
           element={
-            <RegisterPage
-              onPageChange={setCurrentPage}
-            />
+            <RegisterPage/>
           }
         />
         <Route 
           path="/staff" 
           element={
-            <StaffPage 
-              onPageChange={setCurrentPage}
+            <StaffPage
               selectEditEmployee={selectEditEmployee}
               setSelectEditEmployee={setSelectEditEmployee}
               isLoading={isLoading}
@@ -71,8 +62,7 @@ function App() {
         <Route 
           path="/calendar" 
           element={
-            <CalendarPage 
-              onPageChange={setCurrentPage}
+            <CalendarPage
               currentMonth={currentMonth}
               setCurrentMonth={setCurrentMonth}
               currentYear={currentYear}
@@ -91,8 +81,7 @@ function App() {
         <Route 
           path="/availability" 
           element={
-            <AvailabilityPage 
-              onPageChange={setCurrentPage}
+            <AvailabilityPage
               selectEditEmployee={selectEditEmployee}
               setSelectEditEmployee={setSelectEditEmployee}
               isLoading={isLoading}
@@ -103,8 +92,7 @@ function App() {
         <Route 
           path="/shift-config" 
           element={
-            <ShiftConfigPage 
-              onPageChange={setCurrentPage}
+            <ShiftConfigPage
               selectedDays={selectedDays}
               startDate={startDate}
               setWeekData={setWeekData}
@@ -115,7 +103,6 @@ function App() {
           path="/schedule"
           element={
             <GeneratedSchedule
-              onPageChange={setCurrentPage}
               employees={employees}
               setEmployees={setEmployees}
               isLoading={isLoading}
@@ -127,8 +114,7 @@ function App() {
         <Route 
           path="/reports"
           element={
-            <ReportsPage 
-              onPageChange={setCurrentPage}
+            <ReportsPage
               weeksList={weeksList} 
               setWeeksList={setWeeksList}
               isLoading={isLoading}
@@ -144,7 +130,6 @@ function App() {
           path="/schedule-records"
           element={
             <ScheduleRecordsPage
-              onPageChange={setCurrentPage}
               employees={employees}
               setEmployees={setEmployees}
               isLoading={isLoading}
@@ -162,7 +147,6 @@ function App() {
           path="/employee-reports"
           element={
             <EmployeeReportsPage
-              onPageChange={setCurrentPage}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
               employeesList={employees}
@@ -174,7 +158,7 @@ function App() {
         <Route
           path="/settings"
           element={
-            <SettingsPage onPageChange={setCurrentPage} />
+            <SettingsPage/>
           }
         />
         <Route

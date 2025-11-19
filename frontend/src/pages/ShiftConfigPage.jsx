@@ -1,11 +1,12 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
 import { ShiftConfigApi }   from '../services/api.js';
 
-function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekData}) {
-
+function ShiftConfigPage({selectedDays, startDate, setWeekData}) {
+    const navigate = useNavigate();
     const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
     const openDaysMask = [];
     const selectedDaysMap = {};
@@ -34,7 +35,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekData}) {
 
     const handleBack = () => {
         console.log("Voltando para página de calendário");
-        onPageChange(2);
+        navigate('/calendar');
     };
 
     const addTurn = () => {
@@ -205,7 +206,7 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekData}) {
                 }
                 console.log('Todos os turnos criados com sucesso!');
                 alert('Escala criada com sucesso!');
-                onPageChange(7);
+                navigate('/schedule');
                 
             } catch (error) {
                 console.error('Erro ao criar escala:', error);
@@ -229,7 +230,6 @@ function ShiftConfigPage({onPageChange, selectedDays, startDate, setWeekData}) {
             currentPage={6}
             showSelectionPanel={true}
             selectionPanelData={{ startDate, selectedDays }}
-            onPageChange={onPageChange}
         >
             <Header title="Shift Configuration" />
             <div className="bg-slate-800 rounded-lg overflow-x-auto border border-slate-700 mb-6">

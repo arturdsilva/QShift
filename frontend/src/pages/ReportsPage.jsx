@@ -1,11 +1,11 @@
 import {Users, BarChart3, CalendarDays } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
 import {ReportsApi} from '../services/api.js';
 
 function ReportsPage({ 
-    onPageChange,
     weeksList,
     setWeeksList,
     isLoading,
@@ -15,6 +15,8 @@ function ReportsPage({
     setCurrentEmployee,
     employees
 }) {
+    const navigate = useNavigate();
+    
     useEffect(() => {
         setIsLoading(true);
         async function getWeeks() {
@@ -41,17 +43,17 @@ function ReportsPage({
         if (card.title === 'Generated Scales') {
             setWeekRecords(weeksList[currentIdxWeek]);
             setIsLoading(true);
-            onPageChange(8);
+            navigate('/schedule-records');
         } else if (card.title === 'Employees') {
             setIsLoading(true);
             setCurrentEmployee(employees[0]);
-            onPageChange(10);
+            navigate('/employee-reports');
         }
     }
 
     if (isLoading) {
         return (
-            <BaseLayout showSidebar={false} currentPage={3} onPageChange={onPageChange}>
+            <BaseLayout showSidebar={false} currentPage={3}>
                 <div className="flex items-center justify-center min-h-screen">
                     <div className="text-center">
                         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
@@ -62,7 +64,7 @@ function ReportsPage({
         );
     }
     return (
-        <BaseLayout currentPage={3} onPageChange={onPageChange}>
+        <BaseLayout currentPage={3}>
             <Header title="Reports and Analysis" icon={BarChart3} />
 
             <div className="flex gap-4 flex-wrap">

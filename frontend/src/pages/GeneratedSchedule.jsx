@@ -2,18 +2,19 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import ScheduleTable from '../components/ScheduleTable';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {GeneratedScheduleApi} from '../services/api.js'
 import {initialScheduleEmpty} from '../constants/schedule.js';
 import { usePrompt } from '../hooks/usePrompt.js';
 
 function GeneratedSchedule({
-    onPageChange,
     employees,
     setEmployees,
     isLoading,
     setIsLoading,
     weekData
 }) {
+    const navigate = useNavigate();
     const [scheduleData, setScheduleData] = useState(initialScheduleEmpty);
     const [editMode, setEditMode] = useState(false);
     const [isPossible, setIsPossible] = useState(true);
@@ -91,12 +92,12 @@ function GeneratedSchedule({
                     setIsPossible(false);
                     alert('Não foi possível gerar uma escala viável com as configurações atuais. Verifique as configurações de turnos e funcionários.');
                     await cleanupPreview();
-                    onPageChange(1);
+                    navigate('/staff');
                 }
             } catch (error) {
                 console.error('Erro ao gerar escala:', error);
                 await cleanupPreview();
-                onPageChange(1);
+                navigate('/staff');
             } finally {
                 setIsLoading(false);
             }
@@ -117,13 +118,11 @@ function GeneratedSchedule({
                 console.error('Erro ao deletar escala:', error);
             }
         }
-        // Usa onPageChange direto, pois cancelar é ação intencional
-        onPageChange(1);
+        navigate('/staff');
     };
 
     const handleEdit = () => {
         setEditMode(!editMode);
-        onPageChange(7);
     };
 
     const handleShiftsSchedule = () => {
@@ -150,7 +149,7 @@ function GeneratedSchedule({
             console.log('Escala criada com sucesso:', response.data);
             // Marca como persistido antes de navegar para não bloquear
             markPreviewAsPersisted();
-            onPageChange(1);
+            navigate('/staff');
         } catch (error) {
             console.error('Erro ao aprovar a escala:', error);
             alert('Erro ao aprovar a escala. A semana será removida.');
@@ -161,7 +160,7 @@ function GeneratedSchedule({
             } catch (deleteError) {
                 console.error('Erro ao deletar semana:', deleteError);
             }
-            onPageChange(1);
+            navigate('/staff');
         }
     }
 
@@ -181,7 +180,6 @@ function GeneratedSchedule({
         <BaseLayout
             showSidebar={false}
             currentPage={7}
-            onPageChange={onPageChange}
         >
             <Header title="Generated Schedule" />
             <div className="p-3">
