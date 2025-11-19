@@ -27,7 +27,20 @@ api.interceptors.response.use(
         }
         return Promise.reject(error);
     }
-);          
+);
+
+async function fetchApi(path, options = {}) {
+    const token = localStorage.getItem("token");
+
+    return fetch(`${import.meta.env.VITE_BASE_URL}${path}`, {
+        ...options,
+        headers: {
+            "Content-Type": "application/json",
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
+            ...options.headers
+        }
+    });
+}
 
 export const ShiftConfigApi = {
     createShift: async (week_id, shiftData) => {
@@ -174,9 +187,14 @@ export const AvailabilityApi = {
 export const GeneratedScheduleApi = {
     deleteSchedule: async (week_id) => {
         try {
-            return await api.delete(`/weeks/${week_id}`);
+            await fetchApi(`/weeks/${week_id}`,
+                {
+                    method: "DELETE",
+                    keepalive: true,
+                }
+            );
         } catch (error) {
-            console.error('Erro ao deletar a semana da escala:', error);
+            console.error("Erro ao deletar a semana da escala:", error);
             throw error;
         }
     },
