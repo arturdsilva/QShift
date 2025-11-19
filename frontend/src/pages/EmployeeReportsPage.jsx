@@ -187,7 +187,7 @@ function EmployeeReportsPage({
                     </div>
                 </div>
 
-                <div className='flex-1'>
+                <div className='flex-1 overflow-auto'>
                     <div className='flex gap-2 flex-wrap mb-4'>
                         {statsCards.map(card => (
                             <div 
@@ -202,9 +202,9 @@ function EmployeeReportsPage({
                     </div>
 
                     <div className='bg-slate-800 rounded-lg px-4 py-1.5 border border-slate-700'>
-                        <div className='flex items-center justify-between mb-4'>
+                        <div className='flex items-center mb-4 overflow-auto'>
                             <h3 className='text-lg font-semibold text-slate-200 mb-2'>Select Metric to Display</h3>       
-                            <div className="flex items-center ml-64">
+                            <div className="flex items-center justify-center ml-auto gap-2">
                                 <button
                                     onClick={handlePrevMonth}
                                     className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
@@ -225,7 +225,7 @@ function EmployeeReportsPage({
                                     <ChevronRight size={24} className="text-slate-300" />
                                 </button>
                             </div>
-                            <div className="flex items-center">
+                            <div className="flex items-center ml-4">
                                 <button
                                     onClick={handlePrevYear}
                                     className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
