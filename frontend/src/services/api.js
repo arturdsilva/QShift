@@ -174,9 +174,22 @@ export const AvailabilityApi = {
 export const GeneratedScheduleApi = {
     deleteSchedule: async (week_id) => {
         try {
-            return await api.delete(`/weeks/${week_id}`);
+            const token = localStorage.getItem('token');
+
+            const response = await fetch(
+                `${import.meta.env.VITE_BASE_URL}/weeks/${week_id}`,
+                {
+                    method: "DELETE",
+                    keepalive: true,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Accept": "application/json",
+                        ...(token ? { "Authorization": `Bearer ${token}` } : {})
+                    }
+                }
+            );
         } catch (error) {
-            console.error('Erro ao deletar a semana da escala:', error);
+            console.error("Erro ao deletar a semana da escala:", error);
             throw error;
         }
     },

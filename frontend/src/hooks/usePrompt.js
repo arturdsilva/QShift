@@ -12,21 +12,23 @@ export function usePrompt(when, onConfirm) {
 
     useEffect(() => {
         if (!when) return;
+
         const handleBeforeUnload = (e) => {
-            const cleanup = onConfirmRef.current;
-            if (cleanup) {
-                try {
-                    cleanup();
-                } catch (error) {
-                    console.error('Erro ao executar cleanup no beforeunload:', error);
-                }
-            }
             e.preventDefault();
             e.returnValue = '';
         };
+
+        const handleUnload = () => {
+            const cleanup = onConfirmRef.current;
+            cleanup();
+        };
+
         window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('unload', handleUnload);
+        
         return () => {
             window.removeEventListener('beforeunload', handleBeforeUnload);
+            window.removeEventListener('unload', handleUnload);
         };
     }, [when]);
 }
