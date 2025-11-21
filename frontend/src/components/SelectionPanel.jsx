@@ -18,9 +18,9 @@ function SelectionPanel({ startDate, selectedDays }) {
   const hasSelection = selectedDays && selectedDays.length > 0;
 
   return (
-    <div className="w-72 space-y-3 mt-5 ml-3">
+    <div className="w-64 space-y-3 mt-5">
       {/* Week Selection */}
-      <div className="space-y-3 mt-4 mr-4">
+      <div className="space-y-3 mt-4">
         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
           Week Selection
         </h3>
@@ -43,7 +43,7 @@ function SelectionPanel({ startDate, selectedDays }) {
       </div>
 
       {/* Days Selection */}
-      <div className="space-y-3 mr-4">
+      <div className="space-y-3">
         <h3 className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
           Selected Days
         </h3>
