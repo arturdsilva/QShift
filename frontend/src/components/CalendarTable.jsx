@@ -50,10 +50,10 @@ function CalendarTable({
 
   return (
     <div className="space-y-4">
-      <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700">
+      <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-slate-700">
+            <tr className="bg-slate-700/90">
               {weekDays.map((day) => (
                 <th key={day} className="px-4 py-3 text-center text-sm font-bold text-slate-200">
                   {day}
@@ -93,7 +93,7 @@ function CalendarTable({
                           className={`w-16 px-6 py-3 rounded-lg text-center transition
                             ${
                               selected
-                                ? 'bg-blue-500 text-white font-semibold'
+                                ? 'bg-blue-600 text-white font-semibold'
                                 : isCurrentMonth
                                   ? alreadyExists
                                     ? 'text-slate-400 cursor-not-allowed'
