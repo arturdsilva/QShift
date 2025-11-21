@@ -2,7 +2,7 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { BarChart3, ChevronLeft, ChevronRight, ArrowLeft, User, ChevronDown, ChevronUp } from 'lucide-react';
 import {
   METRIC_COLORS,
   STATS_CONFIG,
@@ -13,30 +13,52 @@ import { EmployeeReportsApi } from '../services/api.js';
 import BarChart from '../components/BarChart.jsx';
 
 function EmployeeSelector({ employeesList, currentEmployee, onToggleEmployee, month, year }) {
+  const [isOpen, setIsOpen] = useState(true);
+
   return (
-    <div className="bg-slate-800 p-4 rounded-lg shadow-xl max-w-md border border-slate-700">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xl font-bold text-slate-200">Employees</h3>
-      </div>
-      <div className="space-y-2 max-h-96 overflow-y-auto mb-3 px-3">
-        {employeesList.map((emp) => {
-          const isSelected = emp.id === currentEmployee.id;
-          return (
-            <button
-              onClick={() => onToggleEmployee(emp, month, year)}
-              className={`w-full px-4 py-3 rounded-lg text-left transition-all ${
-                isSelected
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <span className="font-medium max-w-full break-all leading-none">{emp.name}</span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+    <div className="bg-slate-800 rounded-lg shadow-xl w-full border border-slate-700 overflow-hidden transition-all duration-300">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-4 bg-slate-800 hover:bg-slate-750 transition-colors"
+      >
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600/20 p-2 rounded-lg">
+            <User className="text-blue-400" size={20} />
+          </div>
+          <h3 className="text-lg font-bold text-slate-200">Employees</h3>
+        </div>
+        {isOpen ? (
+          <ChevronUp className="text-slate-400" size={20} />
+        ) : (
+          <ChevronDown className="text-slate-400" size={20} />
+        )}
+      </button>
+
+      {isOpen && (
+        <div className="p-3 border-t border-slate-700 bg-slate-800/50">
+          <div className="space-y-1 max-h-96 overflow-y-auto pr-2 custom-scrollbar">
+            {employeesList.map((emp) => {
+              const isSelected = emp.id === currentEmployee.id;
+              return (
+                <button
+                  key={emp.id}
+                  onClick={() => onToggleEmployee(emp, month, year)}
+                  className={`w-full px-3 py-2.5 rounded-lg text-left transition-all flex items-center gap-3 group ${isSelected
+                    ? 'bg-blue-600 text-white shadow-md'
+                    : 'text-slate-300 hover:bg-slate-700/50'
+                    }`}
+                >
+                  <div className={`p-1.5 rounded-md ${isSelected ? 'bg-white/20' : 'bg-slate-700 group-hover:bg-slate-600'}`}>
+                    <User size={14} className={isSelected ? 'text-white' : 'text-slate-400'} />
+                  </div>
+                  <span className="font-medium text-sm truncate">{emp.name}</span>
+                  {isSelected && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -174,8 +196,8 @@ function EmployeeReportsPage({
   return (
     <BaseLayout showSidebar={false} currentPage={10}>
       <Header title={'Employees Reports'} icon={BarChart3}></Header>
-      <div className="flex gap-4">
-        <div className="">
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full lg:w-80 shrink-0">
           <EmployeeSelector
             employeesList={employeesList}
             currentEmployee={currentEmployee}
@@ -183,19 +205,10 @@ function EmployeeReportsPage({
             month={currentMonth}
             year={currentYear}
           />
-          <div className="flex-1 justify-start flex mt-4">
-            <button
-              onClick={handleBack}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Back
-              <ArrowLeft size={20} />
-            </button>
-          </div>
         </div>
 
-        <div className="flex-1 overflow-auto">
-          <div className="flex gap-2 flex-wrap mb-4">
+        <div className="flex-1 overflow-hidden">
+          <div className="flex gap-2 flex-wrap mb-4 justify-center lg:justify-start">
             {statsCards.map((card) => (
               <div
                 key={card.key}
@@ -214,52 +227,56 @@ function EmployeeReportsPage({
             ))}
           </div>
 
-          <div className="bg-slate-800 rounded-lg px-4 py-1.5 border border-slate-700">
-            <div className="flex items-center mb-4 overflow-auto">
-              <h3 className="text-lg font-semibold text-slate-200 mb-2">
+          <div className="bg-slate-800 rounded-lg px-4 py-3 border border-slate-700">
+            <div className="flex flex-col lg:flex-row items-center mb-4 gap-4">
+              <h3 className="text-lg font-semibold text-slate-200 w-full lg:w-auto text-center lg:text-left">
                 Select Metric to Display
               </h3>
-              <div className="flex items-center justify-center ml-auto gap-2">
-                <button
-                  onClick={handlePrevMonth}
-                  className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
-                  title="Previous month"
-                >
-                  <ChevronLeft size={24} className="text-slate-300" />
-                </button>
 
-                <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
-                  {months[currentMonth - 1]}
-                </span>
+              <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto lg:ml-auto">
+                <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={handlePrevMonth}
+                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                    title="Previous month"
+                  >
+                    <ChevronLeft size={24} className="text-slate-300" />
+                  </button>
 
-                <button
-                  onClick={handleNextMonth}
-                  className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
-                  title="Next month"
-                >
-                  <ChevronRight size={24} className="text-slate-300" />
-                </button>
-              </div>
-              <div className="flex items-center ml-4">
-                <button
-                  onClick={handlePrevYear}
-                  className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
-                  title="Previous Year"
-                >
-                  <ChevronLeft size={24} className="text-slate-300" />
-                </button>
+                  <span className="text-xl text-slate-200 font-medium min-w-[120px] text-center">
+                    {months[currentMonth - 1]}
+                  </span>
 
-                <span className="text-xl text-slate-200 font-medium min-w-[150px] text-center">
-                  {currentYear}
-                </span>
+                  <button
+                    onClick={handleNextMonth}
+                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                    title="Next month"
+                  >
+                    <ChevronRight size={24} className="text-slate-300" />
+                  </button>
+                </div>
 
-                <button
-                  onClick={handleNextYear}
-                  className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
-                  title="Next Year"
-                >
-                  <ChevronRight size={24} className="text-slate-300" />
-                </button>
+                <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                  <button
+                    onClick={handlePrevYear}
+                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                    title="Previous Year"
+                  >
+                    <ChevronLeft size={24} className="text-slate-300" />
+                  </button>
+
+                  <span className="text-xl text-slate-200 font-medium min-w-[80px] text-center">
+                    {currentYear}
+                  </span>
+
+                  <button
+                    onClick={handleNextYear}
+                    className="p-2 rounded-lg hover:bg-slate-600 transition-colors bg-slate-700/80"
+                    title="Next Year"
+                  >
+                    <ChevronRight size={24} className="text-slate-300" />
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -267,11 +284,10 @@ function EmployeeReportsPage({
               {STATS_CONFIG.map((metric) => (
                 <button
                   key={metric.key}
-                  className={`px-1.5 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedMetric === metric.key
-                      ? `${METRIC_COLORS[metric.key].bgButton} text-white shadow-lg`
-                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                  } `}
+                  className={`px-1.5 py-2 rounded-lg text-sm font-medium transition-all ${selectedMetric === metric.key
+                    ? `${METRIC_COLORS[metric.key].bgButton} text-white shadow-lg`
+                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                    } `}
                   onClick={() => setSelectedMetric(metric.key)}
                 >
                   {metric.label}
@@ -352,6 +368,15 @@ function EmployeeReportsPage({
             </div>
           </div>
         </div>
+      </div>
+      <div className="flex-1 justify-start flex mt-4">
+        <button
+          onClick={handleBack}
+          className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium w-full lg:w-auto"
+        >
+          <ArrowLeft size={20} />
+          Back
+        </button>
       </div>
     </BaseLayout>
   );
