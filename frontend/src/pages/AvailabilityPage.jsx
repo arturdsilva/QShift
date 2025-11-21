@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { Calendar, Save, X } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout.jsx';
 import Header from '../components/Header.jsx';
-import {AvailabilityApi, StaffApi} from '../services/api.js';
+import { AvailabilityApi, StaffApi } from '../services/api.js';
 
 function AvailabilityPage({
-    selectEditEmployee,
-    setSelectEditEmployee,
-    isLoading,
-    setIsLoading
+  selectEditEmployee,
+  setSelectEditEmployee,
+  isLoading,
+  setIsLoading
 }) {
   const navigate = useNavigate();
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -25,7 +25,7 @@ function AvailabilityPage({
     days.forEach(day => {
       initial[day] = {};
       hours.forEach(hour => {
-        initial[day][hour] = false;          
+        initial[day][hour] = false;
       });
     });
     return initial;
@@ -43,9 +43,9 @@ function AvailabilityPage({
         end_time = parseInt(schema.end_time.split(':')[0])
       }
       const weekday = days[schema.weekday];
-      Array.from({ length: end_time-start_time }).forEach(() => {
+      Array.from({ length: end_time - start_time }).forEach(() => {
         const slotsTime = `${start_time.toString().padStart(2, '0')}:00`;
-        start_time = start_time + 1;          
+        start_time = start_time + 1;
         updateAvailability[weekday][slotsTime] = true;
       });
     });
@@ -64,40 +64,40 @@ function AvailabilityPage({
         alert('Error loading employee data. Please check the console.');
         navigate('/staff');
       } finally {
-      setIsLoading(false);
-      console.log('página carregada', isLoading);
+        setIsLoading(false);
+        console.log('página carregada', isLoading);
       }
     }
     fetchEmployee();
   }, [selectEditEmployee?.id]);
 
   const handleMouseDown = (day, hour) => {
-      setIsMouseDown(true);
-      const newValue = !availability[day][hour];
-      setPaintMode(newValue);
-      toggleCell(day, hour, newValue);
+    setIsMouseDown(true);
+    const newValue = !availability[day][hour];
+    setPaintMode(newValue);
+    toggleCell(day, hour, newValue);
   };
-  
+
   const handleMouseEnter = (day, hour) => {
-      if (isMouseDown) {
+    if (isMouseDown) {
       toggleCell(day, hour, paintMode);
-      }
+    }
   };
-  
+
   const handleMouseUp = () => {
-      setIsMouseDown(false);
+    setIsMouseDown(false);
   };
-  
+
   const toggleCell = (day, hour, value) => {
-      setAvailability(prev => ({
+    setAvailability(prev => ({
       ...prev,
       [day]: {
-          ...prev[day],
-          [hour]: value
+        ...prev[day],
+        [hour]: value
       }
-      }));
+    }));
   };
-  
+
   const handleCancel = () => {
     setSelectEditEmployee(null);
     navigate('/staff');
@@ -124,15 +124,15 @@ function AvailabilityPage({
         slotPrevious = slot;
       });
       if (slotPrevious && slotsActive.length > 0) {
-          SlotsDay[index].push({
-            start_time: slotsActive[0],
-            end_time: '23:59:59'
-          });
+        SlotsDay[index].push({
+          start_time: slotsActive[0],
+          end_time: '23:59:59'
+        });
       }
     })
     const availabilitySchemas = [];
     SlotsDay.forEach((schemas, day) => {
-      availabilitySchemas[day]=[];
+      availabilitySchemas[day] = [];
       schemas.forEach((slot, index) => {
         availabilitySchemas[day][index] = {
           weekday: day,
@@ -185,27 +185,27 @@ function AvailabilityPage({
       setError(err.response?.data?.detail || 'Erro ao salvar funcionário. Tente novamente.');
     }
   };
-    
+
   if (isLoading) {
-      return (
-          <BaseLayout showSidebar={false} currentPage={5}>
-              <div className="flex items-center justify-center min-h-screen">
-                  <div className="text-center">
-                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p className="text-slate-400">Loading...</p>
-                  </div>
-              </div>
-          </BaseLayout>
-      );
+    return (
+      <BaseLayout showSidebar={false} currentPage={5}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading...</p>
+          </div>
+        </div>
+      </BaseLayout>
+    );
   }
 
   return (
-    <BaseLayout 
-        showSidebar={false}
-        currentPage={5} 
+    <BaseLayout
+      showSidebar={false}
+      currentPage={5}
     >
       <Header title="Employee availability" icon={Calendar} />
-      
+
       <div className="space-y-6" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-6 space-y-4">
           <div className="flex items-center gap-4">
@@ -226,7 +226,7 @@ function AvailabilityPage({
               />
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3 pt-2">
             <label className="flex items-center gap-3 cursor-pointer group">
               <div className="relative">
@@ -253,41 +253,56 @@ function AvailabilityPage({
             </label>
           </div>
         </div>
-        
+
         {/* TODO: Ajeitar o tamanho da tabela de disponibilidade ou trocar linha pela coluna*/}
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold text-white mb-2">Select Availability</h3>
-            <p className="text-sm text-slate-400">
-              Click and drag to mark available (green) or unavailable (red) times
-            </p>
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-white mb-1">Select Availability</h3>
+              <p className="text-sm text-slate-400">
+                Click and drag to mark available times.
+              </p>
+            </div>
+            <div className="flex gap-4 text-sm">
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-green-500 rounded"></div>
+                <span className="text-slate-300">Available</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-4 h-4 bg-slate-700/50 border border-slate-600 rounded"></div>
+                <span className="text-slate-300">Unavailable</span>
+              </div>
+            </div>
           </div>
-          
+
           <div className="overflow-x-auto">
-            <div className="inline-block min-w-full">
-              <div className="grid" style={{ gridTemplateColumns: `100px repeat(${days.length}, 1fr)` }}>
-                {/* Cabeçalho com dias da semana */}
-                <div className="sticky left-0 bg-slate-800 z-10"></div>
-                {days.map(day => (
-                  <div key={day} className="text-center py-3 px-2 font-semibold text-white border-b border-slate-700">
-                    {day}
+            <div className="inline-block min-w-full border border-slate-700 rounded-lg overflow-hidden">
+              <div className="grid" style={{ gridTemplateColumns: `100px repeat(${hours.length}, minmax(40px, 1fr))` }}>
+                {/* Header: Hours */}
+                <div className="sticky left-0 top-0 bg-slate-800 z-20 border border-slate-700"></div>
+                {hours.map(hour => (
+                  <div
+                    key={hour}
+                    className={`text-center py-3 text-xs font-medium text-slate-400 border border-slate-700 select-none bg-slate-800`}
+                  >
+                    {hour.split(':')[0]}h
                   </div>
                 ))}
-                
-                {/* Grade de horários */}
-                {hours.map(hour => (
+
+                {/* Rows: Days */}
+                {days.map(day => (
                   <>
-                    <div key={`label-${hour}`} className="sticky left-0 bg-slate-800 z-10 py-2 px-3 text-sm text-slate-300 font-medium border-r border-slate-700 flex items-center">
-                      {hour}
+                    <div key={`label-${day}`} className="sticky left-0 bg-slate-800 z-10 py-2 px-3 text-sm text-slate-300 font-medium flex items-center border border-slate-700/50">
+                      {day}
                     </div>
-                    {days.map(day => (
+                    {hours.map(hour => (
                       <div
                         key={`${day}-${hour}`}
                         onMouseDown={() => handleMouseDown(day, hour)}
                         onMouseEnter={() => handleMouseEnter(day, hour)}
                         className={`
-                          h-10 border border-slate-700 cursor-pointer transition-colors select-none
-                          ${availability[day][hour] ? 'bg-green-500 hover:bg-green-600' : 'bg-red-500 hover:bg-red-600'}
+                          h-10 border border-slate-700/30 cursor-pointer transition-colors select-none
+                          ${availability[day][hour] ? 'bg-green-500 hover:bg-green-600' : 'bg-slate-700/20 hover:bg-slate-700/50'}
                         `}
                       />
                     ))}
@@ -297,7 +312,7 @@ function AvailabilityPage({
             </div>
           </div>
         </div>
-        
+
         {/* Botões de ação */}
         <div className="flex justify-end gap-3">
           <button
