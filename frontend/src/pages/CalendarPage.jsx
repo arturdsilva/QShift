@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Calendar, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft} from 'lucide-react';
+import { Calendar, ChevronLeft, ChevronRight, ArrowRight, ArrowLeft } from 'lucide-react';
 import BaseLayout from '../layouts/BaseLayout';
 import CalendarTable from '../components/CalendarTable';
 import Header from '../components/Header';
-import {CalendarApi} from '../services/api.js';
+import { CalendarApi } from '../services/api.js';
 
-function CalendarPage ({ 
+function CalendarPage({
   currentMonth,
   setCurrentMonth,
   currentYear,
@@ -18,26 +18,26 @@ function CalendarPage ({
   startDate,
   setStartDate,
   isLoading,
-  setIsLoading
-  }) {
+  setIsLoading,
+}) {
   const navigate = useNavigate();
   const [generatedWeeks, setGeneratedWeeks] = useState([]);
   useEffect(() => {
     async function getWeeks() {
-        try {
+      try {
         const weekResponse = await CalendarApi.getWeeks();
         setGeneratedWeeks(weekResponse.data);
         setSelectedDays([]);
         setSelectedWeek(null);
 
         console.log('Semanas recebidas com sucesso:', weekResponse.data);
-        } catch (error) {
+      } catch (error) {
         console.error('Erro ao carregar dados da API:', error);
-        } finally {
-          setIsLoading(false)
-        }
+      } finally {
+        setIsLoading(false);
+      }
     }
-  getWeeks();
+    getWeeks();
   }, []);
 
   const handlePrevMonth = () => {
@@ -67,9 +67,9 @@ function CalendarPage ({
       return;
     }
     const dateStr = date.toISOString().split('T')[0];
-    setSelectedDays(prev => {
-      if (prev.some(d => d.toISOString().split('T')[0] === dateStr)) {
-        return prev.filter(d => d.toISOString().split('T')[0] !== dateStr);
+    setSelectedDays((prev) => {
+      if (prev.some((d) => d.toISOString().split('T')[0] === dateStr)) {
+        return prev.filter((d) => d.toISOString().split('T')[0] !== dateStr);
       }
       return [...prev, date].sort((a, b) => a - b);
     });
@@ -83,7 +83,10 @@ function CalendarPage ({
 
   const handleAdvance = () => {
     if (selectedWeek && selectedDays.length > 0) {
-      console.log('Avançando com:', { selectedWeek, selectedDays });
+      console.log('Avançando com:', {
+        selectedWeek,
+        selectedDays,
+      });
       navigate('/shift-config');
     }
   };
@@ -93,28 +96,41 @@ function CalendarPage ({
   };
 
   const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
   ];
 
   if (isLoading) {
-      return (
-          <BaseLayout showSidebar={false} currentPage={2}>
-              <div className="flex items-center justify-center min-h-screen">
-                  <div className="text-center">
-                      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                      <p className="text-slate-400">Loading...</p>
-                  </div>
-              </div>
-          </BaseLayout>
-      );
+    return (
+      <BaseLayout showSidebar={false} currentPage={2}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading...</p>
+          </div>
+        </div>
+      </BaseLayout>
+    );
   }
 
   return (
-    <BaseLayout 
-      showSidebar={true} 
+    <BaseLayout
+      showSidebar={true}
       showSelectionPanel={true}
-      selectionPanelData={{ startDate, selectedDays }}
+      selectionPanelData={{
+        startDate,
+        selectedDays,
+      }}
       currentPage={2}
     >
       <Header title="Calendar" icon={Calendar}>
@@ -126,11 +142,11 @@ function CalendarPage ({
           >
             <ChevronLeft size={24} className="text-slate-300" />
           </button>
-          
+
           <span className="text-xl text-slate-200 font-medium min-w-[200px] text-center">
             {months[currentMonth - 1]} {currentYear}
           </span>
-          
+
           <button
             onClick={handleNextMonth}
             className="p-2 rounded-lg hover:bg-slate-700 transition-colors"
@@ -140,8 +156,8 @@ function CalendarPage ({
           </button>
         </div>
       </Header>
-      
-      <CalendarTable 
+
+      <CalendarTable
         currentMonth={currentMonth}
         currentYear={currentYear}
         selectedDays={selectedDays}
@@ -170,7 +186,6 @@ function CalendarPage ({
             <ArrowRight size={20} />
           </button>
         </div>
-
       </div>
     </BaseLayout>
   );

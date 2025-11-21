@@ -1,7 +1,7 @@
 export const COLORS_CHART = {
   textColorAxis: '#94a3b8', // slate-400
   gridColor: 'rgba(148, 163, 184, 0.2)',
-  bgChart: 'bg-slate-800'
+  bgChart: 'bg-slate-800',
 };
 
 // Color and style settings for employee metrics
@@ -17,7 +17,7 @@ export const METRIC_COLORS = {
     bgInactive: 'bg-blue-900',
     bgInactiveHex: '#1e3a8a',
     bgButton: 'bg-blue-500',
-    bgButtonHex: '#3b82f6'
+    bgButtonHex: '#3b82f6',
   },
 
   daysWorked: {
@@ -31,7 +31,7 @@ export const METRIC_COLORS = {
     bgInactive: 'bg-emerald-900',
     bgInactiveHex: '#064e3b',
     bgButton: 'bg-green-500',
-    bgButtonHex: '#22c55e'
+    bgButtonHex: '#22c55e',
   },
 
   hoursWorked: {
@@ -45,7 +45,7 @@ export const METRIC_COLORS = {
     bgInactive: 'bg-indigo-900',
     bgInactiveHex: '#312e81',
     bgButton: 'bg-purple-500',
-    bgButtonHex: '#8b5cf6'
+    bgButtonHex: '#8b5cf6',
   },
 
   monrningShifts: {
@@ -59,7 +59,7 @@ export const METRIC_COLORS = {
     bgInactive: 'bg-yellow-700',
     bgInactiveHex: '#a16207',
     bgButton: 'bg-yellow-400',
-    bgButtonHex: '#facc15'
+    bgButtonHex: '#facc15',
   },
 
   afternoonShifts: {
@@ -73,7 +73,7 @@ export const METRIC_COLORS = {
     bgInactive: 'bg-orange-900',
     bgInactiveHex: '#7c2d12',
     bgButton: 'bg-orange-500',
-    bgButtonHex: '#f97316'
+    bgButtonHex: '#f97316',
   },
 
   nightShifts: {
@@ -87,10 +87,9 @@ export const METRIC_COLORS = {
     bgInactive: 'bg-red-600',
     bgInactiveHex: '#7f1d1d',
     bgButton: 'bg-red-500',
-    bgButtonHex: '#ef4444'
-  }
+    bgButtonHex: '#ef4444',
+  },
 };
-
 
 // Card configuration (structure, labels)
 export const STATS_CONFIG = [
@@ -99,7 +98,7 @@ export const STATS_CONFIG = [
   { key: 'hoursWorked', label: 'Hours Worked', suffix: 'h' },
   { key: 'monrningShifts', label: 'Morning Shifts' },
   { key: 'afternoonShifts', label: 'Afternoon Shifts' },
-  { key: 'nightShifts', label: 'Night Shifts' }
+  { key: 'nightShifts', label: 'Night Shifts' },
 ];
 
 // Chart titles
@@ -109,5 +108,5 @@ export const METRIC_TITLES = {
   daysOff: 'Days Off per Month',
   monrningShifts: 'Morning Shifts per Month',
   afternoonShifts: 'Afternoon Shifts per Month',
-  nightShifts: 'Night Shifts per Month'
+  nightShifts: 'Night Shifts per Month',
 };

@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react'
+import { useState } from 'react';
 import CalendarPage from './pages/CalendarPage.jsx';
 import StaffPage from './pages/StaffPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
@@ -18,12 +18,12 @@ function App() {
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [selectedWeek, setSelectedWeek] = useState(null);
   const [selectedDays, setSelectedDays] = useState([]);
-  const [selectEditEmployee, setSelectEditEmployee] = useState(null)
+  const [selectEditEmployee, setSelectEditEmployee] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [employees, setEmployees] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [weekData, setWeekData] = useState(null);
-  const [weeksList, setWeeksList] = useState(null); 
+  const [weeksList, setWeeksList] = useState(null);
   const [weekRecords, setWeekRecords] = useState(null);
   const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
   const [currentEmployee, setCurrentEmployee] = useState(null);
@@ -31,23 +31,13 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route 
-          path="/login" 
-          element={
-            <LoginPage
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-            />
-          }
+        <Route
+          path="/login"
+          element={<LoginPage isLoading={isLoading} setIsLoading={setIsLoading} />}
         />
-        <Route 
-          path="/register" 
-          element={
-            <RegisterPage/>
-          }
-        />
-        <Route 
-          path="/staff" 
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/staff"
           element={
             <StaffPage
               selectEditEmployee={selectEditEmployee}
@@ -57,10 +47,10 @@ function App() {
               employees={employees}
               setEmployees={setEmployees}
             />
-          } 
+          }
         />
-        <Route 
-          path="/calendar" 
+        <Route
+          path="/calendar"
           element={
             <CalendarPage
               currentMonth={currentMonth}
@@ -78,8 +68,8 @@ function App() {
             />
           }
         />
-        <Route 
-          path="/availability" 
+        <Route
+          path="/availability"
           element={
             <AvailabilityPage
               selectEditEmployee={selectEditEmployee}
@@ -87,19 +77,19 @@ function App() {
               isLoading={isLoading}
               setIsLoading={setIsLoading}
             />
-          } 
+          }
         />
-        <Route 
-          path="/shift-config" 
+        <Route
+          path="/shift-config"
           element={
             <ShiftConfigPage
               selectedDays={selectedDays}
               startDate={startDate}
               setWeekData={setWeekData}
             />
-          } 
+          }
         />
-        <Route 
+        <Route
           path="/schedule"
           element={
             <GeneratedSchedule
@@ -111,11 +101,11 @@ function App() {
             />
           }
         />
-        <Route 
+        <Route
           path="/reports"
           element={
             <ReportsPage
-              weeksList={weeksList} 
+              weeksList={weeksList}
               setWeeksList={setWeeksList}
               isLoading={isLoading}
               setIsLoading={setIsLoading}
@@ -126,7 +116,7 @@ function App() {
             />
           }
         />
-        <Route 
+        <Route
           path="/schedule-records"
           element={
             <ScheduleRecordsPage
@@ -155,17 +145,9 @@ function App() {
             />
           }
         />
-        <Route
-          path="/settings"
-          element={
-            <SettingsPage/>
-          }
-        />
-        <Route
-          path="/"
-          element={<Navigate to="/login" replace />} />
-        <Route
-          path="*" element={<Navigate to="/" replace />} />
+        <Route path="/settings" element={<SettingsPage />} />
+        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
