@@ -334,17 +334,17 @@ function ScheduleRecordsPage({
                 <div className="px-2 py-1.5 rounded text-center font-medium">
                   <button
                     onClick={handleExportCSV}
-                    className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+                    className="flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium sm:w-auto whitespace-nowrap"
                     title="Export schedule to CSV"
                   >
                     <FileSpreadsheet size={20} />
                     Export CSV
                   </button>
                 </div>
-                <div className="px-2 py-1.5 rounded text-center font-medium">
+                <div className="px-1 py-1.5 rounded text-center font-medium">
                   <button
                     onClick={handleEdit}
-                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                    className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium sm:w-auto sm:ml-auto"
                   >
                     {`Edit`}
                   </button>
