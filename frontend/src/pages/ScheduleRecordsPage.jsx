@@ -11,7 +11,7 @@ import {
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedScheduleApi } from '../services/api.js';
-import { exportToCSV } from '../utils/exportSchedule.js';
+import { exportToExcel } from '../utils/exportSchedule.js';
 
 function ScheduleRecordsPage({
   employees,
@@ -194,7 +194,7 @@ function ScheduleRecordsPage({
       return;
     }
     try {
-      exportToCSV(scheduleData, weekRecords, employees);
+      exportToExcel(scheduleData, weekRecords, employees);
       console.log('Schedule exported to CSV successfully');
     } catch (error) {
       console.error('Error exporting to CSV:', error);
