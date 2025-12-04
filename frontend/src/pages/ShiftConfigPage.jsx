@@ -3,9 +3,15 @@ import Header from '../components/Header';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
-import { ShiftConfigApi } from '../services/api.js';
+import { GeneratedScheduleApi } from '../services/api.js';
 
-function ShiftConfigPage({ selectedDays, startDate, setWeekData }) {
+function ShiftConfigPage({
+  selectedDays,
+  startDate,
+  setWeekData,
+  setShiftsData,
+  setPreviewSchedule,
+}) {
   const navigate = useNavigate();
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const openDaysMask = [];
@@ -166,7 +172,7 @@ function ShiftConfigPage({ selectedDays, startDate, setWeekData }) {
         ],
       };
     }
-
+    setShiftsData(shiftsSchedule);
     return { sucess: true, data: shiftsSchedule };
   };
 
@@ -185,32 +191,14 @@ function ShiftConfigPage({ selectedDays, startDate, setWeekData }) {
           start_date: startDate.toISOString().split('T')[0],
           open_days: openDaysMask,
         };
-        console.log('Criando semana:', week);
-        const responseWeek = await ShiftConfigApi.submitWeekData(week);
-        console.log('Semana criada com sucesso:', responseWeek.data);
-        const weekData = responseWeek.data;
-        setWeekData(weekData);
+        setWeekData(week);
+        console.log('Criando escala prévia:', week, shiftsSchedule);
+        const responsePreviewSchedule =
+          await GeneratedScheduleApi.generateSchedulePreview(shiftsSchedule);
+        console.log('Escala prévia criada com sucesso:', responsePreviewSchedule.data);
+        const preciewScheduleData = responsePreviewSchedule.data;
+        setPreviewSchedule(preciewScheduleData);
 
-        console.log('Turnos a serem criados:', shiftsSchedule);
-        if (shiftsSchedule.length === 0) {
-          alert(
-            'Nenhum turno válido configurado. Preencha os horários e quantidade de funcionários.',
-          );
-          return;
-        }
-
-        for (const shift of shiftsSchedule) {
-          try {
-            console.log('Criando turno:', shift);
-            const response = await ShiftConfigApi.createShift(weekData.id, shift);
-            console.log('Turno criado:', response.data);
-          } catch (error) {
-            console.error('Erro ao criar turno específico:', shift, error);
-            throw error;
-          }
-        }
-        console.log('Todos os turnos criados com sucesso!');
-        alert('Escala criada com sucesso!');
         navigate('/schedule');
       } catch (error) {
         console.error('Erro ao criar escala:', error);
