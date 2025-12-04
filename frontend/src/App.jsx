@@ -27,6 +27,8 @@ function App() {
   const [weekRecords, setWeekRecords] = useState(null);
   const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
   const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [shiftsData, setShiftsData] = useState(null);
+  const [previewSchedule, setPreviewSchedule] = useState(null);
 
   return (
     <BrowserRouter>
@@ -86,6 +88,8 @@ function App() {
               selectedDays={selectedDays}
               startDate={startDate}
               setWeekData={setWeekData}
+              setShiftsData={setShiftsData}
+              setPreviewSchedule={setPreviewSchedule}
             />
           }
         />
@@ -98,6 +102,8 @@ function App() {
               isLoading={isLoading}
               setIsLoading={setIsLoading}
               weekData={weekData}
+              shiftsData={shiftsData}
+              previewSchedule={previewSchedule}
             />
           }
         />
