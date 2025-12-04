@@ -195,9 +195,9 @@ export const GeneratedScheduleApi = {
     }
   },
 
-  generateSchedulePreview: async (week_id) => {
+  generateSchedulePreview: async (shift_vector) => {
     try {
-      return await api.get(`/weeks/${week_id}/schedule/preview`);
+      return await api.post(`/preview-schedule`, shift_vector);
     } catch (error) {
       console.error('Erro ao gerar prévia da escala:', error);
       throw error;
