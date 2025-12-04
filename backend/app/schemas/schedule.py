@@ -6,6 +6,7 @@ from typing import List
 from pydantic import BaseModel, Field
 import app.core.constants as constants
 from typing import Optional
+from app.schemas.shift import ShiftBase
 
 class ScheduleOut(BaseModel):
     shifts: List[ScheduleShiftOut]
@@ -48,3 +49,6 @@ class PreviewScheduleOut(BaseModel):
 
 class PreviewScheduleShiftOut(ScheduleShiftOutBase):
     pass
+
+class ShiftVectorIn(BaseModel):
+    shift_vector: List[ShiftBase]
