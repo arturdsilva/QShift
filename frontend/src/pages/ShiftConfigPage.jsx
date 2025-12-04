@@ -11,11 +11,21 @@ function ShiftConfigPage({
   setWeekData,
   setShiftsData,
   setPreviewSchedule,
+  setIsLoading,
 }) {
   const navigate = useNavigate();
   const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const openDaysMask = [];
   const selectedDaysMap = {};
+  const days_of_week = [
+    'monday',
+    'tuesday',
+    'wednesday',
+    'thursday',
+    'friday',
+    'saturday',
+    'sunday',
+  ];
   selectedDays.forEach((day) => {
     selectedDaysMap[day.getDay() === 0 ? 6 : day.getDay() - 1] = day;
     openDaysMask.push(day.getDay() === 0 ? 6 : day.getDay() - 1);
@@ -176,10 +186,47 @@ function ShiftConfigPage({
     return { sucess: true, data: shiftsSchedule };
   };
 
+  const convertScheduleData = (shifts) => {
+    let scheduleModified = {
+      monday: [],
+      tuesday: [],
+      wednesday: [],
+      thursday: [],
+      friday: [],
+      saturday: [],
+      sunday: [],
+    };
+    shifts.forEach((shift) => {
+      const dayName = days_of_week[shift.weekday];
+      scheduleModified[dayName].push({
+        startTime: shift.start_time.slice(0, 5),
+        endTime: shift.end_time.slice(0, 5),
+        minEmployees: shift.min_staff,
+        employees: shift.employees.map((emp) => ({
+          id: emp.employee_id,
+          name: emp.name,
+        })),
+      });
+    });
+    days_of_week.forEach((day) => {
+      scheduleModified[day].sort((a, b) => {
+        if (a.startTime < b.startTime) return -1;
+        if (a.startTime > b.startTime) return 1;
+        if (a.endTime < b.endTime) return -1;
+        if (a.endTime > b.endTime) return 1;
+
+        return 0;
+      });
+    });
+    setPreviewSchedule(scheduleModified);
+  };
+
   const createSchedule = async () => {
     const result = handleShiftsSchedule();
+    setIsLoading(true);
     if (!result.sucess) {
       const errorMessage = result.errors.join('\n\n');
+      setIsLoading(false);
       alert(`Por favor, corrija os seguintes problemas:\n\n${errorMessage}`);
       return;
     }
@@ -195,9 +242,17 @@ function ShiftConfigPage({
         console.log('Criando escala prévia:', week, shiftsSchedule);
         const responsePreviewSchedule =
           await GeneratedScheduleApi.generateSchedulePreview(shiftsSchedule);
-        console.log('Escala prévia criada com sucesso:', responsePreviewSchedule.data);
         const preciewScheduleData = responsePreviewSchedule.data;
-        setPreviewSchedule(preciewScheduleData);
+
+        if (preciewScheduleData.possible && preciewScheduleData.schedule) {
+          convertScheduleData(preciewScheduleData.schedule.shifts);
+          console.log('A escala criada:', preciewScheduleData.schedule);
+        } else {
+          alert(
+            'Não foi possível gerar uma escala viável com as configurações atuais. Verifique as configurações de turnos e funcionários.',
+          );
+          navigate('/staff');
+        }
 
         navigate('/schedule');
       } catch (error) {
@@ -213,6 +268,8 @@ function ShiftConfigPage({
           console.error('Erro na configuração:', error.message);
           alert(`Erro: ${error.message}`);
         }
+
+        setIsLoading(false);
       }
     }
   };
