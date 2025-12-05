@@ -299,11 +299,8 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
 
                 {/* Rows: Days */}
                 {daysOfWeek.map((day) => (
-                  <>
-                    <div
-                      key={`label-${day}`}
-                      className="sticky left-0 bg-slate-800 z-10 py-2 px-3 text-sm text-slate-300 font-medium flex items-center border border-slate-700/50"
-                    >
+                  <div key={`label-${day}`} className="contents">
+                    <div className="sticky left-0 bg-slate-800 z-10 py-2 px-3 text-sm text-slate-300 font-medium flex items-center border border-slate-700/50">
                       {day}
                     </div>
                     {hours.map((hour) => (
@@ -317,7 +314,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
                         `}
                       />
                     ))}
-                  </>
+                  </div>
                 ))}
               </div>
             </div>
