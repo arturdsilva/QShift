@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 function Sidebar({ currentPage, onClose }) {
   const navigate = useNavigate();
   const navItems = [
-    { icon: CalendarRange, label: 'Create Schedule', path: '/staff' },
-    { icon: BarChart3, label: 'Reports', path: '/reports' },
+    { icon: CalendarRange, label: 'Create Schedule', path: '/staff', indexPage: 1 },
+    { icon: BarChart3, label: 'Reports', path: '/reports', indexPage: 3 },
   ];
   const logout = () => {
     localStorage.removeItem('access_token');
@@ -24,10 +24,10 @@ function Sidebar({ currentPage, onClose }) {
       <div className="flex-1">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = currentPage === item.index;
+          const isActive = currentPage === item.indexPage;
           return (
             <button
-              key={item.index}
+              key={item.path}
               onClick={() => {
                 navigate(item.path);
                 onClose && onClose();
