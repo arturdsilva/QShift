@@ -32,7 +32,7 @@ function EmployeeSelector({
               const isSelected = assignedEmployees.some((assignedEmp) => assignedEmp.id === emp.id);
               return (
                 <button
-                  onClick={() => onToggleEmployee(emp)}
+                  onClick={() => onToggleEmployee(emp, slot, day)}
                   className={`w-full px-4 py-3 rounded-lg text-left transition-all ${
                     isSelected
                       ? 'bg-blue-600 text-white shadow-md'
@@ -111,7 +111,7 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
       const dayData = [...newData[day]];
 
       newData[day] = dayData.map((slt) => {
-        if (slt.id === slot.id) {
+        if (slt.localId === slot.localId) {
           const isSelected = slt.employees.some((emp) => emp.id === employee.id);
           const updatedEmployees = isSelected
             ? slt.employees.filter((emp) => emp.id !== employee.id)
@@ -290,11 +290,11 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
           day={selectedSlot.day}
           slot={selectedSlot.slot}
           assignedEmployees={
-            scheduleData[selectedSlot.day].find((slt) => slt.id === selectedSlot.slot.id)
+            scheduleData[selectedSlot.day].find((slt) => slt.localId === selectedSlot.slot.localId)
               ?.employees || []
           }
           employeeList={employeeList}
-          onToggleEmployee={(emp) => onToggleEmployee(emp, selectedSlot.slot, selectedSlot.day)}
+          onToggleEmployee={onToggleEmployee}
           onClose={() => {
             setShowEmployeeSelector(false);
             setSelectedSlot(null);
