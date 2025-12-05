@@ -2,7 +2,15 @@ import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BarChart3, ChevronLeft, ChevronRight, ArrowLeft, User, ChevronDown, ChevronUp } from 'lucide-react';
+import {
+  BarChart3,
+  ChevronLeft,
+  ChevronRight,
+  ArrowLeft,
+  User,
+  ChevronDown,
+  ChevronUp,
+} from 'lucide-react';
 import {
   METRIC_COLORS,
   STATS_CONFIG,
@@ -11,6 +19,7 @@ import {
 } from '../constants/employeeStatsConfig.js';
 import { EmployeeReportsApi } from '../services/api.js';
 import BarChart from '../components/BarChart.jsx';
+import { months } from '../constants/constantsOfTable.js';
 
 function EmployeeSelector({ employeesList, currentEmployee, onToggleEmployee, month, year }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -43,12 +52,15 @@ function EmployeeSelector({ employeesList, currentEmployee, onToggleEmployee, mo
                 <button
                   key={emp.id}
                   onClick={() => onToggleEmployee(emp, month, year)}
-                  className={`w-full px-3 py-2.5 rounded-lg text-left transition-all flex items-center gap-3 group ${isSelected
-                    ? 'bg-blue-600 text-white shadow-md'
-                    : 'text-slate-300 hover:bg-slate-700/50'
-                    }`}
+                  className={`w-full px-3 py-2.5 rounded-lg text-left transition-all flex items-center gap-3 group ${
+                    isSelected
+                      ? 'bg-blue-600 text-white shadow-md'
+                      : 'text-slate-300 hover:bg-slate-700/50'
+                  }`}
                 >
-                  <div className={`p-1.5 rounded-md ${isSelected ? 'bg-white/20' : 'bg-slate-700 group-hover:bg-slate-600'}`}>
+                  <div
+                    className={`p-1.5 rounded-md ${isSelected ? 'bg-white/20' : 'bg-slate-700 group-hover:bg-slate-600'}`}
+                  >
                     <User size={14} className={isSelected ? 'text-white' : 'text-slate-400'} />
                   </div>
                   <span className="font-medium text-sm truncate">{emp.name}</span>
@@ -134,21 +146,6 @@ function EmployeeReportsPage({
     console.log('Selecionando relatório do funcionário:', employee, month, year);
     setCurrentEmployee(employee);
   };
-
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
 
   const handlePrevMonth = () => {
     if (currentMonth === 1) {
@@ -284,10 +281,11 @@ function EmployeeReportsPage({
               {STATS_CONFIG.map((metric) => (
                 <button
                   key={metric.key}
-                  className={`px-1.5 py-2 rounded-lg text-sm font-medium transition-all ${selectedMetric === metric.key
-                    ? `${METRIC_COLORS[metric.key].bgButton} text-white shadow-lg`
-                    : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
-                    } `}
+                  className={`px-1.5 py-2 rounded-lg text-sm font-medium transition-all ${
+                    selectedMetric === metric.key
+                      ? `${METRIC_COLORS[metric.key].bgButton} text-white shadow-lg`
+                      : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
+                  } `}
                   onClick={() => setSelectedMetric(metric.key)}
                 >
                   {metric.label}

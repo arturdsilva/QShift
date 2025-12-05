@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedScheduleApi } from '../services/api.js';
 import { exportToExcel } from '../utils/exportSchedule.js';
+import { months } from '../constants/constantsOfTable.js';
 
 function ScheduleRecordsPage({
   employees,
@@ -80,20 +81,6 @@ function ScheduleRecordsPage({
     const [yearStartDate, monthStartDate, dayStartDate] = week.start_date.split('-').map(Number);
     const startDate = new Date(yearStartDate, monthStartDate - 1, dayStartDate);
     const endDate = new Date(startDate.getTime() + 6 * 24 * 60 * 60 * 1000);
-    const months = [
-      'January',
-      'February',
-      'March',
-      'April',
-      'May',
-      'June',
-      'July',
-      'August',
-      'September',
-      'October',
-      'November',
-      'December',
-    ];
     const startMonth = months[startDate.getMonth()];
     const endMonth = months[endDate.getMonth()];
 

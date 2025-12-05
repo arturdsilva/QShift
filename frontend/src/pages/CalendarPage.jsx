@@ -5,6 +5,7 @@ import BaseLayout from '../layouts/BaseLayout';
 import CalendarTable from '../components/CalendarTable';
 import Header from '../components/Header';
 import { CalendarApi } from '../services/api.js';
+import { months } from '../constants/constantsOfTable.js';
 
 function CalendarPage({
   currentMonth,
@@ -94,21 +95,6 @@ function CalendarPage({
   const handleBack = () => {
     navigate('/staff');
   };
-
-  const months = [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ];
 
   if (isLoading) {
     return (
