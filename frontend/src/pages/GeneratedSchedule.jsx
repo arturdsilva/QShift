@@ -5,6 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedScheduleApi } from '../services/api.js';
 import { ShiftConfigApi } from '../services/api.js';
+import { daysOfWeek } from '../constants/constantsOfTable.js';
 
 function GeneratedSchedule({
   employees,
@@ -21,15 +22,6 @@ function GeneratedSchedule({
   const navigate = useNavigate();
   const [scheduleData, setScheduleData] = useState(previewSchedule);
   const [editMode, setEditMode] = useState(false);
-  const days_of_week = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
 
   useEffect(() => {
     if (!previewSchedule) return;
@@ -52,7 +44,7 @@ function GeneratedSchedule({
   const handleShiftsSchedule = (responseShifts) => {
     return {
       shifts: responseShifts.map((respShift, index) => {
-        const day = days_of_week[respShift.weekday];
+        const day = daysOfWeek[respShift.weekday];
 
         const previewShift = scheduleData[day]?.find(
           (s) =>

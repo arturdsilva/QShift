@@ -1,3 +1,5 @@
+import { daysOfWeek } from '../constants/constantsOfTable.js';
+
 function getMonthCalendar(year, month) {
   const firstDay = new Date(year, month - 1, 1);
   const lastDay = new Date(year, month, 0);
@@ -40,7 +42,6 @@ function CalendarTable({
   generatedWeeks,
 }) {
   const weeks = getMonthCalendar(currentYear, currentMonth);
-  const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
   const isSelectedDay = (date) => {
     return selectedDays.some(
@@ -54,7 +55,7 @@ function CalendarTable({
         <table className="w-full">
           <thead>
             <tr className="bg-slate-700/90">
-              {weekDays.map((day) => (
+              {daysOfWeek.map((day) => (
                 <th key={day} className="px-4 py-3 text-center text-sm font-bold text-slate-200">
                   {day}
                 </th>

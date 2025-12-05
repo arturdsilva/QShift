@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedScheduleApi } from '../services/api.js';
 import { exportToExcel } from '../utils/exportSchedule.js';
-import { months } from '../constants/constantsOfTable.js';
+import { months, daysOfWeek } from '../constants/constantsOfTable.js';
 
 function ScheduleRecordsPage({
   employees,
@@ -29,29 +29,19 @@ function ScheduleRecordsPage({
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
   const [scheduleData, setScheduleData] = useState(null);
-  const days_of_week = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
   const [schedulesCache, setSchedulesCache] = useState({});
-  console.log('week', weekRecords);
   const convertScheduleData = (shifts) => {
     let scheduleModified = {
-      monday: [],
-      tuesday: [],
-      wednesday: [],
-      thursday: [],
-      friday: [],
-      saturday: [],
-      sunday: [],
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+      Sunday: [],
     };
     shifts.forEach((shift) => {
-      const dayName = days_of_week[shift.weekday];
+      const dayName = daysOfWeek[shift.weekday];
       scheduleModified[dayName].push({
         id: shift.shift_id,
         startTime: shift.start_time.slice(0, 5),
@@ -63,7 +53,7 @@ function ScheduleRecordsPage({
         })),
       });
     });
-    days_of_week.forEach((day) => {
+    daysOfWeek.forEach((day) => {
       scheduleModified[day].sort((a, b) => {
         if (a.startTime < b.startTime) return -1;
         if (a.startTime > b.startTime) return 1;
@@ -91,7 +81,6 @@ function ScheduleRecordsPage({
   };
 
   useEffect(() => {
-    console.log('entrou useEffect');
     async function generateSchedule() {
       if (!weekRecords?.id) {
         setIsLoading(false);
@@ -103,11 +92,9 @@ function ScheduleRecordsPage({
       }
       try {
         const response = await GeneratedScheduleApi.getGeneratedSchedule(weekRecords.id);
-        console.log('GeneratedScheduleApi', response.data);
         if (response.data) {
           const convertedData = convertScheduleData(response.data.shifts);
           setScheduleData(convertedData);
-          console.log('Turnos:', response.data.shifts);
           setSchedulesCache((prev) => ({
             ...prev,
             [weekRecords.id]: convertedData,
@@ -122,7 +109,6 @@ function ScheduleRecordsPage({
     }
     generateSchedule();
   }, [weekRecords?.id]);
-  console.log('saiu useEffect');
   const previousWeek = () => {
     if (weeksList.length - 1 > currentIdxWeek) {
       setWeekRecords(weeksList[currentIdxWeek + 1]);
@@ -145,7 +131,7 @@ function ScheduleRecordsPage({
 
   const handleShiftsSchedule = () => {
     const shiftsSchedule = { shifts: [] };
-    days_of_week.forEach((day) => {
+    daysOfWeek.forEach((day) => {
       if (scheduleData[day]) {
         scheduleData[day].forEach((shift) => {
           shiftsSchedule.shifts.push({
@@ -155,7 +141,6 @@ function ScheduleRecordsPage({
         });
       }
     });
-    console.log('shiftsSchedule', shiftsSchedule);
     return shiftsSchedule;
   };
 

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { X, Check } from 'lucide-react';
 import React from 'react';
+import { daysOfWeek } from '../constants/constantsOfTable.js';
 
 function EmployeeSelector({
   day,
@@ -63,16 +64,7 @@ function EmployeeSelector({
 function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, editMode }) {
   const [showEmployeeSelector, setShowEmployeeSelector] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
-  const days_of_week = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
-  const maxSlots = Math.max(...days_of_week.map((day) => scheduleData[day].length));
+  const maxSlots = Math.max(...daysOfWeek.map((day) => scheduleData[day].length));
 
   const hendleSelecetedDaysMap = () => {
     if (!week) {
@@ -92,7 +84,7 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
     const year = startDate.getFullYear();
     const month = startDate.getMonth();
     const lastDay = new Date(year, month + 1, 0);
-    days_of_week.forEach((day, index) => {
+    daysOfWeek.forEach((day, index) => {
       selecetedDaysMap[day] =
         index + startDate.getDate() <= lastDay.getDate()
           ? index + startDate.getDate()
@@ -138,7 +130,7 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
   const visibleSlots = useMemo(() => {
     const visible = {};
     let previousSlots = [];
-    days_of_week.forEach((day) => {
+    daysOfWeek.forEach((day) => {
       const currentSlots = scheduleData[day];
       visible[day] = !areEqualSlots(currentSlots, previousSlots);
       previousSlots = currentSlots;
@@ -153,7 +145,7 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
           <table className="w-full">
             <thead>
               <tr className="bg-slate-700">
-                {days_of_week.map((day) => {
+                {daysOfWeek.map((day) => {
                   const selecetedDaysMap = hendleSelecetedDaysMap();
 
                   return (
@@ -180,7 +172,7 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
               {Array.from({ length: maxSlots }).map((_, rowIndex) => {
                 return (
                   <tr key={rowIndex} className="border-t border-slate-700">
-                    {days_of_week.map((day) => {
+                    {daysOfWeek.map((day) => {
                       const dayData = scheduleData[day];
                       const slot = dayData[rowIndex];
                       const employees = slot ? slot.employees || [] : [];
@@ -244,7 +236,7 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
                 );
               })}
               <tr className="border-t-2 border-slate-600 bg-slate-750">
-                {days_of_week.map((day) => {
+                {daysOfWeek.map((day) => {
                   const assignedEmployees = [];
                   employeeList.forEach((employee) => {
                     scheduleData[day].forEach((slot) =>

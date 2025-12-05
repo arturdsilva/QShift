@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
 import { GeneratedScheduleApi } from '../services/api.js';
+import { daysOfWeek } from '../constants/constantsOfTable.js';
 
 function ShiftConfigPage({
   selectedDays,
@@ -14,18 +15,8 @@ function ShiftConfigPage({
   setIsLoading,
 }) {
   const navigate = useNavigate();
-  const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   const openDaysMask = [];
   const selectedDaysMap = {};
-  const days_of_week = [
-    'monday',
-    'tuesday',
-    'wednesday',
-    'thursday',
-    'friday',
-    'saturday',
-    'sunday',
-  ];
   selectedDays.forEach((day) => {
     selectedDaysMap[day.getDay() === 0 ? 6 : day.getDay() - 1] = day;
     openDaysMask.push(day.getDay() === 0 ? 6 : day.getDay() - 1);
@@ -48,7 +39,6 @@ function ShiftConfigPage({
   ]);
 
   const handleBack = () => {
-    console.log('Voltando para página de calendário');
     navigate('/calendar');
   };
 
@@ -66,7 +56,6 @@ function ShiftConfigPage({
       ],
     };
     setWeekShifts([...weekShifts, newWeekShift]);
-    console.log('Adicionando novo turno:', newWeekShift);
   };
 
   const removeShift = (weekShiftId) => {
@@ -188,16 +177,16 @@ function ShiftConfigPage({
 
   const convertScheduleData = (shifts) => {
     let scheduleModified = {
-      monday: [],
-      tuesday: [],
-      wednesday: [],
-      thursday: [],
-      friday: [],
-      saturday: [],
-      sunday: [],
+      Monday: [],
+      Tuesday: [],
+      Wednesday: [],
+      Thursday: [],
+      Friday: [],
+      Saturday: [],
+      Sunday: [],
     };
     shifts.forEach((shift, index) => {
-      const dayName = days_of_week[shift.weekday];
+      const dayName = daysOfWeek[shift.weekday];
       scheduleModified[dayName].push({
         id: `${dayName}-${index}`,
         startTime: shift.start_time.slice(0, 5),
@@ -209,7 +198,7 @@ function ShiftConfigPage({
         })),
       });
     });
-    days_of_week.forEach((day) => {
+    daysOfWeek.forEach((day) => {
       scheduleModified[day].sort((a, b) => {
         if (a.startTime < b.startTime) return -1;
         if (a.startTime > b.startTime) return 1;
@@ -240,7 +229,6 @@ function ShiftConfigPage({
           open_days: openDaysMask,
         };
         setWeekData(week);
-        console.log('Criando escala prévia:', week, shiftsSchedule);
         const responsePreviewSchedule = await GeneratedScheduleApi.generateSchedulePreview({
           shift_vector: shiftsSchedule,
         });

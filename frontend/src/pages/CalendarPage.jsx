@@ -84,10 +84,6 @@ function CalendarPage({
 
   const handleAdvance = () => {
     if (selectedWeek && selectedDays.length > 0) {
-      console.log('Avançando com:', {
-        selectedWeek,
-        selectedDays,
-      });
       navigate('/shift-config');
     }
   };

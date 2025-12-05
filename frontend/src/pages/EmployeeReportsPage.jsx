@@ -124,7 +124,6 @@ function EmployeeReportsPage({
           currentYear,
         );
         if (response.data) {
-          console.log('Raw employee stats data:', response.data);
           const employeeStatsFormatted = convertEmployeeStatsFormat(response.data);
           setEmployeeYearStats(employeeStatsFormatted);
           const statsCards = createStatsCards(employeeStatsFormatted);

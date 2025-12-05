@@ -21,10 +21,8 @@ function StaffPage({
       try {
         const staffResponse = await StaffApi.getAll();
         setEmployees(staffResponse.data);
-
-        console.log('Fetched Employees:', staffResponse.data);
       } catch (error) {
-        console.error('Erro ao carregar dados da API:', error);
+        console.error('Erro ao carregar dados de funcionários :', error);
       } finally {
         setIsLoading(false);
       }
@@ -43,7 +41,6 @@ function StaffPage({
   };
 
   const handleAddEmployee = () => {
-    console.log('Add employee');
     setSelectEditEmployee(null);
     navigate('/availability');
   };
@@ -52,7 +49,6 @@ function StaffPage({
     setIsLoading(true);
     const emp = employees.find((e) => e.id === employeeId);
     if (emp) {
-      console.log('entrou', emp);
       setSelectEditEmployee(emp);
       navigate('/availability');
     } else {
@@ -68,7 +64,6 @@ function StaffPage({
       setEmployees(
         employees.map((emp) => (emp.id === employeeId ? { ...emp, active: !emp.active } : emp)),
       );
-      console.log('Toggle status:', employeeId, employeeData.active);
     }
   };
 
