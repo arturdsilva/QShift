@@ -97,7 +97,7 @@ function ShiftConfigPage({
       })),
     }));
     localStorage.setItem('shiftConfigurations', JSON.stringify(configToSave));
-    console.log('Configurações de turno salvas:', configToSave);
+    console.log('Shift configurations saved:', configToSave);
   };
 
   const restoreConfigShift = () => {
@@ -112,9 +112,9 @@ function ShiftConfigPage({
         })),
       }));
       setWeekShifts(restoredShifts);
-      console.log('Configurações de turno restauradas:', restoredShifts);
+      console.log('Shift configurations restored:', restoredShifts);
     } else {
-      console.log('Nenhuma configuração salva encontrada.');
+      console.log('No saved configuration found.');
     }
   };
 
@@ -130,21 +130,19 @@ function ShiftConfigPage({
           const hasAllFields = shift.start_time && shift.end_time && shift.min_staff;
           if (hasAnyField && !hasAllFields) {
             let missingFields = [];
-            if (!shift.start_time) missingFields.push('hora de início');
-            if (!shift.end_time) missingFields.push('hora final');
-            if (!shift.min_staff) missingFields.push('número de funcionários');
-            errors.push(`${labelShift}: Falta ${missingFields.join(', ')}`);
+            if (!shift.start_time) missingFields.push('start time');
+            if (!shift.end_time) missingFields.push('end time');
+            if (!shift.min_staff) missingFields.push('number of employees');
+            errors.push(`${labelShift}: Missing ${missingFields.join(', ')}`);
             return;
           }
 
           if (shift.start_time && shift.end_time && shift.start_time >= shift.end_time) {
-            errors.push(
-              `${labelShift}: O horário de término deve ser posterior ao horário de início.`,
-            );
+            errors.push(`${labelShift}: End time must be after start time.`);
             return;
           }
           if (shift.min_staff && Number(shift.min_staff) < 0) {
-            errors.push(`${labelShift}: O número mínimo de funcionários deve ser superior a 0.`);
+            errors.push(`${labelShift}: Minimum number of employees must be greater than 0.`);
             return;
           }
 
@@ -167,7 +165,7 @@ function ShiftConfigPage({
       return {
         sucess: false,
         errors: [
-          'Por favor, configure pelo menos um turno completo (com horário de início, horário de término e número de funcionários).',
+          'Please configure at least one complete shift (with start time, end time, and number of employees).',
         ],
       };
     }
@@ -217,7 +215,7 @@ function ShiftConfigPage({
     if (!result.sucess) {
       const errorMessage = result.errors.join('\n\n');
       setIsLoading(false);
-      alert(`Por favor, corrija os seguintes problemas:\n\n${errorMessage}`);
+      alert(`Please fix the following issues:\n\n${errorMessage}`);
       return;
     }
 
@@ -237,27 +235,27 @@ function ShiftConfigPage({
         if (preciewScheduleData.possible && preciewScheduleData.schedule) {
           const convertedData = convertScheduleData(preciewScheduleData.schedule.shifts);
           setPreviewSchedule(convertedData);
-          console.log('A escala criada:', preciewScheduleData.schedule);
+          console.log('The created schedule:', preciewScheduleData.schedule);
         } else {
           alert(
-            'Não foi possível gerar uma escala viável com as configurações atuais. Verifique as configurações de turnos e funcionários.',
+            'Unable to generate a viable schedule with the current settings. Check shift and employee settings.',
           );
           navigate('/staff');
         }
 
         navigate('/schedule');
       } catch (error) {
-        console.error('Erro ao criar escala:', error);
+        console.error('Error creating schedule:', error);
 
         if (error.response) {
-          console.error('Resposta do servidor:', error.response.data);
-          alert(`Erro: ${error.response.data.detail || 'Erro ao criar escala'}`);
+          console.error('Server response:', error.response.data);
+          alert(`Error: ${error.response.data.detail || 'Error creating schedule'}`);
         } else if (error.request) {
-          console.error('Sem resposta do servidor:', error.request);
-          alert('Erro: Servidor não respondeu. Verifique se o backend está rodando.');
+          console.error('No response from server:', error.request);
+          alert('Error: Server did not respond. Check if the backend is running.');
         } else {
-          console.error('Erro na configuração:', error.message);
-          alert(`Erro: ${error.message}`);
+          console.error('Configuration error:', error.message);
+          alert(`Error: ${error.message}`);
         }
 
         setIsLoading(false);

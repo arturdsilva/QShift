@@ -50,7 +50,7 @@ export const ShiftConfigApi = {
     try {
       return await api.post(`/weeks/${week_id}/shifts`, shiftData);
     } catch (error) {
-      console.error('Erro ao criar um turno:', error);
+      console.error('Error creating a shift:', error);
       throw error;
     }
   },
@@ -59,7 +59,7 @@ export const ShiftConfigApi = {
     try {
       return await api.post('/weeks', week);
     } catch (error) {
-      console.error('Erro ao criar uma semana:', error);
+      console.error('Error creating a week:', error);
       throw error;
     }
   },
@@ -74,7 +74,7 @@ export const StaffApi = {
     try {
       return await api.patch(`/employees/${employee_id}`, employeeData);
     } catch (error) {
-      console.error('Erro ao atualizar o funcionário:', error);
+      console.error('Error updating employee:', error);
       throw error;
     }
   },
@@ -83,7 +83,7 @@ export const StaffApi = {
     try {
       return await api.delete(`/employees/${employee_id}`);
     } catch (error) {
-      console.error('Erro ao remover o funcionário:', error);
+      console.error('Error removing employee:', error);
       throw error;
     }
   },
@@ -95,7 +95,7 @@ export const AvailabilityApi = {
       const response = await api.get(`/employees/${employeeId}/availabilities`);
       return response.data;
     } catch (error) {
-      console.error('Erro ao receber a disponibilidade:', error);
+      console.error('Error receiving availability:', error);
       throw error;
     }
   },
@@ -108,7 +108,7 @@ export const AvailabilityApi = {
       );
       return response.data;
     } catch (error) {
-      console.error('Erro ao atualizar disponibilidade:', error);
+      console.error('Error updating availability:', error);
       throw error;
     }
   },
@@ -118,9 +118,9 @@ export const AvailabilityApi = {
       const response = await api.post(`/employees/${employeeId}/availabilities`, availability);
       return response.data;
     } catch (error) {
-      console.error('Erro ao criar disponibilidade:', error);
-      console.error('Payload enviado:', availability);
-      console.error('Resposta:', error.response?.data);
+      console.error('Error creating availability:', error);
+      console.error('Payload sent:', availability);
+      console.error('Response:', error.response?.data);
       throw error;
     }
   },
@@ -130,7 +130,7 @@ export const AvailabilityApi = {
       await api.delete(`/employees/${employeeId}/availabilities/${availabilityId}`);
       return { success: true };
     } catch (error) {
-      console.error('Erro ao deletar disponibilidade:', error);
+      console.error('Error deleting availability:', error);
       throw error;
     }
   },
@@ -143,7 +143,7 @@ export const AvailabilityApi = {
       );
       return response.data;
     } catch (error) {
-      console.error('Erro ao atualizar disponibilidade:', error);
+      console.error('Error updating availability:', error);
       throw error;
     }
   },
@@ -165,7 +165,7 @@ export const AvailabilityApi = {
       });
       return created;
     } catch (error) {
-      console.error('Erro ao substituir disponibilidades:', error);
+      console.error('Error replacing availabilities:', error);
       throw error;
     }
   },
@@ -175,8 +175,8 @@ export const AvailabilityApi = {
       const response = await api.post('/employees', employeeData);
       return response.data;
     } catch (error) {
-      console.error('Erro ao criar funcionário:', error);
-      console.error('Resposta:', error.response?.data);
+      console.error('Error creating employee:', error);
+      console.error('Response:', error.response?.data);
       throw error;
     }
   },
@@ -190,7 +190,7 @@ export const GeneratedScheduleApi = {
         keepalive: true,
       });
     } catch (error) {
-      console.error('Erro ao deletar a semana da escala:', error);
+      console.error('Error deleting schedule week:', error);
       throw error;
     }
   },
@@ -199,7 +199,7 @@ export const GeneratedScheduleApi = {
     try {
       return await api.post(`/preview-schedule`, shift_vector);
     } catch (error) {
-      console.error('Erro ao gerar prévia da escala:', error);
+      console.error('Error generating schedule preview:', error);
       throw error;
     }
   },
@@ -208,7 +208,7 @@ export const GeneratedScheduleApi = {
     try {
       return await api.get(`/weeks/${week_id}/schedule`);
     } catch (error) {
-      console.error('Erro ao buscar escala:', error);
+      console.error('Error fetching schedule:', error);
       throw error;
     }
   },
@@ -217,7 +217,7 @@ export const GeneratedScheduleApi = {
     try {
       return await api.post(`/weeks/${week_id}/schedule`, schedule);
     } catch (error) {
-      console.error('Erro ao enviar a escala aprovada:', error);
+      console.error('Error sending approved schedule:', error);
       throw error;
     }
   },
@@ -226,7 +226,7 @@ export const GeneratedScheduleApi = {
     try {
       return await api.delete(`/weeks/${week_id}/schedule`);
     } catch (error) {
-      console.error('Erro ao deletar a lista de turnos da escala:', error);
+      console.error('Error deleting schedule shift list:', error);
       throw error;
     }
   },
@@ -237,7 +237,7 @@ export const LoginApi = {
     try {
       return await api.post('/auth/login', { email, password });
     } catch (error) {
-      console.error('Erro ao enviar o dados para login:', error);
+      console.error('Error sending login data:', error);
       throw error;
     }
   },
@@ -248,7 +248,7 @@ export const RegisterApi = {
     try {
       return await api.post('/users', { email, password });
     } catch (error) {
-      console.error('Erro ao enviar o dados para registro:', error);
+      console.error('Error sending registration data:', error);
       throw error;
     }
   },
@@ -271,7 +271,7 @@ export const EmployeeReportsApi = {
     try {
       return await api.get(`/employees/${employee_id}/report/${year}`);
     } catch (error) {
-      console.error('Erro ao buscar relatório anual do funcionário:', error);
+      console.error('Error fetching employee annual report:', error);
       throw error;
     }
   },
@@ -280,7 +280,7 @@ export const EmployeeReportsApi = {
     try {
       return await api.get(`/employees/${employee_id}/report/${year}/${month}`);
     } catch (error) {
-      console.error('Erro ao buscar relatório mensal do funcionário:', error);
+      console.error('Error fetching employee monthly report:', error);
       throw error;
     }
   },

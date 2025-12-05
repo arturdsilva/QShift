@@ -66,7 +66,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
         navigate('/staff');
       } finally {
         setIsLoading(false);
-        console.log('página carregada', isLoading);
+        console.log('page loaded', isLoading);
       }
     }
     fetchEmployee();
@@ -157,35 +157,35 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
 
       let employeeId = selectEditEmployee?.id;
       if (!employeeId) {
-        console.log('Criando novo funcionário...');
+        console.log('Creating new employee...');
         const newEmployee = await AvailabilityApi.addNewEmployee({
           name: name,
           active: isActive,
         });
         employeeId = newEmployee.id;
-        console.log('Funcionário criado:', newEmployee);
+        console.log('Employee created:', newEmployee);
       } else {
-        console.log('Atualizando funcionário existente...');
+        console.log('Updating existing employee...');
         await StaffApi.updateEmployeeData(employeeId, {
           name,
           active: isActive,
         });
       }
       try {
-        console.log('Salvando disponibilidades...');
+        console.log('Saving availabilities...');
         await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
-        console.log('Funcionário e disponibilidades salvos com sucesso!');
+        console.log('Employee and availabilities saved successfully!');
         setSelectEditEmployee(null);
         navigate('/staff');
       } catch (err) {
-        console.error('Erro ao salvar disponibilidades:', err);
+        console.error('Error saving availabilities:', err);
         await StaffApi.deleteEmployee(employeeId);
-        alert('Erro ao salvar disponibilidades. Tente novamente.');
+        alert('Error saving availabilities. Please try again.');
         return;
       }
     } catch (err) {
-      console.error('Erro ao salvar:', err);
-      setError(err.response?.data?.detail || 'Erro ao salvar funcionário. Tente novamente.');
+      console.error('Error saving:', err);
+      setError(err.response?.data?.detail || 'Error saving employee. Please try again.');
     }
   };
 
@@ -258,8 +258,6 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
             </label>
           </div>
         </div>
-
-        {/* TODO: Ajeitar o tamanho da tabela de disponibilidade ou trocar linha pela coluna*/}
         <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
           <div className="mb-6 flex items-center justify-between">
             <div>
@@ -321,7 +319,6 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
           </div>
         </div>
 
-        {/* Botões de ação */}
         <div className="flex justify-end gap-3">
           <button
             onClick={handleCancel}

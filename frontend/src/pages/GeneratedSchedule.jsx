@@ -65,9 +65,9 @@ function GeneratedSchedule({
     let newWeek = null;
 
     try {
-      console.log('Criando semana:', weekData);
+      console.log('Creating week:', weekData);
       newWeek = await ShiftConfigApi.submitWeekData(weekData).then((r) => r.data);
-      console.log('Semana criada com sucesso:', newWeek);
+      console.log('Week created successfully:', newWeek);
 
       const createdShifts = await Promise.all(
         shiftsData.map((shift) =>
@@ -76,22 +76,22 @@ function GeneratedSchedule({
       );
 
       const shiftsSchedule = handleShiftsSchedule(createdShifts);
-      console.log('Todos os turnos criados com sucesso!');
+      console.log('All shifts created successfully!');
 
       await GeneratedScheduleApi.approvedSchedule(newWeek.id, shiftsSchedule);
 
-      alert('Escala criada com sucesso!');
+      alert('Schedule created successfully!');
       navigate('/staff');
     } catch (error) {
-      console.error('Erro ao aprovar:', error);
+      console.error('Error approving:', error);
 
       if (newWeek) {
         await GeneratedScheduleApi.deleteSchedule(newWeek.id).catch((e) =>
-          console.error('Erro ao deletar semana:', e),
+          console.error('Error deleting week:', e),
         );
       }
 
-      alert('Erro ao aprovar a escala.');
+      alert('Error approving schedule.');
       setWeekData(null);
       setShiftsData(null);
       setPreviewSchedule(null);

@@ -101,8 +101,8 @@ function ScheduleRecordsPage({
           }));
         }
       } catch (error) {
-        console.error('Erro ao receber a escala:', error);
-        alert('Nenhuma escala foi gerada ainda.');
+        console.error('Error receiving schedule:', error);
+        alert('No schedule has been generated yet.');
       } finally {
         setIsLoading(false);
       }
@@ -156,7 +156,7 @@ function ScheduleRecordsPage({
       await GeneratedScheduleApi.approvedSchedule(weekRecords.id, shiftsSchedule);
       setEditMode(false);
     } catch (error) {
-      console.error('Erro ao salvar a escala:', error);
+      console.error('Error saving schedule:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -207,7 +207,7 @@ function ScheduleRecordsPage({
         }
       }
     } catch (error) {
-      console.log('Erro ao deletar a escala:', error);
+      console.log('Error deleting schedule:', error);
       throw error;
     } finally {
       setEditMode(false);

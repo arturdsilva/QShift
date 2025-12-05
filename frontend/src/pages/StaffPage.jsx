@@ -23,7 +23,7 @@ function StaffPage({
         const staffResponse = await StaffApi.getAll();
         setEmployees(staffResponse.data);
       } catch (error) {
-        console.error('Erro ao carregar dados de funcionários :', error);
+        console.error('Error loading employee data:', error);
       } finally {
         setIsLoading(false);
       }
@@ -36,9 +36,9 @@ function StaffPage({
       await StaffApi.deleteEmployee(employeeId);
       setEmployees((prevEmployees) => prevEmployees.filter((emp) => emp.id !== employeeId));
       setDeleteConfirmation(null);
-      console.log('Funcionário removido com sucesso');
+      console.log('Employee removed successfully');
     } catch (error) {
-      console.error('Erro ao deletar funcionário:', error);
+      console.error('Error deleting employee:', error);
       setDeleteConfirmation(null);
     }
   };
@@ -63,7 +63,7 @@ function StaffPage({
       setSelectEditEmployee(emp);
       navigate('/availability');
     } else {
-      console.warn('Funcionário não encontrado:', employeeId);
+      console.warn('Employee not found:', employeeId);
     }
   };
 

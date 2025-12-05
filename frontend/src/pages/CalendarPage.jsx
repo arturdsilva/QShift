@@ -31,9 +31,9 @@ function CalendarPage({
         setSelectedDays([]);
         setSelectedWeek(null);
 
-        console.log('Semanas recebidas com sucesso:', weekResponse.data);
+        console.log('Weeks received successfully:', weekResponse.data);
       } catch (error) {
-        console.error('Erro ao carregar dados da API:', error);
+        console.error('Error loading API data:', error);
       } finally {
         setIsLoading(false);
       }
