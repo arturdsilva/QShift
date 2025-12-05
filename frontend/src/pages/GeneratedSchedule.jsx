@@ -33,15 +33,6 @@ function GeneratedSchedule({
 
   useEffect(() => {
     if (!previewSchedule) return;
-    const scheduleWithIds = {};
-    days_of_week.forEach((day) => {
-      const slots = previewSchedule[day];
-      scheduleWithIds[day] = slots.map((slot, index) => ({
-        ...slot,
-        id: `${day}-${index}`,
-      }));
-    });
-    setScheduleData(scheduleWithIds);
     if (isLoading) {
       setIsLoading(false);
     }

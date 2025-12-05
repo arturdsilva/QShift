@@ -196,9 +196,10 @@ function ShiftConfigPage({
       saturday: [],
       sunday: [],
     };
-    shifts.forEach((shift) => {
+    shifts.forEach((shift, index) => {
       const dayName = days_of_week[shift.weekday];
       scheduleModified[dayName].push({
+        id: `${dayName}-${index}`,
         startTime: shift.start_time.slice(0, 5),
         endTime: shift.end_time.slice(0, 5),
         minEmployees: shift.min_staff,
@@ -218,7 +219,7 @@ function ShiftConfigPage({
         return 0;
       });
     });
-    setPreviewSchedule(scheduleModified);
+    return scheduleModified;
   };
 
   const createSchedule = async () => {
@@ -246,7 +247,8 @@ function ShiftConfigPage({
         const preciewScheduleData = responsePreviewSchedule.data;
 
         if (preciewScheduleData.possible && preciewScheduleData.schedule) {
-          convertScheduleData(preciewScheduleData.schedule.shifts);
+          const convertedData = convertScheduleData(preciewScheduleData.schedule.shifts);
+          setPreviewSchedule(convertedData);
           console.log('A escala criada:', preciewScheduleData.schedule);
         } else {
           alert(
