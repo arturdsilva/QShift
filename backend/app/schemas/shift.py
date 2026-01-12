@@ -23,6 +23,8 @@ class ShiftBase(BaseModel):
 class ShiftCreate(ShiftBase):
     pass
 
+class PreviewShiftBase(ShiftBase):
+    id: uuid.UUID
 
 class ShiftUpdate(BaseModel):
     weekday: int | None = Field(None, ge=0, le=6)
