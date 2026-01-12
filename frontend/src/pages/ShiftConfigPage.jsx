@@ -146,6 +146,7 @@ function ShiftConfigPage({
 
           if (hasAllFields) {
             shiftsSchedule.push({
+              id: crypto.randomUUID(),
               weekday: shift.weekday,
               start_time: shift.start_time,
               end_time: shift.end_time,
