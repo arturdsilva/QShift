@@ -228,7 +228,11 @@ def test_preview_excludes_inactive_employees(client: TestClient, seeded_data):
     for emp in employees:
         client.patch(f"/api/v1/employees/{emp['id']}", json={"active": False})
 
-    response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts},
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -325,7 +329,11 @@ def test_large_min_staff_with_few_employees(client: TestClient, seeded_data):
 
     assert response.status_code == 201
 
-    preview_response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    preview_response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
     assert preview_response.status_code == 200
 
 

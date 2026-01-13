@@ -57,12 +57,14 @@ class ScheduleGenerator:
     def __init__(
         self,
         *,
+        shift_ids: List[UUID],
         employee_ids: List[UUID],
         employee_names: List[str],
         shift_vector: List[shift_domain.Shift],
         availability_matrix: List[List[bool]],
     ):
 
+        self.shift_ids = shift_ids
         self.employee_ids = employee_ids
         self.employee_names = employee_names
         self.shift_vector = shift_vector
@@ -104,7 +106,9 @@ class ScheduleGenerator:
         employee_ids, employee_names = cls._get_employees_for_user(
             db=db, user_id=user_id
         )
+        shift_ids = cls._get_shift_ids(db=db, shift_vector=shift_vector)
         return cls(
+            shift_ids=shift_ids,
             employee_ids=employee_ids,
             employee_names=employee_names,
             shift_vector=shift_vector,
@@ -112,6 +116,13 @@ class ScheduleGenerator:
                 db=db, shift_vector=shift_vector, employee_ids=employee_ids
             ),
         )
+
+    @classmethod
+    def _get_shift_ids(cls, db: Session, shift_vector: List[shift_domain.Shift]) -> List[UUID]:
+        shift_ids = []
+        for shift in shift_vector:
+            shift_ids.append(shift.id)
+        return shift_ids
 
     @classmethod
     def _get_employees_for_user(

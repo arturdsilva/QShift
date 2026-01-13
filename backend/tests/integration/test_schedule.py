@@ -166,7 +166,11 @@ def test_read_schedule_structure(client: TestClient, seeded_data):
 def test_preview_schedule_feasible(client: TestClient, seeded_data):
     """Should generate feasible schedule preview."""
     week_id = seeded_data["week_id"]
-    response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -182,7 +186,11 @@ def test_preview_schedule_does_not_persist(client: TestClient, seeded_data):
     """Should not persist preview schedule to database."""
     week_id = seeded_data["week_id"]
 
-    preview_response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    preview_response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
     assert preview_response.status_code == 200
     assert preview_response.json()["possible"] is True
 
@@ -205,7 +213,11 @@ def test_preview_schedule_no_employees(client: TestClient):
     weeks = client.get("/api/v1/weeks").json()
     week_id = weeks[0]["id"]
 
-    response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -230,7 +242,11 @@ def test_preview_schedule_no_availabilities(client: TestClient):
     weeks = client.get("/api/v1/weeks").json()
     week_id = weeks[0]["id"]
 
-    response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -242,7 +258,11 @@ def test_preview_schedule_no_availabilities(client: TestClient):
 def test_preview_schedule_structure(client: TestClient, seeded_data):
     """Should return preview with correct structure."""
     week_id = seeded_data["week_id"]
-    response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
 
     assert response.status_code == 200
     data = response.json()
@@ -254,7 +274,6 @@ def test_preview_schedule_structure(client: TestClient, seeded_data):
         assert "shifts" in schedule
 
         for shift in schedule["shifts"]:
-            assert "shift_id" in shift
             assert "weekday" in shift
             assert "start_time" in shift
             assert "end_time" in shift
@@ -270,17 +289,29 @@ def test_preview_schedule_structure(client: TestClient, seeded_data):
 def test_preview_schedule_respects_availabilities(client: TestClient, seeded_data):
     """Should only assign employees to shifts they are available for."""
     week_id = seeded_data["week_id"]
-    response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    
+    response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
 
     assert response.status_code == 200
     data = response.json()
 
     if data["possible"]:
         schedule = data["schedule"]
-        shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+        
+        # Iterate by index to match result with original shifts
+        for i, schedule_shift in enumerate(schedule["shifts"]):
+            shift = shifts[i]
 
-        for schedule_shift in schedule["shifts"]:
-            shift = next(s for s in shifts if s["id"] == schedule_shift["shift_id"])
+            # Verify that the shift at this index actually matches the input shift's definition
+            # This ensures that relying on index order is safe/correct
+            assert schedule_shift["weekday"] == shift["weekday"]
+            assert schedule_shift["start_time"] == shift["start_time"]
+            assert schedule_shift["end_time"] == shift["end_time"]
+            assert schedule_shift["min_staff"] == shift["min_staff"]
 
             for employee in schedule_shift["employees"]:
                 availabilities = client.get(
