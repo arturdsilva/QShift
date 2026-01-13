@@ -89,7 +89,10 @@ def test_rf005_generate_schedule_flow(client: TestClient):
     for shift in shifts:
         assert shift["min_staff"] >= 1
 
-    preview_response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    preview_response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
     assert preview_response.status_code == 200
 
     preview_data = preview_response.json()
@@ -101,27 +104,29 @@ def test_rf005_generate_schedule_flow(client: TestClient):
     assert len(schedule["shifts"]) > 0
 
     shifts_with_employees = 0
-    for schedule_shift in schedule["shifts"]:
-        assert "shift_id" in schedule_shift
+    # Map back using index since preview shifts don't have shift_id
+    schedule_payload_shifts = []
+
+    for i, schedule_shift in enumerate(schedule["shifts"]):
+        # Removed "shift_id" assertion as it's no longer in preview output
         assert "weekday" in schedule_shift
         assert "start_time" in schedule_shift
         assert "end_time" in schedule_shift
         assert "min_staff" in schedule_shift
         assert "employees" in schedule_shift
+        
         if len(schedule_shift["employees"]) > 0:
             shifts_with_employees += 1
+            original_shift_id = shifts[i]["id"]
+            schedule_payload_shifts.append({
+                "shift_id": original_shift_id,
+                "employee_ids": [e["employee_id"] for e in schedule_shift["employees"]],
+            })
 
     assert shifts_with_employees > 0
 
     schedule_payload = {
-        "shifts": [
-            {
-                "shift_id": s["shift_id"],
-                "employee_ids": [e["employee_id"] for e in s["employees"]],
-            }
-            for s in schedule["shifts"]
-            if len(s["employees"]) > 0
-        ]
+        "shifts": schedule_payload_shifts
     }
 
     save_response = client.post(
@@ -138,14 +143,25 @@ def test_rf005_generate_schedule_flow(client: TestClient):
 
     shifts_with_assignments = [s for s in saved_schedule["shifts"] if len(s["employees"]) > 0]
     assert len(shifts_with_assignments) > 0
-
+    
+    # Check consistency of saved schedule
     for saved_shift in shifts_with_assignments:
-        original_shift = next(
-            (s for s in schedule["shifts"] if s["shift_id"] == saved_shift["shift_id"]),
+        # 1. Find the original shift info to identify which index in the preview it corresponds to
+        matching_original_index = next(
+            (i for i, s in enumerate(shifts) if s["id"] == saved_shift["shift_id"]),
             None
         )
-        if original_shift:
-            assert len(saved_shift["employees"]) == len(original_shift["employees"])
+        assert matching_original_index is not None, f"Saved shift {saved_shift['shift_id']} not found in original shifts"
+        
+        # 2. Get the previewed shift from the schedule output using the index
+        preview_shift = schedule["shifts"][matching_original_index]
+        
+        # 3. Compare the saved assignment with the previewed assignment
+        assert len(saved_shift["employees"]) == len(preview_shift["employees"])
+        
+        saved_emp_ids = set(e["employee_id"] for e in saved_shift["employees"])
+        preview_emp_ids = set(e["employee_id"] for e in preview_shift["employees"])
+        assert saved_emp_ids == preview_emp_ids
 
 
 @pytest.mark.integration
@@ -172,7 +188,10 @@ def test_rf008_notify_unavailability_flow(client: TestClient):
     shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
     assert len(shifts) > 0
 
-    preview_response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    preview_response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
     assert preview_response.status_code == 200
 
     preview_data = preview_response.json()
@@ -202,7 +221,11 @@ def test_rf008_notify_unavailability_insufficient_staff(client: TestClient):
     weeks = client.get("/api/v1/weeks").json()
     week_id = weeks[0]["id"]
 
-    preview_response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    preview_response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
     assert preview_response.status_code == 200
 
     preview_data = preview_response.json()
@@ -226,7 +249,11 @@ def test_rf008_notify_unavailability_inactive_employees(client: TestClient):
     weeks = client.get("/api/v1/weeks").json()
     week_id = weeks[0]["id"]
 
-    preview_response = client.get(f"/api/v1/weeks/{week_id}/schedule/preview")
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    preview_response = client.post(
+        "/api/v1/preview-schedule",
+        json={"shift_vector": shifts}
+    )
     assert preview_response.status_code == 200
 
     preview_data = preview_response.json()
