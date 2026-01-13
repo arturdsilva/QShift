@@ -204,12 +204,17 @@ def _assert_basic_constraints(
     # 1) Same number of shift slots returned
     assert len(schedule.shifts) == gen.num_shifts
 
-    # Map shift_id -> t index in generator
-    idx_by_id = {gen.shift_ids[i]: i for i in range(gen.num_shifts)}
-
     # 2) Availability respected
-    for s_out in schedule.shifts:
-        t = idx_by_id[s_out.shift_id]
+    for i, s_out in enumerate(schedule.shifts):
+        # Shifts correspond to the generator's shift_vector index `i`
+        t = i
+        s_dom = gen.shift_vector[t]
+
+        # Verify that the output shift matches the input shift definition
+        assert s_out.weekday == s_dom.weekday
+        assert s_out.start_time == s_dom.start_time
+        assert s_out.end_time == s_dom.end_time
+        assert s_out.min_staff == s_dom.min_staff
 
         # Availability respected
         for emp_out in s_out.employees:
@@ -218,8 +223,8 @@ def _assert_basic_constraints(
 
     # 3) No overlapping shifts per employee
     alloc_per_emp = {e_id: [] for e_id in gen.employee_ids}
-    for s_out in schedule.shifts:
-        t = idx_by_id[s_out.shift_id]
+    for i, s_out in enumerate(schedule.shifts):
+        t = i
         s_dom = gen.shift_vector[t]
         for emp in s_out.employees:
             alloc_per_emp[emp.employee_id].append(s_dom)
@@ -461,11 +466,13 @@ def _build_week_constrained_instance_with_shortage() -> ScheduleGenerator:
     sunday_eve_idx = 6 * 3 + 2
     # Increase min_staff to an impossible number (e.g., 6)
     # Note: we do not change availability, only the demand target.
+    # gen.shift_vector is a list, we must update the item at sunday_eve_idx
+    old_shift = gen.shift_vector[sunday_eve_idx]
     gen.shift_vector[sunday_eve_idx] = shift_domain.Shift(
-        id=gen.shift_vector[sunday_eve_idx].id,
-        weekday=gen.shift_vector[sunday_eve_idx].weekday,
-        start_time=gen.shift_vector[sunday_eve_idx].start_time,
-        end_time=gen.shift_vector[sunday_eve_idx].end_time,
+        id=old_shift.id,
+        weekday=old_shift.weekday,
+        start_time=old_shift.start_time,
+        end_time=old_shift.end_time,
         min_staff=6,
     )
     # Keep ids as-is; the generator uses separate arrays for ids and domain shifts.
@@ -569,11 +576,9 @@ def test_generate_schedule_week_constrained_instance_with_shortage(
     _assert_basic_constraints(gen, schedule)
 
     # At least one shift must have Real < Min (negative delta).
-    # Build a quick map from shift_id to (min_staff, real)
-    real_by_id = {s.shift_id: len(s.employees) for s in schedule.shifts}
     has_shortage = False
     for idx, s in enumerate(gen.shift_vector):
-        real = real_by_id[gen.shift_ids[idx]]
+        real = len(schedule.shifts[idx].employees)
         if real < int(s.min_staff):
             has_shortage = True
             break
