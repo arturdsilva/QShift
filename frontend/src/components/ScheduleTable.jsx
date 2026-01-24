@@ -255,12 +255,12 @@ function ScheduleTable({ scheduleData, setScheduleData, employeeList, week, edit
                   });
                   return (
                     <React.Fragment key={day}>
-                      {visibleSlots[day] && day === 'monday' && (
+                      {visibleSlots[day] && day === 'Monday' && (
                         <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
                           Day off
                         </th>
                       )}
-                      {visibleSlots[day] && day !== 'monday' && (
+                      {visibleSlots[day] && day !== 'Monday' && (
                         <th className="px-3 py-3 text-left text-xs font-bold text-slate-400 border-r border-slate-600 bg-slate-750 w-32">
                           —
                         </th>
