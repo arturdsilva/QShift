@@ -68,6 +68,10 @@ function CalendarPage({
     const dateStr = date.toISOString().split('T')[0];
     setSelectedDays((prev) => {
       if (prev.some((d) => d.toISOString().split('T')[0] === dateStr)) {
+        if (prev.length === 1) {
+          setSelectedWeek(null);
+          setStartDate(null);
+        }
         return prev.filter((d) => d.toISOString().split('T')[0] !== dateStr);
       }
       return [...prev, date].sort((a, b) => a - b);

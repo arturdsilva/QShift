@@ -49,6 +49,15 @@ function CalendarTable({
     );
   };
 
+  const handleDayClick = (date, week, weekIdx) => {
+    const isThisWeekSelected = selectedWeek === weekIdx + 1;
+    if (!isThisWeekSelected) {
+      onToggleWeek(week, weekIdx);
+    } else {
+      onToggleDay(date, true);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 overflow-x-auto">
@@ -67,6 +76,7 @@ function CalendarTable({
               const alreadyExists = generatedWeeks.some(
                 (generatedWeek) => week[0].toISOString().split('T')[0] === generatedWeek.start_date,
               );
+              const isThisWeekSelected = selectedWeek === weekIdx + 1;
               return (
                 <tr
                   key={weekIdx}
@@ -76,12 +86,13 @@ function CalendarTable({
                         ? 'opacity-50 cursor-not-allowed bg-slate-800'
                         : 'hover:bg-slate-900 cursor-pointer'
                     }`}
-                  onClick={() => !alreadyExists && onToggleWeek(week, weekIdx)}
+                  onClick={() =>
+                    !isThisWeekSelected && !alreadyExists && onToggleWeek(week, weekIdx)
+                  }
                 >
                   {week.map((date, dayIdx) => {
                     const isCurrentMonth = date.getMonth() + 1 === currentMonth;
                     const selected = isSelectedDay(date);
-                    const isSelectedWeek = selectedWeek === weekIdx + 1;
 
                     return (
                       <td key={dayIdx} className="p-2">
@@ -89,7 +100,7 @@ function CalendarTable({
                           disabled={alreadyExists}
                           onClick={(e) => {
                             e.stopPropagation();
-                            !alreadyExists && onToggleDay(date, isSelectedWeek);
+                            !alreadyExists && handleDayClick(date, week, weekIdx);
                           }}
                           className={`w-16 px-6 py-3 rounded-lg text-center transition
                             ${
