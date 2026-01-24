@@ -52,7 +52,7 @@ function LoginPage({ isLoading, setIsLoading }) {
       >
         <div>
           <label className="block text-sm font-medium text-slate-300 mb-2" htmlFor="email">
-            email
+            Email
           </label>
           <input
             type="email"
