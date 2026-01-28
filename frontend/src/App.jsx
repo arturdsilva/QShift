@@ -90,6 +90,7 @@ function App() {
               setWeekData={setWeekData}
               setShiftsData={setShiftsData}
               setPreviewSchedule={setPreviewSchedule}
+              isLoading={isLoading}
               setIsLoading={setIsLoading}
             />
           }

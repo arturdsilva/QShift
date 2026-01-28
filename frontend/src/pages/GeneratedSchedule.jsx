@@ -63,6 +63,7 @@ function GeneratedSchedule({
 
   async function handleApproved() {
     let newWeek = null;
+    setIsLoading(true);
 
     try {
       newWeek = await ShiftConfigApi.submitWeekData(weekData).then((r) => r.data);

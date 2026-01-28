@@ -151,6 +151,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
       return;
     }
     setError(null);
+    setIsLoading(true);
     try {
       const availabilitySchemas = convertAvailabilityToSchemas();
 
@@ -179,11 +180,13 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
         console.error('Error saving availabilities:', err);
         await StaffApi.deleteEmployee(employeeId);
         alert('Error saving availabilities. Please try again.');
+        setIsLoading(false);
         return;
       }
     } catch (err) {
       console.error('Error saving:', err);
       setError(err.response?.data?.detail || 'Error saving employee. Please try again.');
+      setIsLoading(false);
     }
   };
 

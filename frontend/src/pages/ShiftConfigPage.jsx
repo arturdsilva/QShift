@@ -12,6 +12,7 @@ function ShiftConfigPage({
   setWeekData,
   setShiftsData,
   setPreviewSchedule,
+  isLoading,
   setIsLoading,
 }) {
   const navigate = useNavigate();
@@ -220,6 +221,7 @@ function ShiftConfigPage({
 
     const shiftsSchedule = result.data;
     if (shiftsSchedule) {
+      setIsLoading(true);
       try {
         const week = {
           start_date: startDate.toISOString().split('T')[0],
@@ -260,6 +262,20 @@ function ShiftConfigPage({
       }
     }
   };
+
+  if (isLoading) {
+    return (
+      <BaseLayout showSidebar={false} currentPage={6}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-slate-400">Loading...</p>
+          </div>
+        </div>
+      </BaseLayout>
+    );
+  }
+
   return (
     <BaseLayout
       showSidebar={false}
