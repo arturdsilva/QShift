@@ -22,3 +22,13 @@ export const daysOfWeek = [
   'Saturday',
   'Sunday',
 ];
+
+export const scheduleEmpty = {
+  Monday: [],
+  Tuesday: [],
+  Wednesday: [],
+  Thursday: [],
+  Friday: [],
+  Saturday: [],
+  Sunday: [],
+};

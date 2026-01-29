@@ -12,7 +12,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedScheduleApi } from '../services/api.js';
 import { exportToExcel } from '../utils/exportSchedule.js';
-import { months, daysOfWeek } from '../constants/constantsOfTable.js';
+import { months, daysOfWeek, scheduleEmpty } from '../constants/constantsOfTable.js';
 
 function ScheduleRecordsPage({
   employees,
@@ -28,7 +28,7 @@ function ScheduleRecordsPage({
 }) {
   const navigate = useNavigate();
   const [editMode, setEditMode] = useState(false);
-  const [scheduleData, setScheduleData] = useState(null);
+  const [scheduleData, setScheduleData] = useState(scheduleEmpty);
   const [schedulesCache, setSchedulesCache] = useState({});
   const convertScheduleData = (shifts) => {
     let scheduleModified = {
