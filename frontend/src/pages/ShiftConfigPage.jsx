@@ -1,6 +1,6 @@
 import BaseLayout from '../layouts/BaseLayout';
 import Header from '../components/Header';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
 import { GeneratedScheduleApi } from '../services/api.js';
@@ -18,6 +18,13 @@ function ShiftConfigPage({
   const navigate = useNavigate();
   const openDaysMask = [];
   const selectedDaysMap = {};
+
+  useEffect(() => {
+    if (!startDate || !selectedDays || selectedDays.length === 0) {
+      navigate('/staff');
+    }
+  }, [startDate, selectedDays, navigate]);
+
   selectedDays.forEach((day) => {
     selectedDaysMap[day.getDay() === 0 ? 6 : day.getDay() - 1] = day;
     openDaysMask.push(day.getDay() === 0 ? 6 : day.getDay() - 1);

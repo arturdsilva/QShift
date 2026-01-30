@@ -20,10 +20,15 @@ function CalendarPage({
   setStartDate,
   isLoading,
   setIsLoading,
+  employees,
 }) {
   const navigate = useNavigate();
   const [generatedWeeks, setGeneratedWeeks] = useState([]);
   useEffect(() => {
+    if (employees.length === 0) {
+      navigate('/staff');
+      return;
+    }
     async function getWeeks() {
       try {
         const weekResponse = await CalendarApi.getWeeks();

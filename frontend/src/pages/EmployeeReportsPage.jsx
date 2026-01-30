@@ -114,10 +114,32 @@ function EmployeeReportsPage({
   };
 
   useEffect(() => {
-    if (!currentEmployee && employeesList.length > 0) {
-      setCurrentEmployee(employeesList[0]);
+    if (!currentEmployee) {
+      if (employeesList.length > 0) {
+        setCurrentEmployee(employeesList[0]);
+      } else {
+        alert('No employees available. Redirecting to Reports page.');
+        navigate('/reports');
+        return;
+      }
     }
     async function fetchEmployeeStats() {
+      const cacheKey = `employee_stats_${currentEmployee.id}_${currentYear}`;
+
+      try {
+        const cachedData = sessionStorage.getItem(cacheKey);
+        if (cachedData) {
+          const employeeStatsFormatted = JSON.parse(cachedData);
+          setEmployeeYearStats(employeeStatsFormatted);
+          const statsCards = createStatsCards(employeeStatsFormatted);
+          setStatsCards(statsCards);
+          setIsLoading(false);
+          return;
+        }
+      } catch (error) {
+        console.warn('Error reading from sessionStorage:', error);
+      }
+
       try {
         const response = await EmployeeReportsApi.getEmployeeYearStats(
           currentEmployee.id,
@@ -128,6 +150,12 @@ function EmployeeReportsPage({
           setEmployeeYearStats(employeeStatsFormatted);
           const statsCards = createStatsCards(employeeStatsFormatted);
           setStatsCards(statsCards);
+
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(employeeStatsFormatted));
+          } catch (error) {
+            console.warn('Error writing to sessionStorage:', error);
+          }
         }
       } catch (error) {
         console.error('Error fetching employee statistics:', error);
@@ -302,6 +330,13 @@ function EmployeeReportsPage({
               }}
             >
               {(() => {
+                if (!employeeYearStats) {
+                  return (
+                    <div className="h-full flex items-center justify-center text-slate-400">
+                      No data available
+                    </div>
+                  );
+                }
                 const data = {
                   labels: months,
                   datasets: [

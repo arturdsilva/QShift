@@ -22,6 +22,7 @@ function StaffPage({
       try {
         const staffResponse = await StaffApi.getAll();
         setEmployees(staffResponse.data);
+        sessionStorage.setItem('employees', JSON.stringify(staffResponse.data));
       } catch (error) {
         console.error('Error loading employee data:', error);
       } finally {
@@ -34,7 +35,11 @@ function StaffPage({
   const handleDeleteEmployee = async (employeeId) => {
     try {
       await StaffApi.deleteEmployee(employeeId);
-      setEmployees((prevEmployees) => prevEmployees.filter((emp) => emp.id !== employeeId));
+      setEmployees((prevEmployees) => {
+        const updatedEmployees = prevEmployees.filter((emp) => emp.id !== employeeId);
+        sessionStorage.setItem('employees', JSON.stringify(updatedEmployees));
+        return updatedEmployees;
+      });
       setDeleteConfirmation(null);
       console.log('Employee removed successfully');
     } catch (error) {
@@ -72,9 +77,13 @@ function StaffPage({
     if (emp) {
       const employeeData = { ...emp, active: !currentStatus };
       StaffApi.updateEmployeeData(employeeId, employeeData);
-      setEmployees(
-        employees.map((emp) => (emp.id === employeeId ? { ...emp, active: !emp.active } : emp)),
-      );
+      setEmployees((prevEmployees) => {
+        const updatedEmployees = prevEmployees.map((emp) =>
+          emp.id === employeeId ? { ...emp, active: !emp.active } : emp,
+        );
+        sessionStorage.setItem('employees', JSON.stringify(updatedEmployees));
+        return updatedEmployees;
+      });
     }
   };
 

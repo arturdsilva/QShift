@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GeneratedScheduleApi } from '../services/api.js';
 import { ShiftConfigApi } from '../services/api.js';
-import { daysOfWeek } from '../constants/constantsOfTable.js';
+import { daysOfWeek, scheduleEmpty } from '../constants/constantsOfTable.js';
 
 function GeneratedSchedule({
   employees,
@@ -20,15 +20,18 @@ function GeneratedSchedule({
   setPreviewSchedule,
 }) {
   const navigate = useNavigate();
-  const [scheduleData, setScheduleData] = useState(previewSchedule);
+  const [scheduleData, setScheduleData] = useState(previewSchedule || scheduleEmpty);
   const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
-    if (!previewSchedule) return;
+    if (!previewSchedule || !weekData || employees.length === 0) {
+      navigate('/staff');
+      return;
+    }
     if (isLoading) {
       setIsLoading(false);
     }
-  }, [previewSchedule]);
+  }, [previewSchedule, weekData, navigate]);
 
   const handleCancel = async () => {
     setWeekData(null);
