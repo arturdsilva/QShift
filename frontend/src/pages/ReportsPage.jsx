@@ -12,6 +12,7 @@ function ReportsPage({
   setIsLoading,
   setWeekRecords,
   currentIdxWeek,
+  setCurrentIdxWeek,
   setCurrentEmployee,
   employees,
 }) {
@@ -19,6 +20,7 @@ function ReportsPage({
 
   useEffect(() => {
     setIsLoading(true);
+    setCurrentIdxWeek(0);
     async function getWeeks() {
       try {
         const weekResponse = await ReportsApi.getWeeks();

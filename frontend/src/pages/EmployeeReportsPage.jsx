@@ -118,6 +118,7 @@ function EmployeeReportsPage({
       if (employeesList.length > 0) {
         setCurrentEmployee(employeesList[0]);
       } else {
+        alert('No employees available. Redirecting to Reports page.');
         navigate('/reports');
         return;
       }

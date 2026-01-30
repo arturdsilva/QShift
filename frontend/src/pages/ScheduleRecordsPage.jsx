@@ -82,6 +82,10 @@ function ScheduleRecordsPage({
 
   useEffect(() => {
     async function generateSchedule() {
+      if (!weekRecords && currentIdxWeek != 0) {
+        navigate('/reports');
+        return;
+      }
       if (schedulesCache[weekRecords?.id]) {
         setScheduleData(schedulesCache[weekRecords.id]);
         return;

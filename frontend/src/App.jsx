@@ -33,7 +33,7 @@ function App() {
   const [weekData, setWeekData] = useState(null);
   const [weeksList, setWeeksList] = useState(null);
   const [weekRecords, setWeekRecords] = useState(null);
-  const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
+  const [currentIdxWeek, setCurrentIdxWeek] = useState(null);
   const [currentEmployee, setCurrentEmployee] = useState(() => {
     try {
       const savedEmployee = sessionStorage.getItem('currentEmployee');
@@ -151,6 +151,7 @@ function App() {
               setIsLoading={setIsLoading}
               setWeekRecords={setWeekRecords}
               currentIdxWeek={currentIdxWeek}
+              setCurrentIdxWeek={setCurrentIdxWeek}
               setCurrentEmployee={setCurrentEmployee}
               employees={employees}
             />
