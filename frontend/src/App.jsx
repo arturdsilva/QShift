@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import CalendarPage from './pages/CalendarPage.jsx';
 import StaffPage from './pages/StaffPage.jsx';
 import ReportsPage from './pages/ReportsPage.jsx';
@@ -20,15 +20,43 @@ function App() {
   const [selectedDays, setSelectedDays] = useState([]);
   const [selectEditEmployee, setSelectEditEmployee] = useState(null);
   const [startDate, setStartDate] = useState(null);
-  const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState(() => {
+    try {
+      const savedEmployees = sessionStorage.getItem('employees');
+      return savedEmployees ? JSON.parse(savedEmployees) : [];
+    } catch (error) {
+      console.warn('Error reading employees from sessionStorage:', error);
+      return [];
+    }
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [weekData, setWeekData] = useState(null);
   const [weeksList, setWeeksList] = useState(null);
   const [weekRecords, setWeekRecords] = useState(null);
   const [currentIdxWeek, setCurrentIdxWeek] = useState(0);
-  const [currentEmployee, setCurrentEmployee] = useState(null);
+  const [currentEmployee, setCurrentEmployee] = useState(() => {
+    try {
+      const savedEmployee = sessionStorage.getItem('currentEmployee');
+      return savedEmployee ? JSON.parse(savedEmployee) : null;
+    } catch (error) {
+      console.warn('Error reading currentEmployee from sessionStorage:', error);
+      return null;
+    }
+  });
   const [shiftsData, setShiftsData] = useState(null);
   const [previewSchedule, setPreviewSchedule] = useState(null);
+
+  useEffect(() => {
+    try {
+      if (currentEmployee) {
+        sessionStorage.setItem('currentEmployee', JSON.stringify(currentEmployee));
+      } else {
+        sessionStorage.removeItem('currentEmployee');
+      }
+    } catch (error) {
+      console.warn('Error saving currentEmployee to sessionStorage:', error);
+    }
+  }, [currentEmployee]);
 
   return (
     <BrowserRouter>

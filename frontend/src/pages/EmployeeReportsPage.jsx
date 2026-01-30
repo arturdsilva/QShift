@@ -133,7 +133,6 @@ function EmployeeReportsPage({
           const statsCards = createStatsCards(employeeStatsFormatted);
           setStatsCards(statsCards);
           setIsLoading(false);
-          console.log('Loaded employee stats from sessionStorage cache');
           return;
         }
       } catch (error) {
