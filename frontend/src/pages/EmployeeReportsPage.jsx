@@ -123,6 +123,23 @@ function EmployeeReportsPage({
       }
     }
     async function fetchEmployeeStats() {
+      const cacheKey = `employee_stats_${currentEmployee.id}_${currentYear}`;
+
+      try {
+        const cachedData = sessionStorage.getItem(cacheKey);
+        if (cachedData) {
+          const employeeStatsFormatted = JSON.parse(cachedData);
+          setEmployeeYearStats(employeeStatsFormatted);
+          const statsCards = createStatsCards(employeeStatsFormatted);
+          setStatsCards(statsCards);
+          setIsLoading(false);
+          console.log('Loaded employee stats from sessionStorage cache');
+          return;
+        }
+      } catch (error) {
+        console.warn('Error reading from sessionStorage:', error);
+      }
+
       try {
         const response = await EmployeeReportsApi.getEmployeeYearStats(
           currentEmployee.id,
@@ -133,6 +150,12 @@ function EmployeeReportsPage({
           setEmployeeYearStats(employeeStatsFormatted);
           const statsCards = createStatsCards(employeeStatsFormatted);
           setStatsCards(statsCards);
+
+          try {
+            sessionStorage.setItem(cacheKey, JSON.stringify(employeeStatsFormatted));
+          } catch (error) {
+            console.warn('Error writing to sessionStorage:', error);
+          }
         }
       } catch (error) {
         console.error('Error fetching employee statistics:', error);
