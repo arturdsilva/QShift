@@ -383,8 +383,8 @@ function ShiftConfigPage({
         Add shift
       </button>
 
-      <div className="flex flex-wrap gap-3">
-        <div className="flex-1 justify-start flex">
+      <div className="grid grid-cols-2 md:flex md:flex-wrap gap-3">
+        <div className="order-3 md:order-none col-span-1 md:flex-1 justify-start flex">
           <button
             onClick={handleBack}
             className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
@@ -396,7 +396,7 @@ function ShiftConfigPage({
 
         <button
           onClick={restoreConfigShift}
-          className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="order-1 md:order-none px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
           <RotateCcw className="w-4 h-4" />
           Restore settings
@@ -404,7 +404,7 @@ function ShiftConfigPage({
 
         <button
           onClick={saveConfigShift}
-          className="px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
+          className="order-2 md:order-none px-6 py-2.5 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-medium transition-colors flex items-center gap-2"
         >
           <Save className="w-4 h-4" />
           Save settings
@@ -412,7 +412,7 @@ function ShiftConfigPage({
 
         <button
           onClick={createSchedule}
-          className="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 ml-auto"
+          className="order-4 md:order-none px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center gap-2 ml-auto"
         >
           <Calendar className="w-4 h-4" />
           Create Schedule
