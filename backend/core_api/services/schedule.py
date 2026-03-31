@@ -21,15 +21,20 @@ def wake_schedule_generator() -> None:
 
     base_url = settings.SCHEDULE_GENERATOR_BASE_URL.rstrip("/")
     url = f"{base_url}/healthz"
+    logger.debug("Calling schedule generator wake route: GET %s", url)
     request = urllib_request.Request(url, method="GET")
-
     try:
         with urllib_request.urlopen(
             request,
             timeout=settings.SCHEDULE_GENERATOR_WAKE_TIMEOUT_SECONDS,
         ) as response:
             status_code = getattr(response, "status", response.getcode())
-            _ = status_code
+            response_body = response.read().decode("utf-8", errors="replace")
+            logger.debug(
+                "Schedule generator wake route result: status=%s body=%s",
+                status_code,
+                response_body,
+            )
     except (urllib_error.URLError, urllib_error.HTTPError, TimeoutError, OSError) as exc:
         logger.info("Schedule generator healthz was called but returned error: %s", exc)
 
@@ -91,6 +96,11 @@ def dispatch_schedule_generation_job(
     url = f"{base_url}/internal/generate-schedule"
     payload = dispatch_request.model_dump(mode="json")
     body = json.dumps(payload).encode("utf-8")
+    logger.debug(
+        "Calling schedule generation route for job %s: POST %s",
+        dispatch_request.job_id,
+        url,
+    )
     request = urllib_request.Request(
         url,
         data=body,
@@ -104,6 +114,13 @@ def dispatch_schedule_generation_job(
             timeout=settings.SCHEDULE_GENERATOR_TIMEOUT_SECONDS,
         ) as response:
             status_code = getattr(response, "status", response.getcode())
+            response_body = response.read().decode("utf-8", errors="replace")
+            logger.debug(
+                "Schedule generation route result for job %s: status=%s body=%s",
+                dispatch_request.job_id,
+                status_code,
+                response_body,
+            )
             if status_code >= 400:
                 raise RuntimeError(
                     f"schedule generator returned unexpected status {status_code}"
