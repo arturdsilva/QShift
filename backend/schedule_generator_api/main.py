@@ -14,7 +14,7 @@ def root():
     return {"message": "QShift schedule generator is running!"}
 
 
-@app.get("/healthz")
+@app.api_route("/healthz", methods=["GET", "HEAD"])
 def healthz():
     logger.info("Generator health check OK")
     return {"status": "ok"}
