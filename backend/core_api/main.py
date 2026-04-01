@@ -25,7 +25,7 @@ def root():
     return {"message": "QShift backend is running!", "env": settings.ENV}
 
 
-@app.get("/healthz")
+@app.api_route("/healthz", methods=["GET", "HEAD"])
 def healthz():
     logger.info("Health check OK")
     return {"status": "ok"}
