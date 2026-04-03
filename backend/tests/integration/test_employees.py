@@ -35,6 +35,23 @@ def test_create_employee_inactive(client: TestClient, seeded_data):
 
 
 @pytest.mark.integration
+def test_create_employee_with_weekly_workload_hours(client: TestClient, seeded_data):
+    """Should create employee with an individual weekly workload target."""
+    response = client.post(
+        "/api/v1/employees",
+        json={
+            "name": "Ana Paula",
+            "active": True,
+            "weekly_workload_hours": 36,
+        },
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["weekly_workload_hours"] == 36
+
+
+@pytest.mark.integration
 def test_create_employee_empty_name(client: TestClient, seeded_data):
     """Should reject employee with empty name."""
     response = client.post(
@@ -78,6 +95,20 @@ def test_create_employee_default_active(client: TestClient, seeded_data):
 
     assert response.status_code == 201
     assert response.json()["active"] is True
+    assert response.json()["weekly_workload_hours"] is None
+
+
+@pytest.mark.integration
+def test_create_employee_negative_weekly_workload_hours(
+    client: TestClient, seeded_data
+):
+    """Should reject negative weekly workload targets."""
+    response = client.post(
+        "/api/v1/employees",
+        json={"name": "Pedro Costa", "weekly_workload_hours": -1},
+    )
+
+    assert response.status_code == 422
 
 
 @pytest.mark.integration
@@ -203,6 +234,46 @@ def test_update_employee_active_status(client: TestClient, seeded_data):
 
     assert response.status_code == 200
     assert response.json()["active"] is False
+
+
+@pytest.mark.integration
+def test_update_employee_weekly_workload_hours(client: TestClient, seeded_data):
+    """Should update employee weekly workload target."""
+    create_response = client.post(
+        "/api/v1/employees",
+        json={"name": "Employee", "active": True},
+    )
+    employee_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/api/v1/employees/{employee_id}",
+        json={"weekly_workload_hours": 20},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["weekly_workload_hours"] == 20
+
+
+@pytest.mark.integration
+def test_update_employee_clears_weekly_workload_hours(client: TestClient, seeded_data):
+    """Should allow clearing employee weekly workload target."""
+    create_response = client.post(
+        "/api/v1/employees",
+        json={
+            "name": "Employee",
+            "active": True,
+            "weekly_workload_hours": 30,
+        },
+    )
+    employee_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/api/v1/employees/{employee_id}",
+        json={"weekly_workload_hours": None},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["weekly_workload_hours"] is None
 
 
 @pytest.mark.integration

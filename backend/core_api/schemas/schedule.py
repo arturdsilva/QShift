@@ -69,6 +69,15 @@ class ScheduleGenerationEmployeeOut(BaseModel):
         max_length=constants.MAX_EMPLOYEE_NAME_LENGTH,
         description="Employee's name",
     )
+    weekly_workload_hours: int | None = Field(
+        None,
+        ge=0,
+        le=constants.MAX_WEEKLY_WORKLOAD_HOURS,
+        description=(
+            "Optional weekly workload target in hours used by the generator to "
+            "balance assignments for this employee"
+        ),
+    )
 
 
 class ScheduleGenerationAvailabilityOut(BaseModel):

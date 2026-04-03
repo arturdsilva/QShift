@@ -15,6 +15,15 @@ class EmployeeBase(BaseModel):
     active: bool = Field(
         True, description="If True, the employee will be included on the schedule"
     )
+    weekly_workload_hours: int | None = Field(
+        None,
+        ge=0,
+        le=constants.MAX_WEEKLY_WORKLOAD_HOURS,
+        description=(
+            "Optional weekly workload target in hours used by the schedule generator "
+            "to balance assignments for this employee"
+        ),
+    )
 
     @field_validator("name")
     @classmethod
@@ -32,6 +41,11 @@ class EmployeeCreate(EmployeeBase):
 class EmployeeUpdate(BaseModel):
     name: str | None = Field(None, max_length=constants.MAX_EMPLOYEE_NAME_LENGTH)
     active: bool | None = Field(None)
+    weekly_workload_hours: int | None = Field(
+        None,
+        ge=0,
+        le=constants.MAX_WEEKLY_WORKLOAD_HOURS,
+    )
 
     @field_validator("name")
     @classmethod

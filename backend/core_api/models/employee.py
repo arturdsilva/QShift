@@ -2,7 +2,7 @@ from __future__ import annotations
 import uuid
 
 from typing import List
-from sqlalchemy import String, Boolean, ForeignKey, UniqueConstraint, Index, text
+from sqlalchemy import String, Boolean, ForeignKey, Integer, UniqueConstraint, Index, text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import UUID
 import core_api.core.constants as constants
@@ -32,6 +32,9 @@ class Employee(Base):
     )
     active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, default=True, server_default=text("true")
+    )
+    weekly_workload_hours: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
     )
 
     # relationships

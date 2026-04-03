@@ -72,7 +72,11 @@ def build_schedule_generation_payload(
     return schemas.ScheduleGenerationDispatchPayload(
         shift_vector=shift_vector,
         employees=[
-            schemas.ScheduleGenerationEmployeeOut(id=employee.id, name=employee.name)
+            schemas.ScheduleGenerationEmployeeOut(
+                id=employee.id,
+                name=employee.name,
+                weekly_workload_hours=employee.weekly_workload_hours,
+            )
             for employee in employees
         ],
         availabilities=[

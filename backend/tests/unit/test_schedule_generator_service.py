@@ -34,10 +34,12 @@ def _build_dispatch_request():
             schemas.ScheduleGenerationEmployeeOut(
                 id=employee_morning_id,
                 name="Morning Employee",
+                weekly_workload_hours=12,
             ),
             schemas.ScheduleGenerationEmployeeOut(
                 id=employee_afternoon_id,
                 name="Afternoon Employee",
+                weekly_workload_hours=8,
             ),
         ],
         availabilities=[
@@ -69,6 +71,7 @@ def test_schedule_generator_from_payload_builds_expected_assignments():
     generator = ScheduleGenerator.from_payload(payload=dispatch_request.payload)
 
     assert generator.check_possibility() is True
+    assert generator.employee_weekly_workload_hours == [12, 8]
 
     schedule = generator.generate_schedule()
     assert len(schedule.shifts) == 2

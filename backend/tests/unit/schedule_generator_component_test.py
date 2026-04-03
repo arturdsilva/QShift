@@ -330,6 +330,39 @@ def _build_week_large_instance() -> ScheduleGenerator:
     )
 
 
+def _build_custom_workload_instance() -> ScheduleGenerator:
+    """
+    Small instance used to verify that individual workload targets influence
+    the fairness stage of the solver.
+    """
+    employee_names = ["Ana", "Bruno"]
+    employee_ids = [uuid.uuid4() for _ in employee_names]
+
+    shift_ids = [uuid.uuid4() for _ in range(3)]
+    shifts: List[shift_domain.Shift] = [
+        shift_domain.Shift(
+            id=shift_ids[0], weekday=0, start_time=_t(8), end_time=_t(12), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[1], weekday=1, start_time=_t(8), end_time=_t(12), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[2], weekday=2, start_time=_t(8), end_time=_t(12), min_staff=1
+        ),
+    ]
+
+    availability = [[True for _ in shifts] for _ in employee_ids]
+
+    return ScheduleGenerator(
+        shift_ids=shift_ids,
+        employee_ids=employee_ids,
+        employee_names=employee_names,
+        employee_weekly_workload_hours=[8, 4],
+        shift_vector=shifts,
+        availability_matrix=availability,
+    )
+
+
 def _build_week_constrained_instance() -> ScheduleGenerator:
     """
     Week-long instance with employee constraints and varying daily demand.
@@ -501,6 +534,11 @@ def week_large_instance():
 
 
 @pytest.fixture
+def custom_workload_instance():
+    return _build_custom_workload_instance()
+
+
+@pytest.fixture
 def week_constrained_instance():
     return _build_week_constrained_instance()
 
@@ -540,6 +578,26 @@ def test_generate_schedule_week_large_instance(week_large_instance: ScheduleGene
     schedule: schemas.ScheduleOut = gen.generate_schedule()
     _print_schedule(schedule, gen.employee_ids, gen.employee_names)
     _assert_basic_constraints(gen, schedule)
+
+
+@pytest.mark.unit
+def test_generate_schedule_respects_individual_workload_targets(
+    custom_workload_instance: ScheduleGenerator,
+):
+    gen = custom_workload_instance
+    assert gen.check_possibility() is True
+
+    schedule: schemas.ScheduleOut = gen.generate_schedule()
+    _print_schedule(schedule, gen.employee_ids, gen.employee_names)
+    _assert_basic_constraints(gen, schedule)
+
+    per_emp = _hours_per_employee(schedule, gen.employee_ids, gen.employee_names)
+    hours_by_name = {
+        display_name: total_hours for display_name, total_hours in per_emp.values()
+    }
+
+    assert hours_by_name["Ana"] == 8.0
+    assert hours_by_name["Bruno"] == 4.0
 
 
 @pytest.mark.unit

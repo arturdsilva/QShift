@@ -238,6 +238,34 @@ def test_preview_schedule_creates_processing_job_and_dispatches_payload(
 
 
 @pytest.mark.integration
+def test_preview_schedule_dispatches_employee_weekly_workload_hours(
+    client: TestClient,
+    seeded_data,
+    dispatched_schedule_jobs,
+):
+    """Should propagate the employee weekly workload target to the generator payload."""
+    week_id = seeded_data["week_id"]
+    employee_id = client.get("/api/v1/employees").json()[0]["id"]
+    patch_response = client.patch(
+        f"/api/v1/employees/{employee_id}",
+        json={"weekly_workload_hours": 24},
+    )
+    assert patch_response.status_code == 200
+
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    response = client.post("/api/v1/preview-schedule", json={"shift_vector": shifts})
+
+    assert response.status_code == 202
+    dispatch_request = dispatched_schedule_jobs[0]
+    employee_payload = next(
+        employee
+        for employee in dispatch_request.payload.employees
+        if employee.id == patch_response.json()["id"]
+    )
+    assert employee_payload.weekly_workload_hours == 24
+
+
+@pytest.mark.integration
 def test_preview_schedule_does_not_persist_assignments(
     client: TestClient,
     seeded_data,

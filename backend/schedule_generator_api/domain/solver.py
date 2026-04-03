@@ -19,6 +19,7 @@ class ScheduleGenerator:
         shift_ids: List[UUID],
         employee_ids: List[UUID],
         employee_names: List[str],
+        employee_weekly_workload_hours: List[int | None] | None = None,
         shift_vector: List[shift_domain.Shift],
         availability_matrix: List[List[bool]],
     ):
@@ -26,6 +27,13 @@ class ScheduleGenerator:
         self.shift_ids = shift_ids
         self.employee_ids = employee_ids
         self.employee_names = employee_names
+        if employee_weekly_workload_hours is None:
+            employee_weekly_workload_hours = [None] * len(self.employee_ids)
+        if len(employee_weekly_workload_hours) != len(self.employee_ids):
+            raise ValueError(
+                "employee_weekly_workload_hours must match employee_ids length"
+            )
+        self.employee_weekly_workload_hours = employee_weekly_workload_hours
         self.shift_vector = shift_vector
         self.availability_matrix = availability_matrix
 
@@ -68,6 +76,9 @@ class ScheduleGenerator:
             shift_ids=cls._get_shift_ids(shift_vector=shift_vector),
             employee_ids=employee_ids,
             employee_names=employee_names,
+            employee_weekly_workload_hours=[
+                employee.weekly_workload_hours for employee in payload.employees
+            ],
             shift_vector=shift_vector,
             availability_matrix=cls._build_availability_matrix_from_payload(
                 shift_vector=shift_vector,
@@ -122,6 +133,42 @@ class ScheduleGenerator:
             self.end_time_minutes[t2] > self.start_time_minutes[t1]
             and self.end_time_minutes[t1] > self.start_time_minutes[t2]
         )
+
+    def _build_target_workload_minutes(self, total_minutes: int) -> List[int]:
+        if self.num_employees == 0:
+            return []
+
+        if all(
+            workload_hours is None
+            for workload_hours in self.employee_weekly_workload_hours
+        ):
+            average_target = total_minutes // self.num_employees
+            return [average_target] * self.num_employees
+
+        target_minutes: List[int | None] = [
+            workload_hours * 60 if workload_hours is not None else None
+            for workload_hours in self.employee_weekly_workload_hours
+        ]
+        employees_without_target = [
+            index for index, target in enumerate(target_minutes) if target is None
+        ]
+
+        if not employees_without_target:
+            return [int(target) for target in target_minutes]
+
+        defined_total = sum(
+            int(target) for target in target_minutes if target is not None
+        )
+        remaining_minutes = max(total_minutes - defined_total, 0)
+        fallback_target, remainder = divmod(
+            remaining_minutes, len(employees_without_target)
+        )
+        for offset, employee_index in enumerate(employees_without_target):
+            target_minutes[employee_index] = fallback_target + (
+                1 if offset < remainder else 0
+            )
+
+        return [int(target) for target in target_minutes]
 
     def _build_feasibility_model(
         self,
@@ -216,16 +263,20 @@ class ScheduleGenerator:
             self.shift_duration_min[t] * int(self.demand[t])
             for t in range(self.num_shifts)
         )
-        T = total_minutes // max(1, self.num_employees)
+        target_minutes_by_employee = self._build_target_workload_minutes(
+            total_minutes
+        )
+        max_target_minutes = max(target_minutes_by_employee, default=0)
+        max_workload_deviation = max(max_working_time, max_target_minutes)
 
         devp = {}
         devm = {}
         dev = {}
         for e in range(self.num_employees):
-            devp[e] = model.NewIntVar(0, total_minutes, f"devp[{e}]")
-            devm[e] = model.NewIntVar(0, total_minutes, f"devm[{e}]")
-            model.Add(H[e] - T == devp[e] - devm[e])
-            dev[e] = model.NewIntVar(0, 2 * total_minutes, f"dev[{e}]")
+            devp[e] = model.NewIntVar(0, max_workload_deviation, f"devp[{e}]")
+            devm[e] = model.NewIntVar(0, max_workload_deviation, f"devm[{e}]")
+            model.Add(H[e] - target_minutes_by_employee[e] == devp[e] - devm[e])
+            dev[e] = model.NewIntVar(0, max_workload_deviation, f"dev[{e}]")
             model.Add(dev[e] == devp[e] + devm[e])
 
         for e in range(self.num_employees):
