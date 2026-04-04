@@ -34,6 +34,7 @@ export function MolSidebar({ currentPage, onClose }) {
           return (
             <SelectableButton
               key={item.path}
+              variant="default"
               selected={isActive}
               onClick={() => {
                 navigate(item.path);

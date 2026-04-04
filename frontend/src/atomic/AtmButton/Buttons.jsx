@@ -31,6 +31,7 @@ export const ButtonTv = tv({
       secondary: 'bg-slate-700 hover:bg-slate-600 text-white',
       outline: 'border border-slate-500 text-slate-300 hover:bg-slate-800',
       ghost: 'text-slate-400 hover:text-white',
+      ghostRed: 'text-red-400 hover:text-red-500',
       danger: 'bg-red-600 hover:bg-red-700 text-white',
       columnDelete: 'bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white',
       success: 'bg-green-600 hover:bg-green-700 text-white',
@@ -89,11 +90,11 @@ export function CalendarDayButton({ onClick, selected, disabled, currentMonth, c
  * SelectableButton – buttons that can be selected (employee list in modals)
  */
 export const selectableButtonTv = tv({
-  base: 'flex rounded-lg text-left items-center gap-3 group transition-all',
+  base: 'flex items-center gap-3 group transition-all',
   variants: {
     selected: {
-      true: 'bg-blue-600 text-white shadow-md',
-      false: 'text-slate-300 hover:bg-slate-700/50',
+      true: '',
+      false: '',
     },
     fullWidth: {
       true: 'w-full',
@@ -104,15 +105,23 @@ export const selectableButtonTv = tv({
       md: 'px-4 py-2',
       lg: 'px-6 py-4',
     },
+    variant: {
+      default: 'rounded-lg text-left',
+      colorDot: 'w-8 h-8 rounded-full transition-transform hover:scale-110',
+    },
   },
-  defaultVariants: { selected: false, size: 'md', fullWidth: false },
+  compoundVariants: [
+    { variant: 'default', selected: true,  className: 'bg-blue-600 text-white shadow-md' },
+    { variant: 'default', selected: false, className: 'text-slate-300 hover:bg-slate-700/50' },
+  ],
+  defaultVariants: { selected: false, size: 'md', fullWidth: false, variant: 'default' },
 });
 
-export function SelectableButton({ onClick, children, selected, size, fullWidth, className = '', ...props }) {
+export function SelectableButton({ onClick, children, selected, size, fullWidth, variant, className = '', ...props }) {
   return (
     <button
       onClick={onClick}
-      className={selectableButtonTv({ selected, size, fullWidth, class: className })}
+      className={selectableButtonTv({ selected, size, fullWidth, variant, class: className })}
       {...props}
     >
       {children}
