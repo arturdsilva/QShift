@@ -13,9 +13,9 @@ export function TemplateItem({ item, meta, onDelete, color }) {
         <div
             draggable
             onDragStart={(e) =>
-                e.dataTransfer.setData("text/plain", JSON.stringify(item))
+                e.dataTransfer.setData("text/plain", JSON.stringify({ ...item, _type: item._type || 'shift' }))
             }
-            className="mb-2 flex cursor-grab items-center justify-between rounded-[10px] border border-[#1e2d47] bg-[#0e1929] px-[12px] py-[10px] transition-colors duration-150"
+            className="flex cursor-grab items-center justify-between rounded-[10px] border border-[#1e2d47] bg-[#0e1929] px-[12px] py-[10px] transition-colors duration-150"
             onMouseEnter={(e) => (e.currentTarget.style.borderColor = hoverHex)}
             onMouseLeave={(e) => (e.currentTarget.style.borderColor = "#1e2d47")}
         >

@@ -6,6 +6,8 @@ import { MolFormField } from '../MolFormField';
 import { TemplateItem } from '../MolScheduleTemplateItem';
 import { COLOR_OPTIONS } from '../../constants/shiftColors.js';
 
+const DEFAULT_FORM = { name: '', start: '', end: '', staff: '', color: 'blue' };
+
 export function ObjCreateShiftModal({ onSave, onCancel }) {
   const [form, setForm] = useState(DEFAULT_FORM);
 
@@ -105,7 +107,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
           </div>
 
           <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#1e2d47]">
-            <Button variant="outline" size="md" onClick={onCancel}>
+            <Button variant="secondary" size="md" onClick={onCancel}>
               Cancel
             </Button>
             <Button variant="primary" size="md" onClick={handleSave} disabled={!form.name.trim()}>
