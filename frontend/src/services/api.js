@@ -206,6 +206,24 @@ export const GeneratedScheduleApi = {
     }
   },
 
+    getEligibleEmployees: async (day, startTime, endTime) => {
+    try {
+      const normalizedStartTime = startTime.length === 5 ? `${startTime}:00` : startTime;
+      const normalizedEndTime = endTime.length === 5 ? `${endTime}:00` : endTime;
+
+      return await api.get('/eligible-employees', {
+        params: {
+          day,
+          start_time: normalizedStartTime,
+          end_time: normalizedEndTime,
+        },
+      });
+    } catch (error) {
+      console.error('Error fetching eligible employees:', error);
+      throw error;
+    }
+  },
+
   approvedSchedule: async (week_id, schedule) => {
     try {
       return await api.post(`/weeks/${week_id}/schedule`, schedule);

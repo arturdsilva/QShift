@@ -1,5 +1,6 @@
 from uuid import UUID
-from fastapi import APIRouter, Request, status, Depends, HTTPException
+from datetime import time
+from fastapi import APIRouter, Request, status, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 import core_api.schemas.schedule as schemas
@@ -23,15 +24,34 @@ def create_schedule(
     db: Session = Depends(get_session),
 ):
     for schedule_shift in payload.shifts:
-        if db.get(Shift, schedule_shift.shift_id) is None:
+        shift = db.get(Shift, schedule_shift.shift_id)
+        if shift is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="Shift not found"
             )
+
         for employee_id in schedule_shift.employee_ids:
-            if db.get(Employee, employee_id) is None:
+            employee = db.get(Employee, employee_id)
+            if employee is None:
                 raise HTTPException(
                     status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
                 )
+
+            is_eligible = schedule_service.validate_employee_is_eligible_for_shift(
+                db=db,
+                user_id=user_id,
+                employee_id=employee_id,
+                weekday=shift.weekday,
+                start_time=shift.start_time,
+                end_time=shift.end_time,
+            )
+
+            if not is_eligible:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Employee is not eligible for this shift",
+                )
+
             new_assignment = ShiftAssignment(
                 user_id=user_id,
                 shift_id=schedule_shift.shift_id,
@@ -52,6 +72,41 @@ def read_schedule(
     db: Session = Depends(get_session),
 ):
     return schedule_service.build_schedule_schema_from_db(week_id, user_id, db)
+
+@router.get(
+    "/eligible-employees",
+    response_model=list[schemas.ScheduleGenerationEmployeeOut],
+    status_code=status.HTTP_200_OK,
+)
+def read_eligible_employees(
+    day: str = Query(...),
+    start_time: time = Query(...),
+    end_time: time = Query(...),
+    user_id: UUID = Depends(current_user_id),
+    db: Session = Depends(get_session),
+):
+    try:
+        employees = schedule_service.get_eligible_employees_for_slot(
+            db=db,
+            user_id=user_id,
+            day=day,
+            start_time=start_time,
+            end_time=end_time,
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+
+    return [
+        schemas.ScheduleGenerationEmployeeOut(
+            id=employee.id,
+            name=employee.name,
+            weekly_workload_hours=employee.weekly_workload_hours,
+        )
+        for employee in employees
+    ]
 
 
 # DELETE
