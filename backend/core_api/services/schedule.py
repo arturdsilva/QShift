@@ -1,6 +1,6 @@
 import json
 import time as time_module
-from datetime import datetime, timezone
+from datetime import datetime, timezone, time
 from sqlalchemy import false
 from sqlalchemy.orm import Session
 from typing import List
@@ -259,3 +259,97 @@ def build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
             )
         )
     return schemas.ScheduleOut(shifts=schedule_shifts_out)
+
+def get_weekday_index(day: str) -> int:
+    days = {
+        "monday": 0,
+        "tuesday": 1,
+        "wednesday": 2,
+        "thursday": 3,
+        "friday": 4,
+        "saturday": 5,
+        "sunday": 6,
+    }
+    normalized = day.strip().lower()
+    if normalized not in days:
+        raise ValueError("invalid weekday")
+    return days[normalized]
+
+
+def get_eligible_employees_for_slot(
+    *,
+    db: Session,
+    user_id: UUID,
+    day: str,
+    start_time: time,
+    end_time: time,
+):
+    from core_api.models import Availability, Employee
+
+    weekday = get_weekday_index(day)
+
+    employees = (
+        db.query(Employee)
+        .filter(Employee.user_id == user_id, Employee.active == True)
+        .order_by(Employee.name.asc(), Employee.id.asc())
+        .all()
+    )
+
+    if not employees:
+        return []
+
+    employee_ids = [employee.id for employee in employees]
+
+    availabilities = (
+        db.query(Availability)
+        .filter(
+            Availability.user_id == user_id,
+            Availability.employee_id.in_(employee_ids),
+            Availability.weekday == weekday,
+            Availability.start_time <= start_time,
+            Availability.end_time >= end_time,
+        )
+        .all()
+    )
+
+    available_ids = {availability.employee_id for availability in availabilities}
+
+    return [employee for employee in employees if employee.id in available_ids]
+
+
+def validate_employee_is_eligible_for_shift(
+    *,
+    db: Session,
+    user_id: UUID,
+    employee_id: UUID,
+    weekday: int,
+    start_time: time,
+    end_time: time,
+) -> bool:
+    from core_api.models import Availability, Employee
+
+    employee = (
+        db.query(Employee)
+        .filter(
+            Employee.id == employee_id,
+            Employee.user_id == user_id,
+            Employee.active == True,
+        )
+        .first()
+    )
+    if employee is None:
+        return False
+
+    availability = (
+        db.query(Availability)
+        .filter(
+            Availability.user_id == user_id,
+            Availability.employee_id == employee_id,
+            Availability.weekday == weekday,
+            Availability.start_time <= start_time,
+            Availability.end_time >= end_time,
+        )
+        .first()
+    )
+
+    return availability is not None

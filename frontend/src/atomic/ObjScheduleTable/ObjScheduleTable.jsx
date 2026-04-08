@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import { daysOfWeek } from '../../constants/constantsOfTable.js';
+import { GeneratedScheduleApi } from '../../services/api.js';
 import { ObjModal } from '../ObjModal';
 import { MolSlotEmployeesPicker } from '../MolSlotEmployeePicker/index.js';
 import { Table } from '../AtmTable/index.js';
@@ -12,6 +13,7 @@ import { MolScheduleTableBody } from '../MolScheduleBody';
 export function ObjScheduleTable({ scheduleData, setScheduleData, employeeList, week, editMode }) {
   const [showEmployeeSelector, setShowEmployeeSelector] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [eligibleEmployees, setEligibleEmployees] = useState([]);
   const maxSlots = Math.max(...daysOfWeek.map((day) => scheduleData[day].length));
 
   const hendleSelecetedDaysMap = () => {
@@ -33,9 +35,21 @@ export function ObjScheduleTable({ scheduleData, setScheduleData, employeeList, 
     return selecetedDaysMap;
   };
 
-  const handleEmployeeSelector = (slot, day) => {
-    setShowEmployeeSelector(true);
-    setSelectedSlot({ slot, day });
+    const handleEmployeeSelector = async (slot, day) => {
+    try {
+      const response = await GeneratedScheduleApi.getEligibleEmployees(
+        day,
+        slot.startTime,
+        slot.endTime,
+      );
+
+      setEligibleEmployees(response.data);
+      setSelectedSlot({ slot, day });
+      setShowEmployeeSelector(true);
+    } catch (error) {
+      console.error('Error loading eligible employees:', error);
+      alert('Error loading eligible employees.');
+    }
   };
 
   const onToggleEmployee = (employee, slot, day) => {
@@ -98,17 +112,19 @@ export function ObjScheduleTable({ scheduleData, setScheduleData, employeeList, 
           onClose={() => {
             setShowEmployeeSelector(false);
             setSelectedSlot(null);
+            setEligibleEmployees([]);
           }}
         >
           <MolSlotEmployeesPicker
             day={selectedSlot.day}
             slot={selectedSlot.slot}
             assignedEmployees={scheduleData[selectedSlot.day].find((slt) => slt.id === selectedSlot.slot.id)?.employees || []}
-            employeeList={employeeList}
+            employeeList={eligibleEmployees}
             onToggleEmployee={onToggleEmployee}
             onClose={() => {
               setShowEmployeeSelector(false);
               setSelectedSlot(null);
+              setEligibleEmployees([]);
             }}
           />
         </ObjModal>
