@@ -18,7 +18,7 @@ export function ObjModal({ title, children, onClose }) {
                     </Button>
                 </div>
                 <AtmDivider />
-                {children}
+                <div className="p-3 flex flex-col gap-3">{children}</div>
             </div>
         </div>
     );
