@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Calendar, X, Save } from 'lucide-react';
+import { ArrowLeft, Calendar, Save } from 'lucide-react';
 
 import { ObjAppLayout as BaseLayout } from '../atomic/ObjAppLayout';
 import { MolPageHeader } from '../atomic/MolPageHeader';
@@ -10,17 +10,14 @@ import { MolFormField } from '../atomic/MolFormField';
 import { MolShiftChip } from '../atomic/MolShiftChip/index.js';
 import { ObjRetryStatusBanner } from '../atomic/ObjRetryStatusBanner';
 import { ObjCreateShiftModal } from '../atomic/ObjCreateShiftModal';
-import { ObjTemplateSidebar } from '../atomic/ObjTemplateSidebar';
+import { ObjSidebarSectionTemplate } from '../atomic/ObjSidebarSectionTemplate';
 import { ObjWeeklyShiftGrid } from '../atomic/ObjWeeklyShiftGrid';
+import { ObjModal } from '../atomic/ObjModal';
 
 import { useScheduleCreate } from '../hooks/useScheduleGeneration';
 import { STATUS } from '../hooks/useRetryOnSleep';
 import { useIndexedDB } from '../services/useIndexedDB.js';
 import { daysOfWeek } from '../constants/constantsOfTable.js';
-
-/* ── helpers ───────────────────────────────────────────── */
-const EMPTY_WEEK = () => Array.from({ length: 7 }, () => []);
-const DAY_NAMES = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function buildShiftFromTemplate(tpl) {
   return {
@@ -33,24 +30,6 @@ function buildShiftFromTemplate(tpl) {
   };
 }
 
-/* ── reusable inline Modal shell ───────────────────────── */
-function Modal({ title, onClose, children }) {
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#131c2e] border border-[#1e2d47] rounded-2xl w-full max-w-md shadow-2xl">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-[#1e2d47]">
-          <AtmText as="p" size="base" weight="semibold" color="white">{title}</AtmText>
-          <Button onClick={onClose} variant="ghost" size="sm"><X size={16} /></Button>
-        </div>
-        <div className="p-5 flex flex-col gap-4">{children}</div>
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════════════
-   PAGE COMPONENT
-══════════════════════════════════════════════════════════ */
 function ShiftConfigPage({
   selectedDays,
   startDate,
@@ -62,28 +41,23 @@ function ShiftConfigPage({
   const { run, status, retryCountdown, retriesLeft, errorInfo, getMessage } = useScheduleCreate();
   const isBusy = status === STATUS.RUNNING || status === STATUS.WAKING_UP;
 
-  /* ── IndexedDB stores ──────────────────────────────── */
   const shiftsDB = useIndexedDB('shifts');
   const daysDB = useIndexedDB('days');
   const schedulesDB = useIndexedDB('schedules');
 
-  /* ── modal state ───────────────────────────────────── */
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [showDayModal, setShowDayModal] = useState(false);
   const [showWeekModal, setShowWeekModal] = useState(false);
   const [dayForm, setDayForm] = useState({ name: '' });
   const [weekForm, setWeekForm] = useState({ name: '' });
 
-  /* ── week grid state ───────────────────────────────── */
-  const [weekConfig, setWeekConfig] = useState(EMPTY_WEEK);
+  const [weekConfig, setWeekConfig] = useState(() => Array.from({ length: 7 }, () => []));
   const [selectedDay, setSelectedDay] = useState(null);
 
-  /* ── guard: redirect if no dates selected ──────────── */
   useEffect(() => {
     if (!startDate || !selectedDays || selectedDays.length === 0) navigate('/staff');
   }, [startDate, selectedDays, navigate]);
 
-  /* ── build active-days mask ────────────────────────── */
   const openDaysMask = [];
   const selectedDaysMap = {};
   selectedDays.forEach((day) => {
@@ -93,16 +67,10 @@ function ShiftConfigPage({
   });
   openDaysMask.sort((a, b) => a - b);
 
-  /* ══════════════════════════════════════════════════════
-     COLUMN SELECTION
-  ══════════════════════════════════════════════════════ */
   const handleHeaderClick = useCallback((dayIndex) => {
     setSelectedDay((prev) => (prev === dayIndex ? null : dayIndex));
   }, []);
 
-  /* ══════════════════════════════════════════════════════
-     SHIFT TEMPLATE CRUD
-  ══════════════════════════════════════════════════════ */
   const handleShiftModalSave = useCallback(
     async (data) => {
       const dayIndex = typeof showShiftModal === 'number' ? showShiftModal : null;
@@ -129,9 +97,6 @@ function ShiftConfigPage({
     [showShiftModal, shiftsDB],
   );
 
-  /* ══════════════════════════════════════════════════════
-     DAY TEMPLATE CRUD
-  ══════════════════════════════════════════════════════ */
   const handleOpenDayModal = useCallback(() => {
     setDayForm({ name: '' });
     setShowDayModal(true);
@@ -140,12 +105,12 @@ function ShiftConfigPage({
   const handleSaveDay = useCallback(async () => {
     if (!dayForm.name.trim()) return;
     if (selectedDay === null) {
-      alert('Selecione uma coluna de dia no grid clicando no cabeçalho antes de salvar.');
+      alert('Select a day column in the grid by clicking its header before saving.');
       return;
     }
     const shifts = weekConfig[selectedDay] || [];
     if (shifts.length === 0) {
-      alert('Adicione turnos nesta coluna antes de salvar como Day template.');
+      alert('Add shifts to this column before saving it as a Day template.');
       return;
     }
     await daysDB.add({
@@ -164,13 +129,10 @@ function ShiftConfigPage({
     setDayForm({ name: '' });
   }, [dayForm, selectedDay, weekConfig, daysDB]);
 
-  /* ══════════════════════════════════════════════════════
-     SCHEDULE TEMPLATE CRUD
-  ══════════════════════════════════════════════════════ */
   const handleOpenWeekModal = useCallback(() => {
     const hasAny = weekConfig.some((d) => d.length > 0);
     if (!hasAny) {
-      alert('Configure ao menos um turno antes de salvar como Schedule.');
+      alert('Configure at least one shift before saving as a Schedule.');
       return;
     }
     setWeekForm({ name: '' });
@@ -200,9 +162,6 @@ function ShiftConfigPage({
     setWeekForm({ name: '' });
   }, [weekForm, weekConfig, schedulesDB]);
 
-  /* ══════════════════════════════════════════════════════
-     GRID DROP & ACTIONS
-  ══════════════════════════════════════════════════════ */
   const handleShiftDrop = useCallback((dayIndex, template) => {
     setWeekConfig((prev) => {
       const next = prev.map((d) => [...d]);
@@ -232,9 +191,6 @@ function ShiftConfigPage({
     setShowShiftModal(dayIndex);
   }, []);
 
-  /* ══════════════════════════════════════════════════════
-     CREATE SCHEDULE (submit to backend)
-  ══════════════════════════════════════════════════════ */
   const convertScheduleData = (shifts) => {
     const scheduleModified = {
       Monday: [], Tuesday: [], Wednesday: [], Thursday: [],
@@ -268,11 +224,11 @@ function ShiftConfigPage({
 
       dayShifts.forEach((shift) => {
         if (!shift.start_time || !shift.end_time || !shift.min_staff) {
-          errors.push(`${daysOfWeek[dayIndex]}: Turno "${shift.name}" incompleto.`);
+          errors.push(`${daysOfWeek[dayIndex]}: Shift "${shift.name}" is incomplete.`);
           return;
         }
         if (shift.start_time >= shift.end_time) {
-          errors.push(`${daysOfWeek[dayIndex]}: "${shift.name}" – horário final deve ser após o inicial.`);
+          errors.push(`${daysOfWeek[dayIndex]}: "${shift.name}" – end time must be after start time.`);
           return;
         }
         shiftsSchedule.push({
@@ -286,11 +242,11 @@ function ShiftConfigPage({
     });
 
     if (errors.length > 0) {
-      alert(`Corrija os seguintes problemas:\n\n${errors.join('\n')}`);
+      alert(`Please fix the following issues:\n\n${errors.join('\n')}`);
       return;
     }
     if (shiftsSchedule.length === 0) {
-      alert('Configure ao menos um turno completo antes de gerar a escala.');
+      alert('Configure at least one complete shift before generating the schedule.');
       return;
     }
 
@@ -307,15 +263,12 @@ function ShiftConfigPage({
         setPreviewSchedule(converted);
         navigate('/schedule');
       } else {
-        alert('Não foi possível gerar uma escala viável. Verifique os turnos e funcionários.');
+        alert('Could not generate a viable schedule. Please review the shifts and staff.');
         navigate('/staff');
       }
     }
   };
 
-  /* ══════════════════════════════════════════════════════
-     RENDER
-  ══════════════════════════════════════════════════════ */
   const selectedDayShifts = selectedDay !== null ? (weekConfig[selectedDay] || []) : [];
 
   return (
@@ -331,20 +284,37 @@ function ShiftConfigPage({
         onRetry={createSchedule}
       />
 
-      {/* main area: sidebar + grid */}
       <div className="flex flex-1 gap-3 mt-3 overflow-hidden" style={{ minHeight: 0 }}>
-        <ObjTemplateSidebar
-          shiftTemplates={shiftsDB.items}
-          dayTemplates={daysDB.items}
-          scheduleTemplates={schedulesDB.items}
-          onCreateShift={() => setShowShiftModal(true)}
-          onDeleteShift={(id) => shiftsDB.remove(id)}
-          onCreateDay={handleOpenDayModal}
-          onDeleteDay={(id) => daysDB.remove(id)}
-          onCreateSchedule={handleOpenWeekModal}
-          onDeleteSchedule={(id) => schedulesDB.remove(id)}
-          onCreateNewTemplate={() => setShowShiftModal(true)}
-        />
+        <aside className="w-[240px] shrink-0 flex flex-col h-full border border-slate-800 rounded-lg bg-black bg-opacity-15">
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+            <ObjSidebarSectionTemplate
+              title="Shifts"
+              items={shiftsDB.items}
+              type="shift"
+              onAdd={() => setShowShiftModal(true)}
+              onDelete={(id) => shiftsDB.remove(id)}
+              emptyText="Create your first shift"
+            />
+
+            <ObjSidebarSectionTemplate
+              title="Days"
+              items={daysDB.items}
+              type="day"
+              onAdd={handleOpenDayModal}
+              onDelete={(id) => daysDB.remove(id)}
+              emptyText="Save a day config"
+            />
+
+            <ObjSidebarSectionTemplate
+              title="Schedules"
+              items={schedulesDB.items}
+              type="schedule"
+              onAdd={handleOpenWeekModal}
+              onDelete={(id) => schedulesDB.remove(id)}
+              emptyText="Save a full schedule"
+            />
+          </div>
+        </aside>
 
         <ObjWeeklyShiftGrid
           weekConfig={weekConfig}
@@ -359,8 +329,7 @@ function ShiftConfigPage({
         />
       </div>
 
-      {/* footer */}
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#1e2d47]">
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800">
         <Button onClick={() => navigate('/calendar')} variant="primary" size="lg" disabled={isBusy}>
           <ArrowLeft size={20} />
           Back
@@ -371,7 +340,6 @@ function ShiftConfigPage({
         </Button>
       </div>
 
-      {/* ── Shift Modal ──────────────────────────────────── */}
       {showShiftModal !== false && showShiftModal !== null && (
         <ObjCreateShiftModal
           onSave={handleShiftModalSave}
@@ -379,17 +347,16 @@ function ShiftConfigPage({
         />
       )}
 
-      {/* ── Day Template Modal ───────────────────────────── */}
       {showDayModal && (
-        <Modal title="Save Day Template" onClose={() => setShowDayModal(false)}>
+        <ObjModal title="Save Day Template" onClose={() => setShowDayModal(false)}>
           <AtmText size="sm" color="muted" className="leading-relaxed">
             {selectedDay !== null
-              ? `Saving shifts from ${DAY_NAMES[selectedDay]} as a reusable template.`
+              ? `Saving shifts from ${daysOfWeek[selectedDay]} as a reusable template.`
               : 'Click a day header in the calendar to select it first, then save.'}
           </AtmText>
 
           {selectedDay !== null && selectedDayShifts.length > 0 && (
-            <div className="bg-[#0e1929] rounded-xl p-3 flex flex-col gap-1">
+            <div className="bg-slate-900 rounded-lg p-3 flex flex-col gap-1 mb-1">
               {selectedDayShifts.map((s) => (
                 <MolShiftChip key={s.id} shift={s} small />
               ))}
@@ -404,7 +371,7 @@ function ShiftConfigPage({
             onChange={(e) => setDayForm((f) => ({ ...f, name: e.target.value }))}
           />
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 mb-1 mt-1">
             <Button variant="secondary" size="md" onClick={() => setShowDayModal(false)}>Cancel</Button>
             <Button
               variant="primary" size="md"
@@ -415,12 +382,11 @@ function ShiftConfigPage({
               Save Day
             </Button>
           </div>
-        </Modal>
+        </ObjModal>
       )}
 
-      {/* ── Schedule Template Modal ──────────────────────── */}
       {showWeekModal && (
-        <Modal title="Save Schedule Template" onClose={() => setShowWeekModal(false)}>
+        <ObjModal title="Save Schedule Template" onClose={() => setShowWeekModal(false)}>
           <AtmText size="sm" color="muted" className="leading-relaxed">
             Saves the current week layout as a reusable schedule preset.
           </AtmText>
@@ -433,7 +399,7 @@ function ShiftConfigPage({
             onChange={(e) => setWeekForm((f) => ({ ...f, name: e.target.value }))}
           />
 
-          <div className="flex justify-end gap-3">
+          <div className="flex justify-end gap-3 mb-1 mt-1">
             <Button variant="secondary" size="md" onClick={() => setShowWeekModal(false)}>Cancel</Button>
             <Button
               variant="primary" size="md"
@@ -444,7 +410,7 @@ function ShiftConfigPage({
               Save Schedule
             </Button>
           </div>
-        </Modal>
+        </ObjModal>
       )}
     </BaseLayout>
   );
