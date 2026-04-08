@@ -30,13 +30,13 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#131c2e] border border-[#1e2d47] rounded-2xl overflow-hidden w-full max-w-2xl shadow-2xl flex">
+      <div className="bg-[#131c2e] border border-slate-800 rounded-2xl overflow-hidden w-full max-w-2xl shadow-2xl flex">
 
         {/* left column: header + form + footer */}
         <div className="flex-1 flex flex-col min-w-0">
 
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-[#1e2d47]">
-            <div className="w-9 h-9 bg-[#1a2740] rounded-xl flex items-center justify-center shrink-0">
+          <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-800">
+            <div className="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
               <Clock size={18} className="text-blue-400" />
             </div>
             <div className="flex-1 min-w-0">
@@ -106,7 +106,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-[#1e2d47]">
+          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-800">
             <Button variant="secondary" size="md" onClick={onCancel}>
               Cancel
             </Button>
@@ -117,7 +117,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
           </div>
         </div>
 
-        <div className="w-56 p-4 bg-[#0e1726] border-l border-[#1e2d47] shrink-0 flex flex-col gap-4">
+        <div className="w-56 p-4 bg-slate-900 border-l border-slate-800 shrink-0 flex flex-col gap-4">
           <AtmText as="p" size="xs" weight="medium" color="faint" className="uppercase tracking-widest">
             Preview
           </AtmText>
@@ -130,7 +130,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
             onDelete={() => { }}
           />
 
-          <div className="border border-dashed border-[#1e2d47] rounded-lg p-3">
+          <div className="border border-dashed border-slate-800 rounded-lg p-3">
             <AtmText as="p" size="xs" color="faint" className="text-center leading-relaxed">
               This template can be dragged onto the calendar to quickly populate shifts.
             </AtmText>

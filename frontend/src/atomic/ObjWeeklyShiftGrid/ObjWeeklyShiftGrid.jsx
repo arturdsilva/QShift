@@ -1,11 +1,9 @@
 import { useState, memo } from 'react';
-import { X, Pencil, Plus, Download, Ban } from 'lucide-react';
+import { X, Pencil, Plus, Download, Ban, ArrowDown } from 'lucide-react';
 import { AtmText } from '../AtmText';
 import { Button } from '../AtmButton';
 import { MolShiftChip } from '../MolShiftChip';
-import { BADGE_COLOR } from '../../constants/shiftColors.js';
-
-const DAY_LABELS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+import { DAY_LABELS } from '../../constants/constantsOfTable';
 
 /* ── single shift card inside the grid ─────────────────── */
 const GridShiftCard = memo(function GridShiftCard({ shift, onRemove, onEdit }) {
@@ -72,11 +70,10 @@ function DayColumn({
       if (data._type === 'day') {
         onDayDrop?.(dayIndex, data);
       } else if (data._type === 'schedule') {
-        // schedule drops handled at grid level
       } else {
         onShiftDrop?.(dayIndex, data);
       }
-    } catch { /* ignore */ }
+    } catch { }
   };
 
   const columnClasses = [
@@ -86,8 +83,8 @@ function DayColumn({
         ? 'border-green-500/60 bg-green-500/5'
         : isDragOver
           ? 'border-blue-500 bg-blue-500/10 border-dashed shadow-lg shadow-blue-500/10'
-          : 'border-[#1e2d47] bg-[#0c1220]/60'
-      : 'border-[#1e2d47]/50 bg-[#0c1220]/30 opacity-50 pointer-events-none',
+          : 'border-slate-800 bg-[#0c1220]/60'
+      : 'border-slate-800/50 bg-[#0c1220]/30 opacity-50 pointer-events-none',
   ].join(' ');
 
   return (
@@ -101,7 +98,7 @@ function DayColumn({
       <div
         onClick={() => isActive && onHeaderClick?.(dayIndex)}
         className={`text-center py-3 border-b cursor-pointer select-none transition-colors
-          ${isToday ? 'border-blue-500' : isSelected ? 'border-green-500/40' : 'border-[#1e2d47]'}
+          ${isToday ? 'border-blue-500' : isSelected ? 'border-green-500/40' : 'border-slate-800'}
           ${isActive ? 'hover:bg-white/5' : ''}
         `}
       >
@@ -118,14 +115,13 @@ function DayColumn({
           {dateNum}
         </AtmText>
         {isSelected && (
-          <AtmText as="p" size="xs" className="text-green-400 mt-0.5">● selected</AtmText>
+          <AtmText as="p" size="xs" className="text-green-400 mt-0.5">selected</AtmText>
         )}
         {isToday && !isSelected && (
-          <div className="w-1 h-1 bg-blue-400 rounded-full mx-auto mt-1" />
+          <AtmText as="p" size="xs" className="mt-0.5" color="blue">today</AtmText>
         )}
       </div>
 
-      {/* body */}
       <div className="flex-1 p-2 flex flex-col gap-1.5 overflow-y-auto">
         {isActive ? (
           <>
@@ -147,33 +143,35 @@ function DayColumn({
             )}
             {isDragOver && (
               <div className="border border-dashed border-blue-500/40 rounded-lg p-4 text-center bg-blue-500/5">
-                <AtmText size="xs" className="text-blue-400">↓ Drop here</AtmText>
+                <div className="flex items-center justify-center">
+                  <ArrowDown size={15} className="text-blue-400" />
+                  <AtmText size="xs" color="blue">Drop here</AtmText>
+                </div>
               </div>
             )}
           </>
         ) : (
           <div className="flex-1 flex items-center justify-center">
-            <div className="w-7 h-7 rounded-lg bg-[#0e1929] border border-[#1e2d47] flex items-center justify-center text-[#1e2d47] text-sm">
+            <div className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center">
               <Ban size={22} className="text-slate-500" />
             </div>
           </div>
         )}
       </div>
 
-      {/* add button */}
       {isActive && (
-        <button
+        <Button
           onClick={() => onAddShift?.(dayIndex)}
-          className="mx-2 mb-2 flex items-center justify-center py-1.5 rounded-lg border border-dashed border-[#1e2d47] hover:border-blue-500/50 hover:bg-blue-500/5 transition-colors"
+          variant="ghost"
+          className="mx-2 mb-2 w-auto py-1.5 border border-dashed border-slate-800 hover:border-blue-500/50 hover:bg-blue-500/5"
         >
           <Plus size={14} className="text-slate-500" />
-        </button>
+        </Button>
       )}
     </div>
-  );
+  )
 }
 
-/* ── main grid ─────────────────────────────────────────── */
 export function ObjWeeklyShiftGrid({
   weekConfig = [],
   selectedDays = [],
@@ -211,7 +209,7 @@ export function ObjWeeklyShiftGrid({
           }
         });
       }
-    } catch { /* ignore */ }
+    } catch { }
   };
 
   return (
