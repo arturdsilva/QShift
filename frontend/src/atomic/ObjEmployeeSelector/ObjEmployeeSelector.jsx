@@ -34,6 +34,7 @@ export function ObjEmployeeSelector({ employeesList, currentEmployee, onToggleEm
               return (
                 <SelectableButton
                   key={emp.id}
+                  variant="default"
                   selected={isSelected}
                   onClick={() => onToggleEmployee(emp, month, year)}
                   size='md'

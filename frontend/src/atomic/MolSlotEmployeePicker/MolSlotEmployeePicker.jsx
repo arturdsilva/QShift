@@ -23,6 +23,7 @@ export function MolSlotEmployeesPicker({ day, slot, assignedEmployees, employeeL
                         return (
                             <SelectableButton
                                 key={emp.id}
+                                variant="default"
                                 selected={isSelected}
                                 onClick={() => onToggleEmployee(emp, slot, day)}
                                 size='md'

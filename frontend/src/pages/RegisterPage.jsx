@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { MolLabeledInput } from '../atomic/MolLabeledInput';
+import { MolFormField } from '../atomic/MolFormField';
 import { Button, LinkButton } from '../atomic/AtmButton/index.js';
 import { AtmText } from '../atomic/AtmText/index.js';
 import { RegisterApi } from '../services/api.js';
@@ -57,7 +57,7 @@ function RegisterPage() {
               <AtmText size="sm" color="red">{error}</AtmText>
             </div>
           )}
-          <MolLabeledInput
+          <MolFormField
             label="Email"
             id="email"
             type="email"
@@ -68,7 +68,7 @@ function RegisterPage() {
             variant='auth'
             disabled={isBusy}
           />
-          <MolLabeledInput
+          <MolFormField
             label="Confirm Email"
             id="confirm-email"
             type="email"
@@ -79,7 +79,7 @@ function RegisterPage() {
             variant='auth'
             disabled={isBusy}
           />
-          <MolLabeledInput
+          <MolFormField
             label="Password"
             id="password"
             type="password"

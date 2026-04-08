@@ -1,14 +1,34 @@
+import { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ArrowLeft, Calendar, Save } from 'lucide-react';
+
 import { ObjAppLayout as BaseLayout } from '../atomic/ObjAppLayout';
 import { MolPageHeader } from '../atomic/MolPageHeader';
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Save, RotateCcw, Calendar, Trash2, ArrowLeft } from 'lucide-react';
-import { daysOfWeek } from '../constants/constantsOfTable.js';
 import { Button } from '../atomic/AtmButton/index.js';
-import { AtmInput } from '../atomic/AtmInput/index.js';
+import { AtmText } from '../atomic/AtmText/index.js';
+import { MolFormField } from '../atomic/MolFormField';
+import { MolShiftChip } from '../atomic/MolShiftChip/index.js';
 import { ObjRetryStatusBanner } from '../atomic/ObjRetryStatusBanner';
+import { ObjCreateShiftModal } from '../atomic/ObjCreateShiftModal';
+import { ObjSidebarSectionTemplate } from '../atomic/ObjSidebarSectionTemplate';
+import { ObjWeeklyShiftGrid } from '../atomic/ObjWeeklyShiftGrid';
+import { ObjModal } from '../atomic/ObjModal';
+
 import { useScheduleCreate } from '../hooks/useScheduleGeneration';
 import { STATUS } from '../hooks/useRetryOnSleep';
+import { useIndexedDB } from '../services/useIndexedDB.js';
+import { daysOfWeek } from '../constants/constantsOfTable.js';
+
+function buildShiftFromTemplate(tpl) {
+  return {
+    id: crypto.randomUUID(),
+    name: tpl.name,
+    start_time: tpl.start,
+    end_time: tpl.end,
+    min_staff: Number(tpl.staff),
+    color: tpl.color || 'blue',
+  };
+}
 
 function ShiftConfigPage({
   selectedDays,
@@ -18,136 +38,164 @@ function ShiftConfigPage({
   setPreviewSchedule,
 }) {
   const navigate = useNavigate();
-  const openDaysMask = [];
-  const selectedDaysMap = {};
-
   const { run, status, retryCountdown, retriesLeft, errorInfo, getMessage } = useScheduleCreate();
   const isBusy = status === STATUS.RUNNING || status === STATUS.WAKING_UP;
+
+  const shiftsDB = useIndexedDB('shifts');
+  const daysDB = useIndexedDB('days');
+  const schedulesDB = useIndexedDB('schedules');
+
+  const [showShiftModal, setShowShiftModal] = useState(false);
+  const [showDayModal, setShowDayModal] = useState(false);
+  const [showWeekModal, setShowWeekModal] = useState(false);
+  const [dayForm, setDayForm] = useState({ name: '' });
+  const [weekForm, setWeekForm] = useState({ name: '' });
+
+  const [weekConfig, setWeekConfig] = useState(() => Array.from({ length: 7 }, () => []));
+  const [selectedDay, setSelectedDay] = useState(null);
 
   useEffect(() => {
     if (!startDate || !selectedDays || selectedDays.length === 0) navigate('/staff');
   }, [startDate, selectedDays, navigate]);
 
+  const openDaysMask = [];
+  const selectedDaysMap = {};
   selectedDays.forEach((day) => {
-    selectedDaysMap[day.getDay() === 0 ? 6 : day.getDay() - 1] = day;
-    openDaysMask.push(day.getDay() === 0 ? 6 : day.getDay() - 1);
+    const idx = day.getDay() === 0 ? 6 : day.getDay() - 1;
+    selectedDaysMap[idx] = day;
+    openDaysMask.push(idx);
   });
   openDaysMask.sort((a, b) => a - b);
 
-  const [weekShifts, setWeekShifts] = useState([
-    {
-      id: 1,
-      config: [
-        { weekday: 0, start_time: '', end_time: '', min_staff: null },
-        { weekday: 1, start_time: '', end_time: '', min_staff: null },
-        { weekday: 2, start_time: '', end_time: '', min_staff: null },
-        { weekday: 3, start_time: '', end_time: '', min_staff: null },
-        { weekday: 4, start_time: '', end_time: '', min_staff: null },
-        { weekday: 5, start_time: '', end_time: '', min_staff: null },
-        { weekday: 6, start_time: '', end_time: '', min_staff: null },
-      ],
+  const handleHeaderClick = useCallback((dayIndex) => {
+    setSelectedDay((prev) => (prev === dayIndex ? null : dayIndex));
+  }, []);
+
+  const handleShiftModalSave = useCallback(
+    async (data) => {
+      const dayIndex = typeof showShiftModal === 'number' ? showShiftModal : null;
+
+      await shiftsDB.add({
+        id: data.id ?? Date.now(),
+        name: data.name,
+        start: data.start,
+        end: data.end,
+        staff: Number(data.staff),
+        color: data.color,
+      });
+
+      if (dayIndex !== null) {
+        setWeekConfig((prev) => {
+          const next = prev.map((d) => [...d]);
+          next[dayIndex] = [...next[dayIndex], buildShiftFromTemplate(data)];
+          return next;
+        });
+      }
+
+      setShowShiftModal(false);
     },
-  ]);
+    [showShiftModal, shiftsDB],
+  );
 
-  const handleBack = () => navigate('/calendar');
+  const handleOpenDayModal = useCallback(() => {
+    setDayForm({ name: '' });
+    setShowDayModal(true);
+  }, []);
 
-  const addTurn = () => {
-    const newWeekShift = {
+  const handleSaveDay = useCallback(async () => {
+    if (!dayForm.name.trim()) return;
+    if (selectedDay === null) {
+      alert('Select a day column in the grid by clicking its header before saving.');
+      return;
+    }
+    const shifts = weekConfig[selectedDay] || [];
+    if (shifts.length === 0) {
+      alert('Add shifts to this column before saving it as a Day template.');
+      return;
+    }
+    await daysDB.add({
       id: Date.now(),
-      config: daysOfWeek.map((_, i) => ({ weekday: i, start_time: '', end_time: '', min_staff: null })),
-    };
-    setWeekShifts([...weekShifts, newWeekShift]);
-  };
+      name: dayForm.name,
+      color: shifts[0]?.color || 'blue',
+      shifts: shifts.map((s) => ({
+        name: s.name,
+        start: s.start_time,
+        end: s.end_time,
+        staff: s.min_staff,
+        color: s.color,
+      })),
+    });
+    setShowDayModal(false);
+    setDayForm({ name: '' });
+  }, [dayForm, selectedDay, weekConfig, daysDB]);
 
-  const removeShift = (weekShiftId) => {
-    if (weekShifts.length > 1) setWeekShifts(weekShifts.filter((ws) => ws.id !== weekShiftId));
-  };
+  const handleOpenWeekModal = useCallback(() => {
+    const hasAny = weekConfig.some((d) => d.length > 0);
+    if (!hasAny) {
+      alert('Configure at least one shift before saving as a Schedule.');
+      return;
+    }
+    setWeekForm({ name: '' });
+    setShowWeekModal(true);
+  }, [weekConfig]);
 
-  const updateShiftConfig = (weekShiftId, dayOfWeek, field, value) => {
-    setWeekShifts(
-      weekShifts.map((weekShift) => {
-        if (weekShift.id === weekShiftId) {
-          return {
-            ...weekShift,
-            config: weekShift.config.map((dayConfig, index) =>
-              index === dayOfWeek ? { ...dayConfig, [field]: value } : dayConfig,
-            ),
-          };
-        }
-        return weekShift;
-      }),
-    );
-  };
-
-  const saveConfigShift = () => {
-    const configToSave = weekShifts.map((ws) => ({
-      id: ws.id,
-      config: ws.config.map((dc) => ({
-        weekday: dc.weekday,
-        start_time: dc.start_time,
-        end_time: dc.end_time,
-        min_staff: dc.min_staff ? Number(dc.min_staff) : null,
+  const handleSaveWeek = useCallback(async () => {
+    if (!weekForm.name.trim()) return;
+    const days = weekConfig.map((dayShifts, idx) => ({
+      dayIndex: idx,
+      shifts: dayShifts.map((s) => ({
+        name: s.name,
+        start: s.start_time,
+        end: s.end_time,
+        staff: s.min_staff,
+        color: s.color,
       })),
     }));
-    localStorage.setItem('shiftConfigurations', JSON.stringify(configToSave));
-  };
-
-  const restoreConfigShift = () => {
-    const savedConfig = localStorage.getItem('shiftConfigurations');
-    if (savedConfig) {
-      const parsedConfig = JSON.parse(savedConfig);
-      setWeekShifts(parsedConfig.map((ws) => ({
-        ...ws,
-        config: ws.config.map((dc) => ({ ...dc, min_staff: dc.min_staff !== null ? Number(dc.min_staff) : null })),
-      })));
-    }
-  };
-
-  const handleShiftsSchedule = () => {
-    let shiftsSchedule = [];
-    const errors = [];
-    weekShifts.forEach((weekShift, weekShiftIndex) => {
-      weekShift.config.forEach((shift) => {
-        const labelShift = `${daysOfWeek[shift.weekday]} - Shift ${weekShiftIndex + 1}`;
-        const isDaySelected = selectedDaysMap[shift.weekday] !== undefined;
-        if (isDaySelected && (shift.start_time || shift.end_time || shift.min_staff)) {
-          const hasAnyField = shift.start_time || shift.end_time || shift.min_staff;
-          const hasAllFields = shift.start_time && shift.end_time && shift.min_staff;
-          if (hasAnyField && !hasAllFields) {
-            let missingFields = [];
-            if (!shift.start_time) missingFields.push('start time');
-            if (!shift.end_time) missingFields.push('end time');
-            if (!shift.min_staff) missingFields.push('number of employees');
-            errors.push(`${labelShift}: Missing ${missingFields.join(', ')}`);
-            return;
-          }
-          if (shift.start_time && shift.end_time && shift.start_time >= shift.end_time) {
-            errors.push(`${labelShift}: End time must be after start time.`); return;
-          }
-          if (shift.min_staff && Number(shift.min_staff) < 0) {
-            errors.push(`${labelShift}: Minimum number of employees must be greater than 0.`); return;
-          }
-          if (hasAllFields) {
-            shiftsSchedule.push({
-              id: crypto.randomUUID(),
-              weekday: shift.weekday,
-              start_time: shift.start_time,
-              end_time: shift.end_time,
-              min_staff: Number(shift.min_staff),
-            });
-          }
-        }
-      });
+    await schedulesDB.add({
+      id: Date.now(),
+      name: weekForm.name,
+      color: 'purple',
+      days,
+      meta: `${days.filter((d) => d.shifts.length > 0).length} days configured`,
     });
-    if (errors.length > 0) return { success: false, errors };
-    if (shiftsSchedule.length === 0)
-      return { success: false, errors: ['Please configure at least one complete shift (with start time, end time, and number of employees).'] };
-    setShiftsData(shiftsSchedule);
-    return { success: true, data: shiftsSchedule };
-  };
+    setShowWeekModal(false);
+    setWeekForm({ name: '' });
+  }, [weekForm, weekConfig, schedulesDB]);
+
+  const handleShiftDrop = useCallback((dayIndex, template) => {
+    setWeekConfig((prev) => {
+      const next = prev.map((d) => [...d]);
+      next[dayIndex] = [...next[dayIndex], buildShiftFromTemplate(template)];
+      return next;
+    });
+  }, []);
+
+  const handleDayDrop = useCallback((dayIndex, dayTemplate) => {
+    if (!dayTemplate.shifts || dayTemplate.shifts.length === 0) return;
+    setWeekConfig((prev) => {
+      const next = prev.map((d) => [...d]);
+      next[dayIndex] = dayTemplate.shifts.map((s) => buildShiftFromTemplate(s));
+      return next;
+    });
+  }, []);
+
+  const handleRemoveShift = useCallback((dayIndex, shiftId) => {
+    setWeekConfig((prev) => {
+      const next = prev.map((d) => [...d]);
+      next[dayIndex] = next[dayIndex].filter((s) => s.id !== shiftId);
+      return next;
+    });
+  }, []);
+
+  const handleAddShift = useCallback((dayIndex) => {
+    setShowShiftModal(dayIndex);
+  }, []);
 
   const convertScheduleData = (shifts) => {
-    let scheduleModified = { Monday: [], Tuesday: [], Wednesday: [], Thursday: [], Friday: [], Saturday: [], Sunday: [] };
+    const scheduleModified = {
+      Monday: [], Tuesday: [], Wednesday: [], Thursday: [],
+      Friday: [], Saturday: [], Sunday: [],
+    };
     shifts.forEach((shift, index) => {
       const dayName = daysOfWeek[shift.weekday];
       scheduleModified[dayName].push({
@@ -159,45 +207,72 @@ function ShiftConfigPage({
       });
     });
     daysOfWeek.forEach((day) => {
-      scheduleModified[day].sort((a, b) => {
-        if (a.startTime < b.startTime) return -1;
-        if (a.startTime > b.startTime) return 1;
-        if (a.endTime < b.endTime) return -1;
-        if (a.endTime > b.endTime) return 1;
-        return 0;
-      });
+      scheduleModified[day].sort((a, b) =>
+        a.startTime < b.startTime ? -1 : a.startTime > b.startTime ? 1 : 0,
+      );
     });
     return scheduleModified;
   };
 
   const createSchedule = async () => {
-    const result = handleShiftsSchedule();
-    if (!result.success) {
-      const errorMessage = result.errors.join('\n\n');
-      alert(`Please fix the following issues:\n\n${errorMessage}`);
+    const shiftsSchedule = [];
+    const errors = [];
+
+    weekConfig.forEach((dayShifts, dayIndex) => {
+      const isDaySelected = selectedDaysMap[dayIndex] !== undefined;
+      if (!isDaySelected) return;
+
+      dayShifts.forEach((shift) => {
+        if (!shift.start_time || !shift.end_time || !shift.min_staff) {
+          errors.push(`${daysOfWeek[dayIndex]}: Shift "${shift.name}" is incomplete.`);
+          return;
+        }
+        if (shift.start_time >= shift.end_time) {
+          errors.push(`${daysOfWeek[dayIndex]}: "${shift.name}" – end time must be after start time.`);
+          return;
+        }
+        shiftsSchedule.push({
+          id: crypto.randomUUID(),
+          weekday: dayIndex,
+          start_time: shift.start_time,
+          end_time: shift.end_time,
+          min_staff: Number(shift.min_staff),
+        });
+      });
+    });
+
+    if (errors.length > 0) {
+      alert(`Please fix the following issues:\n\n${errors.join('\n')}`);
       return;
     }
-    const shiftsSchedule = result.data;
+    if (shiftsSchedule.length === 0) {
+      alert('Configure at least one complete shift before generating the schedule.');
+      return;
+    }
+
+    setShiftsData(shiftsSchedule);
     const week = { start_date: startDate.toISOString().split('T')[0], open_days: openDaysMask };
     setWeekData(week);
 
     const response = await run({ shift_vector: shiftsSchedule });
 
     if (response?.success) {
-      const previewScheduleData = response.data.result;
-      if (previewScheduleData?.possible && previewScheduleData.schedule) {
-        const convertedData = convertScheduleData(previewScheduleData.schedule.shifts);
-        setPreviewSchedule(convertedData);
+      const result = response.data.result;
+      if (result?.possible && result.schedule) {
+        const converted = convertScheduleData(result.schedule.shifts);
+        setPreviewSchedule(converted);
         navigate('/schedule');
       } else {
-        alert('Unable to generate a viable schedule with the current settings. Check shift and employee settings.');
+        alert('Could not generate a viable schedule. Please review the shifts and staff.');
         navigate('/staff');
       }
     }
   };
 
+  const selectedDayShifts = selectedDay !== null ? (weekConfig[selectedDay] || []) : [];
+
   return (
-    <BaseLayout showSidebar={false} currentPage={6} showSelectionPanel={true} selectionPanelData={{ startDate, selectedDays }}>
+    <BaseLayout showSidebar={false} currentPage={6} showSelectionPanel={false}>
       <MolPageHeader title="Shift Configuration" />
 
       <ObjRetryStatusBanner
@@ -209,113 +284,134 @@ function ShiftConfigPage({
         onRetry={createSchedule}
       />
 
-      <div className="bg-slate-800 rounded-lg overflow-x-auto border border-slate-700 mb-6">
-        <table className="w-full">
-          <thead>
-            <tr className="bg-slate-700">
-              {daysOfWeek.map((day, idx) => (
-                <th
-                  key={idx}
-                  className={`px-4 py-3 text-center text-sm font-bold ${selectedDaysMap[idx] ? 'text-slate-200' : 'text-slate-500'}`}
-                >
-                  {day}
-                </th>
-              ))}
-              <th className="px-4 py-3 text-center text-sm font-bold text-slate-200">Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            {weekShifts.map((weekShift) => (
-              <tr key={weekShift.id} className="border-t border-slate-700 hover:bg-slate-750">
-                {daysOfWeek.map((day, dayIdx) => (
-                  <td key={dayIdx} className={`px-2 py-3 ${!selectedDaysMap[dayIdx] ? 'bg-slate-900' : ''}`}>
-                    {selectedDaysMap[dayIdx] ? (
-                      <div className="flex flex-col gap-2 min-w-[140px]">
-                        <div className="flex gap-1">
-                          <AtmInput
-                            type="time"
-                            value={weekShift.config[dayIdx].start_time}
-                            onChange={(e) => updateShiftConfig(weekShift.id, dayIdx, 'start_time', e.target.value)}
-                            size="sm"
-                            variant="shiftConfig"
-                            placeholder="Begin"
-                            disabled={isBusy}
-                          />
-                          <AtmInput
-                            type="time"
-                            value={weekShift.config[dayIdx].end_time}
-                            onChange={(e) => updateShiftConfig(weekShift.id, dayIdx, 'end_time', e.target.value)}
-                            size="sm"
-                            variant="shiftConfig"
-                            placeholder="End"
-                            disabled={isBusy}
-                          />
-                        </div>
-                        <AtmInput
-                          type="number"
-                          min="0"
-                          max="50"
-                          value={weekShift.config[dayIdx].min_staff ?? ''}
-                          onChange={(e) => updateShiftConfig(weekShift.id, dayIdx, 'min_staff', e.target.value)}
-                          size="sm"
-                          variant="shiftConfig"
-                          placeholder="Number of employees"
-                          disabled={isBusy}
-                        />
-                      </div>
-                    ) : (
-                      <div className="text-center text-slate-600 text-sm">-</div>
-                    )}
-                  </td>
-                ))}
-                <td className="px-4 py-3 text-center">
-                  <button
-                    onClick={() => removeShift(weekShift.id)}
-                    disabled={weekShifts.length === 1 || isBusy}
-                    className={`p-2 rounded-lg transition-colors ${weekShifts.length === 1 || isBusy
-                      ? 'bg-slate-700 text-slate-500 cursor-not-allowed'
-                      : 'bg-red-600 hover:bg-red-700 text-white'
-                      }`}
-                    title="Delete shift"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="flex flex-1 gap-3 mt-3 overflow-hidden" style={{ minHeight: 0 }}>
+        <aside className="w-[240px] shrink-0 flex flex-col h-full border border-slate-800 rounded-lg bg-black bg-opacity-15">
+          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+            <ObjSidebarSectionTemplate
+              title="Shifts"
+              items={shiftsDB.items}
+              type="shift"
+              onAdd={() => setShowShiftModal(true)}
+              onDelete={(id) => shiftsDB.remove(id)}
+              emptyText="Create your first shift"
+            />
+
+            <ObjSidebarSectionTemplate
+              title="Days"
+              items={daysDB.items}
+              type="day"
+              onAdd={handleOpenDayModal}
+              onDelete={(id) => daysDB.remove(id)}
+              emptyText="Save a day config"
+            />
+
+            <ObjSidebarSectionTemplate
+              title="Schedules"
+              items={schedulesDB.items}
+              type="schedule"
+              onAdd={handleOpenWeekModal}
+              onDelete={(id) => schedulesDB.remove(id)}
+              emptyText="Save a full schedule"
+            />
+          </div>
+        </aside>
+
+        <ObjWeeklyShiftGrid
+          weekConfig={weekConfig}
+          selectedDays={selectedDays}
+          startDate={startDate}
+          selectedDay={selectedDay}
+          onHeaderClick={handleHeaderClick}
+          onShiftDrop={handleShiftDrop}
+          onDayDrop={handleDayDrop}
+          onRemoveShift={handleRemoveShift}
+          onAddShift={handleAddShift}
+        />
       </div>
 
-      <button
-        onClick={addTurn}
-        disabled={isBusy}
-        className="w-full mb-6 px-6 py-3 bg-slate-700 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <Plus className="w-5 h-5" />
-        Add shift
-      </button>
-
-      <div className="grid grid-cols-2 md:flex md:flex-wrap gap-3">
-        <div className="order-3 md:order-none col-span-1 md:flex-1 justify-start flex">
-          <Button onClick={handleBack} variant='primary' size='lg' disabled={isBusy}>
-            <ArrowLeft size={20} />
-            Back
-          </Button>
-        </div>
-        <Button onClick={restoreConfigShift} variant='secondary' className="order-1 md:order-none" size='lg' disabled={isBusy}>
-          <RotateCcw className="w-4 h-4" />
-          Restore settings
+      <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800">
+        <Button onClick={() => navigate('/calendar')} variant="primary" size="lg" disabled={isBusy}>
+          <ArrowLeft size={20} />
+          Back
         </Button>
-        <Button onClick={saveConfigShift} variant='secondary' className="order-2 md:order-none" size='lg' disabled={isBusy}>
-          <Save className="w-4 h-4" />
-          Save settings
-        </Button>
-        <Button onClick={createSchedule} variant='primary' className="order-4 md:order-none ml-auto" size='lg' disabled={isBusy}>
+        <Button onClick={createSchedule} variant="primary" size="lg" disabled={isBusy} className="bg-blue-600 hover:bg-blue-500">
           <Calendar className="w-4 h-4" />
           {isBusy ? 'Generating…' : 'Create Schedule'}
         </Button>
       </div>
+
+      {showShiftModal !== false && showShiftModal !== null && (
+        <ObjCreateShiftModal
+          onSave={handleShiftModalSave}
+          onCancel={() => setShowShiftModal(false)}
+        />
+      )}
+
+      {showDayModal && (
+        <ObjModal title="Save Day Template" onClose={() => setShowDayModal(false)}>
+          <AtmText size="sm" color="muted" className="leading-relaxed">
+            {selectedDay !== null
+              ? `Saving shifts from ${daysOfWeek[selectedDay]} as a reusable template.`
+              : 'Click a day header in the calendar to select it first, then save.'}
+          </AtmText>
+
+          {selectedDay !== null && selectedDayShifts.length > 0 && (
+            <div className="bg-slate-900 rounded-lg p-3 flex flex-col gap-1 mb-1">
+              {selectedDayShifts.map((s) => (
+                <MolShiftChip key={s.id} shift={s} small />
+              ))}
+            </div>
+          )}
+
+          <MolFormField
+            label="Template Name"
+            variant="shiftConfig"
+            placeholder="e.g. Weekday Standard, Saturday Rush…"
+            value={dayForm.name}
+            onChange={(e) => setDayForm((f) => ({ ...f, name: e.target.value }))}
+          />
+
+          <div className="flex justify-end gap-3 mb-1 mt-1">
+            <Button variant="secondary" size="md" onClick={() => setShowDayModal(false)}>Cancel</Button>
+            <Button
+              variant="primary" size="md"
+              onClick={handleSaveDay}
+              disabled={!dayForm.name.trim() || selectedDay === null || selectedDayShifts.length === 0}
+            >
+              <Save size={14} />
+              Save Day
+            </Button>
+          </div>
+        </ObjModal>
+      )}
+
+      {showWeekModal && (
+        <ObjModal title="Save Schedule Template" onClose={() => setShowWeekModal(false)}>
+          <AtmText size="sm" color="muted" className="leading-relaxed">
+            Saves the current week layout as a reusable schedule preset.
+          </AtmText>
+
+          <MolFormField
+            label="Template Name"
+            variant="shiftConfig"
+            placeholder="e.g. Standard Week, Holiday Schedule…"
+            value={weekForm.name}
+            onChange={(e) => setWeekForm((f) => ({ ...f, name: e.target.value }))}
+          />
+
+          <div className="flex justify-end gap-3 mb-1 mt-1">
+            <Button variant="secondary" size="md" onClick={() => setShowWeekModal(false)}>Cancel</Button>
+            <Button
+              variant="primary" size="md"
+              onClick={handleSaveWeek}
+              disabled={!weekForm.name.trim()}
+            >
+              <Save size={14} />
+              Save Schedule
+            </Button>
+          </div>
+        </ObjModal>
+      )}
     </BaseLayout>
   );
 }

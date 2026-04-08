@@ -32,3 +32,5 @@ export const scheduleEmpty = {
   Saturday: [],
   Sunday: [],
 };
+
+export const DAY_LABELS = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];

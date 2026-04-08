@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { MolLabeledInput } from '../atomic/MolLabeledInput';
+import { MolFormField } from '../atomic/MolFormField';
 import { ObjAppLayout as BaseLayout } from '../atomic/ObjAppLayout';
 import { Button, LinkButton } from '../atomic/AtmButton/index.js';
 import { AtmText } from '../atomic/AtmText/index.js';
@@ -44,7 +44,7 @@ function LoginPage() {
         />
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <MolLabeledInput
+          <MolFormField
             label="Email"
             id="email"
             type="email"
@@ -55,7 +55,7 @@ function LoginPage() {
             variant='auth'
             disabled={isBusy}
           />
-          <MolLabeledInput
+          <MolFormField
             label="Password"
             id="password"
             type="password"
