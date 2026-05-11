@@ -16,6 +16,7 @@ const inputTv = tv({
       profile: 'bg-slate-900 border-slate-600 focus:border-blue-500 focus:outline-none focus:ring-0',
       auth: 'bg-slate-700 border-slate-500 focus:border-blue-500 focus:outline-none focus:ring-0',
       shiftConfig: 'bg-slate-700 border-slate-600 focus:border-blue-500 focus:outline-none focus:ring-0',
+      number: 'bg-slate-900 border-slate-600 focus:border-blue-500 focus:outline-none focus:ring-0',
     },
   },
   defaultVariants: { size: 'md', variant: 'default' },
