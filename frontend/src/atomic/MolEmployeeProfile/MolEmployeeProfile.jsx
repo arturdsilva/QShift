@@ -44,6 +44,7 @@ export function MolEmployeeProfile({ name, setName, workload, setWorkload, isAct
         <AtmInput
           type="text"
           value={workload}
+          placeholder="No specific workload"
           onChange={(e) => { setWorkload(e.target.value); }}
           variant='number'
           className="w-full"
