@@ -9,9 +9,12 @@ export function ObjSidebarSectionTemplate({ title, items, type, color, onDelete,
 
   return (
     <div className="mb-4">
-      <AccordionButton
+      <div
+        role="button"
+        tabIndex={0}
         onClick={() => setOpen(!open)}
-        className="mb-2 bg-transparent hover:bg-transparent p-0"
+        onKeyDown={(e) => e.key === 'Enter' && setOpen(!open)}
+        className="mb-2 bg-transparent hover:bg-transparent p-0 w-full flex items-center justify-between cursor-pointer"
       >
         <AtmText as="span" size="xs" weight="bold" color="faint" className="uppercase tracking-widest">
           {title}
@@ -31,7 +34,7 @@ export function ObjSidebarSectionTemplate({ title, items, type, color, onDelete,
             ? <ChevronDown size={14} className="text-slate-500" />
             : <ChevronRight size={14} className="text-slate-500" />}
         </div>
-      </AccordionButton>
+      </div>
 
       {open && (
         <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
