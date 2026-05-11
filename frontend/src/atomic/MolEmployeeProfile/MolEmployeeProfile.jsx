@@ -42,10 +42,8 @@ export function MolEmployeeProfile({ name, setName, workload, setWorkload, isAct
           Weekly Workload (hours)
         </AtmText>
         <AtmInput
-          type="number"
+          type="text"
           value={workload}
-          max={168}
-          min={0}
           onChange={(e) => { setWorkload(e.target.value); }}
           variant='number'
           className="w-full"

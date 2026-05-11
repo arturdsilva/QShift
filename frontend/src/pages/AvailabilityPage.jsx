@@ -15,7 +15,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
   const navigate = useNavigate();
   const hours = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
   const [name, setName] = useState(selectEditEmployee?.name || '');
-  const [workload, setWorkload] = useState(selectEditEmployee?.weekly_workload_hours || '');
+  const [workload, setWorkload] = useState(selectEditEmployee?.weekly_workload_hours ?? '');
   const [isActive, setIsActive] = useState(selectEditEmployee?.active ?? true);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [paintMode, setPaintMode] = useState(true);
@@ -117,16 +117,20 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
 
   const handleSave = async () => {
     if (!name.trim()) { setError('Employee name is required'); return; }
+
+    const workloadNum = workload === '' || workload === null || workload === undefined ? null : Number(workload);
+    if (workloadNum != null && !Number.isFinite(workloadNum)) { setError('Workload must be a valid number'); return; }
+    if (workloadNum != null && (workloadNum < 0 || workloadNum > 168)) { setError('Workload must be a number between 0 and 168'); return; }
     setError(null);
     setIsLoading(true);
     try {
       const availabilitySchemas = convertAvailabilityToSchemas();
       let employeeId = selectEditEmployee?.id;
       if (!employeeId) {
-        const newEmployee = await AvailabilityApi.addNewEmployee({ name, active: isActive, weekly_workload_hours: workload });
+        const newEmployee = await AvailabilityApi.addNewEmployee({ name, active: isActive, weekly_workload_hours: workloadNum });
         employeeId = newEmployee.id;
       } else {
-        await StaffApi.updateEmployeeData(employeeId, { name, active: isActive, weekly_workload_hours: workload });
+        await StaffApi.updateEmployeeData(employeeId, { name, active: isActive, weekly_workload_hours: workloadNum });
       }
       try {
         await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
