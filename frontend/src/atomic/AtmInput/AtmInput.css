@@ -1,0 +1,69 @@
+.atm-input {
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background-color: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 0.5rem;
+  color: white;
+  transition: border-color 0.15s;
+}
+
+.atm-input::placeholder {
+  color: rgba(148, 163, 184, 0.6);
+}
+
+/* Sizes */
+.atm-input--sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+}
+
+.atm-input--md {
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* Variants */
+.atm-input--profile {
+  background-color: #0f172a;
+  border-color: #475569;
+}
+
+.atm-input--profile:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: none;
+}
+
+.atm-input--auth {
+  background-color: #334155;
+  border-color: #64748b;
+}
+
+.atm-input--auth:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: none;
+}
+
+.atm-input--shiftConfig {
+  background-color: #334155;
+  border-color: #475569;
+}
+
+.atm-input--shiftConfig:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: none;
+}
+
+.atm-input--number {
+  background-color: #0f172a;
+  border-color: #475569;
+}
+
+.atm-input--number:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: none;
+}

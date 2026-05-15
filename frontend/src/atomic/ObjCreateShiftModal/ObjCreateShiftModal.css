@@ -1,0 +1,47 @@
+.obj-create-shift-modal__overlay {
+  @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4;
+}
+
+.obj-create-shift-modal {
+  @apply bg-[#131c2e] border border-slate-800 rounded-2xl overflow-hidden w-full max-w-2xl shadow-2xl flex;
+}
+
+.obj-create-shift-modal__left {
+  @apply flex-1 flex flex-col min-w-0;
+}
+
+.obj-create-shift-modal__header {
+  @apply flex items-center gap-3 px-6 py-4 border-b border-slate-800;
+}
+
+.obj-create-shift-modal__header-icon {
+  @apply w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center shrink-0;
+}
+
+.obj-create-shift-modal__header-title {
+  @apply flex-1 min-w-0;
+}
+
+.obj-create-shift-modal__form {
+  @apply flex-1 p-6 flex flex-col gap-5;
+}
+
+.obj-create-shift-modal__time-grid {
+  @apply grid grid-cols-2 gap-4;
+}
+
+.obj-create-shift-modal__color-section {
+  @apply flex gap-2.5;
+}
+
+.obj-create-shift-modal__footer {
+  @apply flex justify-end gap-3 px-6 py-4 border-t border-slate-800;
+}
+
+.obj-create-shift-modal__preview {
+  @apply w-56 p-4 bg-slate-900 border-l border-slate-800 shrink-0 flex flex-col gap-4;
+}
+
+.obj-create-shift-modal__preview-hint {
+  @apply border border-dashed border-slate-800 rounded-lg p-3;
+}

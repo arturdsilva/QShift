@@ -1,0 +1,27 @@
+.mol-add-employee-card {
+  @apply rounded-lg border-2 border-dashed border-slate-700 hover:border-indigo-500 transition-all duration-200 p-4 flex flex-col items-center justify-center gap-3 min-h-[160px];
+}
+
+.mol-add-employee-card__icon-wrapper {
+  @apply w-10 h-10 rounded-full border-2 border-dashed border-slate-600 flex items-center justify-center transition-colors;
+}
+
+.mol-add-employee-card:hover .mol-add-employee-card__icon-wrapper {
+  @apply border-indigo-400;
+}
+
+.mol-add-employee-card__icon {
+  @apply h-5 w-5 text-slate-500 transition-colors;
+}
+
+.mol-add-employee-card:hover .mol-add-employee-card__icon {
+  @apply text-indigo-400;
+}
+
+.mol-add-employee-card__text {
+  transition: color 0.15s;
+}
+
+.mol-add-employee-card:hover .mol-add-employee-card__text {
+  @apply text-indigo-400;
+}

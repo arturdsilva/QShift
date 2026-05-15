@@ -1,5 +1,6 @@
 import { CalendarDayButton } from '../AtmButton/index.js';
 import { TR, TD } from '../AtmTable/index.js';
+import './MolCalendarRow.css';
 
 /**
  * MolCalendarWeekRow – a single clickable week row in the calendar table
@@ -27,10 +28,10 @@ export function MolCalendarWeekRow({
   return (
     <TR
       calendarBody={true}
-      className={`${alreadyExists
-        ? 'opacity-50 cursor-not-allowed bg-slate-800'
-        : 'hover:bg-slate-900 cursor-pointer'
-        }`}
+      className={alreadyExists
+        ? 'mol-calendar-row--exists'
+        : 'mol-calendar-row--selectable'
+      }
       onClick={() => !isThisWeekSelected && !alreadyExists && onToggleWeek(week, weekIdx)}
     >
       {week.map((date, dayIdx) => {

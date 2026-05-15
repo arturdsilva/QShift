@@ -1,0 +1,7 @@
+.mol-schedule-header__time-slot {
+  @apply w-32;
+}
+
+.mol-schedule-header__day-name {
+  @apply text-center;
+}

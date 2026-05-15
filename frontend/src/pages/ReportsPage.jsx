@@ -6,6 +6,7 @@ import { MolPageHeader } from '../atomic/MolPageHeader';
 import { MolReportCard } from '../atomic/MolReportCard';
 import { ReportsApi } from '../services/api.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import './ReportsPage.css';
 
 function ReportsPage({
   weeksList,
@@ -62,7 +63,7 @@ function ReportsPage({
   return (
     <BaseLayout currentPage={3} >
       <MolPageHeader title="Reports and Analysis" icon={BarChart3} />
-      <div className="flex gap-4 flex-wrap">
+      <div className="reports-page__cards">
         {reportCards.map((card, idx) => (
           <MolReportCard key={idx} card={card} onClick={handleCard} />
         ))}

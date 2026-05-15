@@ -1,6 +1,7 @@
 import { MolCalendarThead } from '../MolCalendarThead';
 import { MolCalendarWeekRow } from '../MolCalendarRow';
 import { Table, TBody } from '../AtmTable/index.js';
+import './ObjCalendarTable.css';
 
 function getMonthCalendar(year, month) {
   const firstDay = new Date(year, month - 1, 1);
@@ -53,8 +54,8 @@ export function ObjCalendarTable({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 overflow-x-auto">
+    <div className="obj-calendar-table">
+      <div className="obj-calendar-table__wrapper">
         <Table>
           <MolCalendarThead />
           <TBody>

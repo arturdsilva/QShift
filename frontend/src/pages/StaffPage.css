@@ -1,0 +1,33 @@
+.staff-page__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.staff-page__grid {
+  @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4;
+}
+
+.staff-page__empty {
+  @apply text-slate-400 text-center py-12;
+}
+
+.staff-page__advance-row {
+  @apply flex justify-end;
+}
+
+.staff-page__delete-modal-body {
+  @apply space-y-5 p-4;
+}
+
+.staff-page__delete-modal-info {
+  @apply bg-slate-900 rounded-lg border border-slate-700 px-4 py-3;
+}
+
+.staff-page__delete-modal-actions {
+  @apply flex items-center justify-end gap-3;
+}
+
+.staff-page__delete-modal-warning {
+  margin-top: 0.25rem;
+}

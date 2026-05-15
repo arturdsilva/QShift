@@ -1,0 +1,54 @@
+.atm-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.atm-checkbox__input-wrapper {
+  position: relative;
+}
+
+.atm-checkbox__input {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.25rem;
+  border: 2px solid #475569;
+  background-color: #0f172a;
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.atm-checkbox__input:checked {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.atm-checkbox__input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #1e293b, 0 0 0 4px #6366f1;
+}
+
+.atm-checkbox__check-icon {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 1rem;
+  height: 1rem;
+  color: white;
+  pointer-events: none;
+}
+
+.atm-checkbox__label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.atm-checkbox__label--active {
+  color: #4ade80;
+}
+
+.atm-checkbox__label--inactive {
+  color: #64748b;
+}

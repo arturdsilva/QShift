@@ -17,6 +17,7 @@ import { months, daysOfWeek, scheduleEmpty } from '../constants/constantsOfTable
 import { Button } from '../atomic/AtmButton/index.js';
 import { AtmText } from '../atomic/AtmText/index.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import './ScheduleRecordsPage.css';
 
 function ScheduleRecordsPage({
   employees,
@@ -183,21 +184,21 @@ function ScheduleRecordsPage({
   return (
     <BaseLayout showSidebar={false} showSelectionPanel={true} selectionPanelData={null} currentPage={8}>
       <MolPageHeader title="Schedule Records" icon={CalendarRange}>
-        <div className="flex flex-col md:flex-row items-center gap-2 md:gap-4 md:ml-8 w-full md:w-auto">
-          <div className="flex items-center gap-2 justify-center w-full md:w-auto">
+        <div className="schedule-records__header-nav">
+          <div className="schedule-records__week-nav">
             <Button onClick={previousWeek} variant="periodNav" disabled={isPrevDisabled} title="Previous week">
-              <ChevronLeft className='text-slate-400' />
+              <ChevronLeft className='schedule-records__nav-icon' />
             </Button>
-            <div className={`flex items-center gap-2 ${weekRecords ? 'md:min-w-[250px] justify-center' : 'justify-center'}`}>
-              <AtmText size="lg" weight="medium" color="muted" className="text-center">
+            <div className={`schedule-records__week-label-wrapper ${weekRecords ? 'schedule-records__week-label-wrapper--has-records' : ''}`}>
+              <AtmText size="lg" weight="medium" color="muted" className="schedule-records__week-label">
                 {formatWeekPeriod(weekRecords)}
               </AtmText>
             </div>
             <Button onClick={nextWeek} variant="periodNav" disabled={isNextDisabled} title="Next week">
-              <ChevronRight className='text-slate-400' />
+              <ChevronRight className='schedule-records__nav-icon' />
             </Button>
           </div>
-          <AtmText size="sm" color="muted" className="md:ml-4">
+          <AtmText size="sm" color="muted" className="schedule-records__week-count">
             {weeksList && weeksList.length > 0 ? `Week ${currentIdxWeek + 1} of ${weeksList.length}` : ''}
           </AtmText>
         </div>
@@ -205,17 +206,17 @@ function ScheduleRecordsPage({
 
       <div>
         {!weeksList || weeksList.length <= 0 ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="text-center">
+          <div className="schedule-records__empty">
+            <div className="schedule-records__empty-text">
               <AtmText as="p" size="lg" color="muted">No weekly schedule created</AtmText>
             </div>
           </div>
         ) : (
           <>
             {editMode && (
-              <div className="flex mb-2 p-2 bg-yellow-900/20 border border-yellow-700 rounded-lg">
+              <div className="schedule-records__edit-warning">
                 <AlertTriangle size={24} className="text-yellow-400" />
-                <AtmText as="p" size="sm" color="yellow" className="px-2.5">
+                <AtmText as="p" size="sm" color="yellow" className="schedule-records__edit-warning-text">
                   Editing mode is active. Remember to save your changes.
                 </AtmText>
               </div>
@@ -231,35 +232,35 @@ function ScheduleRecordsPage({
         )}
 
         {!editMode ? (
-          <div className="flex flex-col-reverse sm:flex-row mt-4 gap-3 sm:gap-0">
-            <div className="flex-1 justify-center sm:justify-start flex w-full sm:w-auto">
-              <div className="w-full sm:w-auto px-0 sm:px-2 py-1.5">
+          <div className="schedule-records__actions">
+            <div className="schedule-records__actions-left">
+              <div className="schedule-records__action-item">
                 <Button onClick={handleBack} responsive variant='primary' size='lg'>Back</Button>
               </div>
             </div>
             {weeksList && weeksList.length > 0 && (
-              <div className="justify-end flex flex-col sm:flex-row flex-1 gap-2 w-full sm:w-auto">
-                <div className="w-full sm:w-auto px-0 sm:px-2 py-1.5">
+              <div className="schedule-records__actions-right">
+                <div className="schedule-records__action-item">
                   <Button onClick={handleExportCSV} responsive variant='success' size='lg'>
                     <FileSpreadsheet size={20} />
                     Export CSV
                   </Button>
                 </div>
-                <div className="w-full sm:w-auto px-0 sm:px-1 py-1.5">
+                <div className="schedule-records__action-item">
                   <Button onClick={handleEdit} responsive variant='primary' size='lg'>Edit</Button>
                 </div>
               </div>
             )}
           </div>
         ) : (
-          <div className="flex flex-col-reverse sm:flex-row mt-4 gap-3 sm:gap-0">
-            <div className="justify-center sm:justify-start flex flex-1 w-full sm:w-auto">
-              <div className="w-full sm:w-auto px-0 sm:px-5 py-1.5">
+          <div className="schedule-records__edit-actions">
+            <div className="schedule-records__edit-delete-wrapper">
+              <div className="schedule-records__edit-delete-item">
                 <Button onClick={handleDeleteSchedule} responsive variant='danger' size='lg'>Delete</Button>
               </div>
             </div>
-            <div className="justify-center sm:justify-end flex w-full sm:w-auto">
-              <div className="w-full sm:w-auto px-0 sm:px-2 py-1.5">
+            <div className="schedule-records__edit-save-wrapper">
+              <div className="schedule-records__edit-save-item">
                 <Button onClick={handleSave} responsive variant='primary' size='lg'>Save</Button>
               </div>
             </div>

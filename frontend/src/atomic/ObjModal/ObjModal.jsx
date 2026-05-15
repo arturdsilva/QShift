@@ -2,13 +2,14 @@ import { Button } from "../AtmButton/index.js";
 import { X } from "lucide-react";
 import { AtmDivider } from "../AtmDivider/Divider.jsx";
 import { AtmText } from "../AtmText/Text.jsx";
+import './ObjModal.css';
 
 export function ObjModal({ title, children, onClose }) {
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-slate-800 rounded-lg border border-slate-700 max-w-md w-full shadow-xl">
-                <div className="flex items-center justify-between p-6">
-                    <div className="flex items-center gap-3">
+        <div className="obj-modal-overlay">
+            <div className="obj-modal">
+                <div className="obj-modal__header">
+                    <div className="obj-modal__title-group">
                         <AtmText as="h3" size="lg" weight="semibold" color="white">
                             {title}
                         </AtmText>
@@ -18,7 +19,7 @@ export function ObjModal({ title, children, onClose }) {
                     </Button>
                 </div>
                 <AtmDivider />
-                <div className="p-3 flex flex-col gap-3">{children}</div>
+                <div className="obj-modal__body">{children}</div>
             </div>
         </div>
     );

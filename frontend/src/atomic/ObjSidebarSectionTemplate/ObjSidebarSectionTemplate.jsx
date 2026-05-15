@@ -3,29 +3,30 @@ import { Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { AtmText } from '../AtmText';
 import { AccordionButton, Button } from '../AtmButton';
 import { TemplateItem } from '../MolScheduleTemplateItem';
+import './ObjSidebarSectionTemplate.css';
 
 export function ObjSidebarSectionTemplate({ title, items, type, color, onDelete, onAdd, emptyText }) {
   const [open, setOpen] = useState(true);
 
   return (
-    <div className="mb-4">
+    <div className="obj-sidebar-section">
       <div
         role="button"
         tabIndex={0}
         onClick={() => setOpen(!open)}
         onKeyDown={(e) => e.key === 'Enter' && setOpen(!open)}
-        className="mb-2 bg-transparent hover:bg-transparent p-0 w-full flex items-center justify-between cursor-pointer"
+        className="obj-sidebar-section__header"
       >
         <AtmText as="span" size="xs" weight="bold" color="faint" className="uppercase tracking-widest">
           {title}
         </AtmText>
-        <div className="flex items-center gap-1">
+        <div className="obj-sidebar-section__header-actions">
           {onAdd && (
             <Button
               variant="ghost"
               size="sm"
               onClick={(e) => { e.stopPropagation(); onAdd(); }}
-              className="w-5 h-5 p-0 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center"
+              className="obj-sidebar-section__add-btn"
             >
               <Plus size={12} className="text-white" />
             </Button>
@@ -37,7 +38,7 @@ export function ObjSidebarSectionTemplate({ title, items, type, color, onDelete,
       </div>
 
       {open && (
-        <div className="space-y-1.5 max-h-[200px] overflow-y-auto pr-1 scrollbar-thin">
+        <div className="obj-sidebar-section__list">
           {items.length > 0 ? (
             items.map((item) => {
               const meta =
@@ -62,7 +63,7 @@ export function ObjSidebarSectionTemplate({ title, items, type, color, onDelete,
               );
             })
           ) : (
-            <div className="py-3 text-center">
+            <div className="obj-sidebar-section__empty">
               <AtmText size="xs" color="faint">{emptyText || 'No templates yet'}</AtmText>
             </div>
           )}

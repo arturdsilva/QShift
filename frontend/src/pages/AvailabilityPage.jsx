@@ -10,6 +10,7 @@ import { Button } from '../atomic/AtmButton/index.js';
 import { AvailabilityApi, StaffApi } from '../services/api.js';
 import { daysOfWeek } from '../constants/constantsOfTable.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import './AvailabilityPage.css';
 
 function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading, setIsLoading }) {
   const navigate = useNavigate();
@@ -158,7 +159,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
     <BaseLayout showSidebar={false} currentPage={5}>
       <MolPageHeader title="Employee availability" icon={Calendar} />
 
-      <div className="space-y-6" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+      <div className="availability-page__content" onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
         <MolEmployeeProfile
           name={name}
           setName={setName}
@@ -169,7 +170,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
           error={error}
         />
 
-        <div className="bg-slate-800 rounded-lg border border-slate-700 p-6">
+        <div className="availability-page__grid-wrapper">
           <MolAvailabilityThead />
           <MolAvailabilityTable
             hours={hours}
@@ -179,13 +180,12 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
           />
         </div>
 
-        <div className="flex justify-end gap-3">
+        <div className="availability-page__actions">
           <Button onClick={handleCancel} variant='secondary' size='lg'>
-            <X size={24} className="text-white" />
             Cancel
           </Button>
-          <Button onClick={handleSave} disabled={!name.trim()} variant='primary' className="disabled:bg-slate-700 disabled:cursor-not-allowed" size='lg'>
-            <Save size={24} className="text-white" />
+          <Button onClick={handleSave} disabled={!name.trim()} variant='primary' className="availability-page__save-btn" size='lg'>
+            <Save size={24} />
             Save
           </Button>
         </div>

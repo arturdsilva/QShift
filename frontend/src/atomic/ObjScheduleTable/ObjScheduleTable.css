@@ -1,0 +1,7 @@
+.obj-schedule-table__wrapper {
+  @apply bg-slate-800 rounded-lg overflow-hidden border border-slate-700 shadow-xl;
+}
+
+.obj-schedule-table__scroll {
+  @apply overflow-x-auto;
+}

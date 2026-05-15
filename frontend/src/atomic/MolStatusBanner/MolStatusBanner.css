@@ -1,0 +1,39 @@
+.mol-status-banner {
+  @apply flex items-start gap-3 rounded-lg px-4 py-3 mb-4 border transition-all duration-300;
+}
+
+.mol-status-banner--info {
+  @apply bg-blue-950/40 border-blue-600/50;
+}
+
+.mol-status-banner--warning {
+  @apply bg-amber-950/40 border-amber-600/50;
+}
+
+.mol-status-banner--error {
+  @apply bg-red-950/40 border-red-600/50;
+}
+
+.mol-status-banner__icon {
+  @apply mt-0.5 shrink-0;
+}
+
+.mol-status-banner__icon--info {
+  @apply w-5 h-5 text-blue-400 animate-spin;
+}
+
+.mol-status-banner__icon--warning {
+  @apply w-5 h-5 text-amber-400;
+}
+
+.mol-status-banner__icon--error {
+  @apply w-5 h-5 text-red-400;
+}
+
+.mol-status-banner__content {
+  @apply flex flex-col gap-0.5 flex-1 min-w-0;
+}
+
+.mol-status-banner__actions {
+  @apply flex gap-2 mt-2;
+}

@@ -1,0 +1,11 @@
+.mol-schedule-cell {
+  @apply min-h-[80px] flex flex-col gap-1;
+}
+
+.mol-schedule-employee-chip {
+  @apply px-2 py-1 bg-blue-600/50 rounded text-center leading-none;
+}
+
+.mol-schedule-empty {
+  @apply text-center py-6;
+}

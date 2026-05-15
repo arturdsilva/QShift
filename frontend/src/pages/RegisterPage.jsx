@@ -7,6 +7,7 @@ import { RegisterApi } from '../services/api.js';
 import { useRegister } from '../hooks/useRegister.js';
 import { ObjRetryStatusBanner } from '../atomic/ObjRetryStatusBanner';
 import { STATUS } from '../hooks/useRetryOnSleep';
+import './RegisterPage.css';
 
 function RegisterPage() {
   const navigate = useNavigate();
@@ -40,9 +41,9 @@ function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <div className="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-slate-600">
-        <AtmText as="h3" size="2xl" weight="semibold" color="dimmer" className="mb-6 text-center block">Register</AtmText>
+    <div className="register-page">
+      <div className="register-page__card">
+        <AtmText as="h3" size="2xl" weight="semibold" color="dimmer" className="register-page__title">Register</AtmText>
         <ObjRetryStatusBanner
           status={status}
           getMessage={getMessage}
@@ -51,9 +52,9 @@ function RegisterPage() {
           errorInfo={errorInfo}
           className="mb-4"
         />
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="register-page__form">
           {error && (
-            <div className="p-3 bg-red-900/50 border border-red-700 rounded-lg">
+            <div className="register-page__error">
               <AtmText size="sm" color="red">{error}</AtmText>
             </div>
           )}
@@ -87,7 +88,7 @@ function RegisterPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mb-2"
+            className="register-page__last-field"
             variant='auth'
             disabled={isBusy}
           />
@@ -95,7 +96,7 @@ function RegisterPage() {
             Register
           </Button>
         </form>
-        <div className="mt-5 text-center">
+        <div className="register-page__footer">
           <AtmText as="p" size="sm" color="muted">
             Already have an account?{' '}
             <LinkButton onClick={() => navigate('/login')} disabled={isBusy}>

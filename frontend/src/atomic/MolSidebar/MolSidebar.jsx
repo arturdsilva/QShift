@@ -2,6 +2,7 @@ import { X, LogOut, CalendarRange, BarChart3 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button, SelectableButton } from '../AtmButton/index.js';
 import { AtmText } from '../AtmText/index.js';
+import './MolSidebar.css';
 
 const navItems = [
   { icon: CalendarRange, label: 'Create Schedule', path: '/staff', indexPage: 1 },
@@ -20,14 +21,14 @@ export function MolSidebar({ currentPage, onClose }) {
   };
 
   return (
-    <div className="w-48 bg-slate-800 border-r border-slate-700 flex flex-col p-4 h-full">
-      <div className="flex justify-between items-center mb-6 lg:hidden">
+    <div className="mol-sidebar">
+      <div className="mol-sidebar__header lg:hidden">
         <AtmText as="h2" size="xl" weight="bold">Menu</AtmText>
         <Button onClick={onClose} variant='ghost'>
           <X size={24} />
         </Button>
       </div>
-      <div className="flex-1">
+      <div className="mol-sidebar__nav">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPage === item.indexPage;
@@ -40,7 +41,7 @@ export function MolSidebar({ currentPage, onClose }) {
                 navigate(item.path);
                 onClose && onClose();
               }}
-              className='mb-2'
+              className='mol-sidebar__nav-item'
               fullWidth={true}
             >
               <Icon size={20} />

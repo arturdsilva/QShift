@@ -1,8 +1,9 @@
 import { SelectableButton } from '../AtmButton/index.js';
+import './MolMetricSelector.css';
 
 export function MolMetricSelector({ metrics, selectedMetric, onSelect, colors }) {
     return (
-        <div className="flex gap-1.5 flex-wrap">
+        <div className="mol-metric-selector">
             {metrics.map((metric) => (
                 <SelectableButton
                     key={metric.key}

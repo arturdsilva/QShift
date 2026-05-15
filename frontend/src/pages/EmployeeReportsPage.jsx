@@ -18,6 +18,7 @@ import { months } from '../constants/constantsOfTable.js';
 import { Button } from '../atomic/AtmButton/index.js';
 import { AtmText } from '../atomic/AtmText/index.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import './EmployeeReportsPage.css';
 
 function EmployeeReportsPage({
   isLoading,
@@ -101,8 +102,8 @@ function EmployeeReportsPage({
   return (
     <BaseLayout showSidebar={false} currentPage={10}>
       <MolPageHeader title="Employees Reports" icon={BarChart3} />
-      <div className="flex flex-col lg:flex-row gap-4">
-        <div className="w-full lg:w-80 shrink-0">
+      <div className="employee-reports__layout">
+        <div className="employee-reports__sidebar">
           <ObjEmployeeSelector
             employeesList={employeesList}
             currentEmployee={currentEmployee}
@@ -112,7 +113,7 @@ function EmployeeReportsPage({
           />
         </div>
 
-        <div className="flex-1 overflow-hidden">
+        <div className="employee-reports__content">
           <ObjStatsCards statsCards={statsCards} currentMonth={currentMonth} currentYear={currentYear} />
 
           <ObjChartHeader
@@ -126,14 +127,14 @@ function EmployeeReportsPage({
             onNextYear={handleNextYear}
           />
 
-          <div className="mt-1.5 bg-slate-800 rounded-lg border border-slate-700">
-            <AtmText as="h3" size="lg" weight="bold" color="white" className="px-6 py-2 border-b border-slate-700">
+          <div className="employee-reports__chart-wrapper">
+            <AtmText as="h3" size="lg" weight="bold" color="white" className="employee-reports__chart-title">
               {METRIC_TITLES[selectedMetric]} - {currentYear}
             </AtmText>
-            <div style={{ height: '400px', padding: '24px' }}>
+            <div className="employee-reports__chart-container">
               {(() => {
                 if (!employeeYearStats) {
-                  return <AtmText as="p" size="xl" color="muted" className="h-full flex items-center justify-center">No data available</AtmText>;
+                  return <AtmText as="p" size="xl" color="muted" className="employee-reports__no-data">No data available</AtmText>;
                 }
                 const data = {
                   labels: months,
@@ -170,9 +171,9 @@ function EmployeeReportsPage({
         </div>
       </div>
 
-      <div className="flex-1 justify-start flex mt-4">
-        <Button onClick={handleBack} variant='primary' className="w-full lg:w-auto" size='lg'>
-          <ArrowLeft size={24} className="text-white" />
+      <div className="employee-reports__back-row">
+        <Button onClick={handleBack} variant='primary' className="employee-reports__back-btn" size='lg'>
+          <ArrowLeft size={24} />
           <AtmText as="p" size="md" weight="bold" color="white">Back</AtmText>
         </Button>
       </div>

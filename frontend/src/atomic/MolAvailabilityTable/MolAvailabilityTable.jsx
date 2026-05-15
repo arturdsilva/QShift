@@ -1,24 +1,25 @@
 import { daysOfWeek } from '../../constants/constantsOfTable.js';
 import { AtmText } from '../AtmText/index.js';
+import './MolAvailabilityTable.css';
 
 /**
  * MolAvailabilityTable – drag-to-paint availability grid
  */
 export function MolAvailabilityTable({ hours, availability, onMouseDown, onMouseEnter }) {
   return (
-    <div className="overflow-x-auto">
-      <div className="inline-block min-w-full border border-slate-700 rounded-lg overflow-hidden">
+    <div className="mol-availability-table">
+      <div className="mol-availability-table__wrapper">
         <div
-          className="grid"
+          className="mol-availability-grid"
           style={{ gridTemplateColumns: `100px repeat(${hours.length}, minmax(40px, 1fr))` }}
         >
           {/* Header: corner */}
-          <div className="sticky left-0 top-0 bg-slate-900/40 z-20 border border-slate-700" />
+          <div className="mol-availability-corner" />
           {/* Header: hours */}
           {hours.map((hour) => (
             <div
               key={hour}
-              className="text-center py-3 border border-slate-700 select-none bg-slate-900/40"
+              className="mol-availability-header-cell"
             >
               <AtmText size="xs" weight="medium" color="muted">{hour.split(':')[0]}h</AtmText>
             </div>
@@ -27,7 +28,7 @@ export function MolAvailabilityTable({ hours, availability, onMouseDown, onMouse
           {/* Rows: days */}
           {daysOfWeek.map((day) => (
             <div key={`label-${day}`} className="contents">
-              <div className="sticky left-0 bg-slate-900/40 z-10 py-2 px-3 flex items-center border border-slate-700/50">
+              <div className="mol-availability-day-label">
                 <AtmText size="sm" weight="medium" color="dimmer">{day}</AtmText>
               </div>
               {hours.map((hour) => (
@@ -35,7 +36,7 @@ export function MolAvailabilityTable({ hours, availability, onMouseDown, onMouse
                   key={`${day}-${hour}`}
                   onMouseDown={() => onMouseDown(day, hour)}
                   onMouseEnter={() => onMouseEnter(day, hour)}
-                  className={`h-10 border border-slate-700/30 cursor-pointer transition-colors select-none ${availability[day][hour] ? 'bg-green-500 hover:bg-green-600' : 'bg-slate-900/40 hover:bg-slate-700/50'
+                  className={`mol-availability-cell ${availability[day][hour] ? 'mol-availability-cell--active' : 'mol-availability-cell--inactive'
                     }`}
                 />
               ))}

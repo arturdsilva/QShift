@@ -1,4 +1,5 @@
 import { AtmText } from '../AtmText/index.js';
+import './MolDaysSelection.css';
 
 /**
  * MolDaysSelection – displays selected days as chips
@@ -7,17 +8,17 @@ export function MolDaysSelection({ selectedDays }) {
   const hasSelection = selectedDays && selectedDays.length > 0;
 
   return (
-    <div className="space-y-3">
+    <div className="mol-days-selection">
       <AtmText as="h3" size="xs" weight="semibold" color="muted" className="uppercase tracking-wider flex items-center gap-2">
         Selected Days
       </AtmText>
-      <div className="bg-slate-800 rounded-xl border border-slate-700 p-4 min-h-[100px]">
+      <div className="mol-days-selection__container">
         {hasSelection ? (
-          <div className="flex flex-wrap gap-2">
+          <div className="mol-days-selection__chips">
             {selectedDays.map((d) => (
               <div
                 key={d.toISOString()}
-                className="w-8 h-8 flex items-center justify-center bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg text-sm font-medium"
+                className="mol-days-selection__chip"
                 title={d.toDateString()}
               >
                 {d.getDate()}
@@ -25,7 +26,7 @@ export function MolDaysSelection({ selectedDays }) {
             ))}
           </div>
         ) : (
-          <AtmText size="sm" color="faint" className="h-full flex items-center justify-center italic">
+          <AtmText size="sm" color="faint" className="mol-days-selection__empty">
             No days selected
           </AtmText>
         )}

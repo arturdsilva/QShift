@@ -5,6 +5,7 @@ import { MolWeekSelection } from '../MolWeekSelection';
 import { MolDaysSelection } from '../MolDaysSelection';
 import { Button } from '../AtmButton/index.js';
 import { AtmText } from '../AtmText/index.js';
+import './ObjAppLayout.css';
 
 /**
  * ObjAppLayout – main app shell with optional sidebar and selection panel.
@@ -27,14 +28,14 @@ export function ObjAppLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen bg-slate-900 overflow-hidden">
+    <div className="obj-app-layout">
       {/* Mobile top bar */}
       {showSidebar && (
-        <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-slate-800 border-b border-slate-700 flex items-center px-4 z-40">
+        <div className="obj-app-layout__topbar">
           <Button onClick={() => setIsSidebarOpen(true)} variant='ghost'>
             <Menu size={24} />
           </Button>
-          <AtmText size="lg" weight="bold" className="ml-4">QShift</AtmText>
+          <AtmText size="lg" weight="bold" className="obj-app-layout__brand">QShift</AtmText>
         </div>
       )}
 
@@ -43,13 +44,12 @@ export function ObjAppLayout({
         <>
           {isSidebarOpen && (
             <div
-              className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+              className="obj-app-layout__sidebar-overlay"
               onClick={() => setIsSidebarOpen(false)}
             />
           )}
           <div
-            className={`fixed inset-y-0 left-0 z-50 w-48 transform transition-transform duration-300 ease-in-out lg:static lg:translate-x-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-              }`}
+            className={`obj-app-layout__sidebar ${isSidebarOpen ? 'obj-app-layout__sidebar--open' : ''}`}
           >
             <MolSidebar currentPage={currentPage} onClose={() => setIsSidebarOpen(false)} />
           </div>
@@ -58,14 +58,14 @@ export function ObjAppLayout({
 
       {/* Main content */}
       <div
-        className={`flex-1 flex flex-col lg:flex-row lg:pt-0 overflow-auto lg:overflow-hidden ${showSidebar ? 'pt-16' : ''
+        className={`obj-app-layout__content-wrapper ${showSidebar ? 'obj-app-layout__content-wrapper--with-sidebar' : ''
           }`}
       >
-        <div className="flex-1 p-4 w-full lg:overflow-auto">{children}</div>
+        <div className="obj-app-layout__content">{children}</div>
 
         {showSelectionPanel && selectionPanelData && (
-          <div className="border-t border-slate-700 bg-slate-900/50 lg:h-full lg:overflow-y-auto shrink-0">
-            <div className="p-4 w-64 space-y-3 mt-5">
+          <div className="obj-app-layout__selection-panel">
+            <div className="obj-app-layout__selection-panel-inner">
               <MolWeekSelection
                 startDate={selectionPanelData.startDate}
                 selectedDays={selectionPanelData.selectedDays}

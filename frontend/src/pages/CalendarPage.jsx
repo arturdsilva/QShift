@@ -9,6 +9,7 @@ import { AtmText } from '../atomic/AtmText/index.js';
 import { CalendarApi } from '../services/api.js';
 import { months } from '../constants/constantsOfTable.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import './CalendarPage.css';
 
 function CalendarPage({
   currentMonth,
@@ -106,15 +107,15 @@ function CalendarPage({
   return (
     <BaseLayout showSidebar={true} showSelectionPanel={true} selectionPanelData={{ startDate, selectedDays }} currentPage={2}>
       <MolPageHeader title="Calendar" icon={Calendar}>
-        <div className="flex items-center gap-4">
+        <div className="calendar-page__nav">
           <Button onClick={handlePrevMonth} variant="periodNav" title="Previous month">
-            <ChevronLeft size={24} className="text-white" />
+            <ChevronLeft size={24} />
           </Button>
-          <AtmText as="span" size="xl" weight="medium" color="white" className="min-w-[200px] text-center">
+          <AtmText as="span" size="xl" weight="medium" color="white" className="calendar-page__month-label">
             {months[currentMonth - 1]} {currentYear}
           </AtmText>
           <Button onClick={handleNextMonth} variant="periodNav" title="Next month">
-            <ChevronRight size={24} className="text-white" />
+            <ChevronRight size={24} />
           </Button>
         </div>
       </MolPageHeader>
@@ -129,14 +130,14 @@ function CalendarPage({
         generatedWeeks={generatedWeeks}
       />
 
-      <div className="flex gap-4 mt-4">
+      <div className="calendar-page__actions">
         <Button onClick={handleBack} responsive variant='primary' size='lg'>
-          <ArrowLeft size={24} className="text-white" />
+          <ArrowLeft size={24} />
           Back
         </Button>
-        <Button onClick={handleAdvance} responsive className="sm:ml-auto" variant='primary' size='lg'>
+        <Button onClick={handleAdvance} responsive className="calendar-page__next-btn" variant='primary' size='lg'>
           Next
-          <ArrowRight size={24} className="text-white" />
+          <ArrowRight size={24} />
         </Button>
       </div>
     </BaseLayout>

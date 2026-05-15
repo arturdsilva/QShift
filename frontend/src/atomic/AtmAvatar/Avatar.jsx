@@ -1,28 +1,4 @@
-import { tv } from 'tailwind-variants';
-
-const avatarTv = tv({
-    base: 'relative flex items-center justify-center rounded-full bg-slate-600 text-white font-semibold shrink-0',
-    variants: {
-        size: {
-            sm: 'w-6 h-6 text-xs',
-            md: 'w-12 h-12 text-base',
-            lg: 'w-16 h-16 text-xl',
-        },
-    },
-    defaultVariants: { size: 'md' },
-});
-
-const statusDotTv = tv({
-    base: 'absolute bottom-0 right-0 rounded-full border-2 border-slate-800',
-    variants: {
-        size: { sm: 'w-2 h-2', md: 'w-3 h-3', lg: 'w-4 h-4' },
-        active: {
-            true: 'bg-green-400',
-            false: 'bg-slate-500',
-        },
-    },
-    defaultVariants: { size: 'md', active: false },
-});
+import './AtmAvatar.css';
 
 function getInitials(name = '') {
     return name
@@ -34,11 +10,17 @@ function getInitials(name = '') {
         .join('');
 }
 
-export function AtmAvatar({ name, active, size, className = '' }) {
+export function AtmAvatar({ name, active, size = 'md', className = '' }) {
     return (
-        <div className={avatarTv({ size, class: className })}>
+        <div className={`atm-avatar atm-avatar--${size} ${className}`}>
             {getInitials(name)}
-            <span className={statusDotTv({ size, active })} />
+            <span
+                className={[
+                    'atm-avatar__status-dot',
+                    `atm-avatar__status-dot--${size}`,
+                    active ? 'atm-avatar__status-dot--active' : 'atm-avatar__status-dot--inactive',
+                ].join(' ')}
+            />
         </div>
     );
 }

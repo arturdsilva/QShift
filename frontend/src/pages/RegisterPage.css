@@ -1,0 +1,31 @@
+.register-page {
+  @apply min-h-screen flex items-center justify-center bg-slate-900;
+}
+
+.register-page__card {
+  @apply bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-slate-600;
+}
+
+.register-page__error {
+  @apply p-3 bg-red-900/50 border border-red-700 rounded-lg;
+}
+
+.register-page__footer {
+  @apply mt-5 text-center;
+}
+
+.register-page__title {
+  display: block;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.register-page__form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.register-page__last-field {
+  margin-bottom: 0.5rem;
+}

@@ -1,0 +1,63 @@
+.obj-app-layout {
+  @apply flex h-screen bg-slate-900 overflow-hidden;
+}
+
+.obj-app-layout__topbar {
+  @apply fixed top-0 left-0 right-0 h-16 bg-slate-800 border-b border-slate-700 flex items-center px-4 z-40;
+}
+
+@media (min-width: 1024px) {
+  .obj-app-layout__topbar {
+    display: none;
+  }
+}
+
+.obj-app-layout__brand {
+  margin-left: 1rem;
+}
+
+.obj-app-layout__sidebar-overlay {
+  @apply fixed inset-0 bg-black/50 z-40;
+}
+
+@media (min-width: 1024px) {
+  .obj-app-layout__sidebar-overlay {
+    display: none;
+  }
+}
+
+.obj-app-layout__sidebar {
+  @apply fixed inset-y-0 left-0 z-50 w-48 transform transition-transform duration-300 ease-in-out;
+  transform: translateX(-100%);
+}
+
+.obj-app-layout__sidebar--open {
+  transform: translateX(0);
+}
+
+@media (min-width: 1024px) {
+  .obj-app-layout__sidebar {
+    position: static;
+    transform: translateX(0);
+  }
+}
+
+.obj-app-layout__content-wrapper {
+  @apply flex-1 flex flex-col lg:flex-row lg:pt-0 overflow-auto lg:overflow-hidden;
+}
+
+.obj-app-layout__content-wrapper--with-sidebar {
+  @apply pt-16;
+}
+
+.obj-app-layout__content {
+  @apply flex-1 p-4 w-full lg:overflow-auto;
+}
+
+.obj-app-layout__selection-panel {
+  @apply border-t border-slate-700 bg-slate-900/50 lg:h-full lg:overflow-y-auto shrink-0;
+}
+
+.obj-app-layout__selection-panel-inner {
+  @apply p-4 w-64 space-y-3 mt-5;
+}

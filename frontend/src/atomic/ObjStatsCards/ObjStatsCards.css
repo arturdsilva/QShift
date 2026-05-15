@@ -1,0 +1,7 @@
+.obj-stats-cards {
+  @apply flex gap-2 flex-wrap mb-4 justify-center lg:justify-start;
+}
+
+.obj-stats-card {
+  @apply bg-slate-800 rounded-lg p-3 w-40 border border-slate-700 transition-colors;
+}

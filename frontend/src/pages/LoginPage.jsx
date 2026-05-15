@@ -7,6 +7,7 @@ import { AtmText } from '../atomic/AtmText/index.js';
 import { ObjRetryStatusBanner } from '../atomic/ObjRetryStatusBanner';
 import { useLogin } from '../hooks/useLogin';
 import { STATUS } from '../hooks/useRetryOnSleep';
+import './LoginPage.css';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
@@ -30,9 +31,9 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900">
-      <div className="bg-slate-800 p-8 rounded-xl shadow-2xl w-full max-w-md border border-slate-600">
-        <AtmText as="h3" size="2xl" weight="semibold" color="dimmer" className="mb-6 text-center block">Login</AtmText>
+    <div className="login-page">
+      <div className="login-page__card">
+        <AtmText as="h3" size="2xl" weight="semibold" color="dimmer" className="login-page__title">Login</AtmText>
 
         <ObjRetryStatusBanner
           status={status}
@@ -43,7 +44,7 @@ function LoginPage() {
           onRetry={handleRetry}
         />
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="login-page__form">
           <MolFormField
             label="Email"
             id="email"
@@ -63,7 +64,7 @@ function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="mb-2"
+            className="login-page__last-field"
             variant='auth'
             disabled={isBusy}
           />
@@ -71,7 +72,7 @@ function LoginPage() {
             {isBusy ? 'Connecting…' : 'Enter'}
           </Button>
         </form>
-        <div className="mt-5 text-center">
+        <div className="login-page__footer">
           <AtmText as="p" size="sm" color="muted">
             Don't have an account?{' '}
             <LinkButton onClick={() => navigate('/register')} disabled={isBusy}>

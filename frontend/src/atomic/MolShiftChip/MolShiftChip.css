@@ -1,0 +1,15 @@
+.mol-shift-chip {
+  @apply flex flex-col items-start justify-center rounded-[7px] mb-1 border border-[#1e2d47] px-[20px] py-[7px];
+}
+
+.mol-shift-chip--small {
+  @apply px-[8px] py-[5px];
+}
+
+.mol-shift-chip__staff {
+  @apply flex items-center justify-center gap-1;
+}
+
+.mol-shift-chip__staff-icon {
+  @apply text-slate-400;
+}

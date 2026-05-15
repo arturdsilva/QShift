@@ -1,0 +1,227 @@
+/* ═══════════════════════════════════════════════════════
+   AtmButton – all button variants
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Base Button ─── */
+.atm-btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s, color 0.15s;
+  cursor: pointer;
+  border: none;
+}
+
+.atm-btn--full-width { width: 100%; }
+
+.atm-btn--disabled { opacity: 0.5; }
+
+/* Sizes */
+.atm-btn--col { padding: 0 1rem; }
+.atm-btn--sm  { padding: 0.5rem; }
+.atm-btn--md  { padding: 0.75rem 1rem; font-weight: 500; }
+.atm-btn--lg  { padding: 0.75rem 1.5rem; font-weight: 500; }
+
+/* Variants */
+.atm-btn--primary   { background-color: #2563eb; color: white; }
+.atm-btn--primary:hover { background-color: #1d4ed8; }
+
+.atm-btn--secondary { background-color: #334155; color: white; }
+.atm-btn--secondary:hover { background-color: #475569; }
+
+.atm-btn--outline {
+  background: transparent;
+  border: 1px solid #64748b;
+  color: #cbd5e1;
+}
+.atm-btn--outline:hover { background-color: #1e293b; }
+
+.atm-btn--ghost {
+  background: transparent;
+  color: #94a3b8;
+}
+.atm-btn--ghost:hover { color: white; }
+
+.atm-btn--ghostRed {
+  background: transparent;
+  color: #f87171;
+}
+.atm-btn--ghostRed:hover { color: #ef4444; }
+
+.atm-btn--danger { background-color: #dc2626; color: white; }
+.atm-btn--danger:hover { background-color: #b91c1c; }
+
+.atm-btn--columnDelete {
+  background-color: #1e293b;
+  color: #94a3b8;
+}
+.atm-btn--columnDelete:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+.atm-btn--success { background-color: #16a34a; color: white; }
+.atm-btn--success:hover { background-color: #15803d; }
+
+.atm-btn--periodNav {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+}
+.atm-btn--periodNav:hover { background-color: #334155; }
+.atm-btn--periodNav.atm-btn--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.atm-btn--periodNav.atm-btn--disabled:hover {
+  background: transparent;
+}
+
+.atm-btn--logout {
+  background: transparent;
+  color: #cbd5e1;
+  gap: 0.75rem;
+}
+.atm-btn--logout:hover {
+  background-color: #dc2626;
+  color: white;
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .atm-btn--responsive { width: auto; }
+}
+.atm-btn--responsive { width: 100%; }
+
+
+/* ═══════════════════════════════════════════════════════
+   CalendarDayButton
+   ═══════════════════════════════════════════════════════ */
+.atm-calendar-day-btn {
+  width: 4rem;
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  border-radius: 0.5rem;
+  transition: background-color 0.15s, color 0.15s;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.atm-calendar-day-btn--selected {
+  background-color: #2563eb;
+  color: white;
+  font-weight: 600;
+}
+
+.atm-calendar-day-btn--current-month {
+  color: #e2e8f0;
+}
+
+.atm-calendar-day-btn--current-month:not(.atm-calendar-day-btn--selected):not(.atm-calendar-day-btn--disabled):hover {
+  background-color: #334155;
+}
+
+.atm-calendar-day-btn--other-month {
+  color: #64748b;
+}
+
+.atm-calendar-day-btn--disabled {
+  color: #94a3b8;
+  cursor: not-allowed;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   SelectableButton
+   ═══════════════════════════════════════════════════════ */
+.atm-selectable-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  transition: all 0.15s;
+  border: none;
+  cursor: pointer;
+  background: transparent;
+}
+
+.atm-selectable-btn--full-width { width: 100%; }
+
+/* Sizes */
+.atm-selectable-btn--sm { padding: 0.25rem 0.5rem; }
+.atm-selectable-btn--md { padding: 0.5rem 1rem; }
+.atm-selectable-btn--lg { padding: 1rem 1.5rem; }
+
+/* Default variant */
+.atm-selectable-btn--default {
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+.atm-selectable-btn--default.atm-selectable-btn--selected {
+  background-color: #2563eb;
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.atm-selectable-btn--default:not(.atm-selectable-btn--selected) {
+  color: #cbd5e1;
+}
+
+.atm-selectable-btn--default:not(.atm-selectable-btn--selected):hover {
+  background-color: rgba(51, 65, 85, 0.5);
+}
+
+/* ColorDot variant */
+.atm-selectable-btn--colorDot {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9999px;
+  transition: transform 0.15s;
+  padding: 0;
+}
+
+.atm-selectable-btn--colorDot:hover {
+  transform: scale(1.1);
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   LinkButton
+   ═══════════════════════════════════════════════════════ */
+.atm-link-btn {
+  color: #60a5fa;
+  font-weight: 500;
+  transition: color 0.15s;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+.atm-link-btn:hover {
+  color: #93c5fd;
+  text-decoration: underline;
+}
+
+
+/* ═══════════════════════════════════════════════════════
+   AccordionButton
+   ═══════════════════════════════════════════════════════ */
+.atm-accordion-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+  background-color: #1e293b;
+  transition: background-color 0.15s;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+}
+
+.atm-accordion-btn:hover {
+  background-color: #334155;
+}

@@ -1,0 +1,31 @@
+/* ─── Size variants ─── */
+.atm-text--xs   { font-size: 0.75rem;  line-height: 1rem; }
+.atm-text--sm   { font-size: 0.875rem; line-height: 1.25rem; }
+.atm-text--base { font-size: 1rem;     line-height: 1.5rem; }
+.atm-text--lg   { font-size: 1.125rem; line-height: 1.75rem; }
+.atm-text--xl   { font-size: 1.25rem;  line-height: 1.75rem; }
+.atm-text--2xl  { font-size: 1.5rem;   line-height: 2rem; }
+.atm-text--4xl  { font-size: 2.25rem;  line-height: 2.5rem; }
+
+/* ─── Weight variants ─── */
+.atm-text--normal   { font-weight: 400; }
+.atm-text--medium   { font-weight: 500; }
+.atm-text--semibold { font-weight: 600; }
+.atm-text--bold     { font-weight: 700; }
+
+/* ─── Color variants ─── */
+.atm-text--white  { color: #ffffff; }
+.atm-text--muted  { color: #94a3b8; }
+.atm-text--faint  { color: #64748b; }
+.atm-text--dimmer { color: #cbd5e1; }
+.atm-text--green  { color: #4ade80; }
+.atm-text--red    { color: #f87171; }
+.atm-text--blue   { color: #60a5fa; }
+.atm-text--yellow { color: #facc15; }
+.atm-text--purple { color: #c084fc; }
+.atm-text--orange { color: #fb923c; }
+
+/* ─── Hover group color variants ─── */
+.group:hover .atm-text--hover-white  { color: #ffffff; }
+.group:hover .atm-text--hover-muted  { color: #94a3b8; }
+.group:hover .atm-text--hover-indigo { color: #818cf8; }

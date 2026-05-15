@@ -10,6 +10,7 @@ import { MolLoadingPage } from '../atomic/MolLoadingPage';
 import { ObjModal } from '../atomic/ObjModal';
 import { AtmText } from '../atomic/AtmText/index.js';
 import { MolAddEmployeeCard } from '../atomic/MolAddEmployeeCard';
+import './StaffPage.css';
 
 function StaffPage({
   selectEditEmployee,
@@ -97,8 +98,8 @@ function StaffPage({
     <BaseLayout currentPage={1}>
       <MolPageHeader title="Employee Management" icon={Users} />
 
-      <div className="space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="staff-page__content">
+        <div className="staff-page__grid">
           {employees.map((employee) => (
             <MolEmployeeCard
               key={employee.id}
@@ -112,9 +113,9 @@ function StaffPage({
         </div>
 
         {employees.length === 0 ? (
-          <div className="text-slate-400 text-center py-12">No employees registered yet</div>
+          <div className="staff-page__empty">No employees registered yet</div>
         ) : (
-          <div className="flex justify-end">
+          <div className="staff-page__advance-row">
             <Button onClick={handleAdvance} variant='primary' size='lg'>
               Next
               <ArrowRight size={20} />
@@ -126,30 +127,30 @@ function StaffPage({
       {/* Delete confirmation modal */}
       {deleteConfirmation && (
         <ObjModal title="Confirm Delete" onClose={() => setDeleteConfirmation(null)}>
-          <div className="space-y-5 p-4">
+          <div className="staff-page__delete-modal-body">
 
             <AtmText color="dimmer">
               Deleting this employee will also remove all associated history.
               Are you sure you want to proceed?
             </AtmText>
 
-            <div className="bg-slate-900 rounded-lg border border-slate-700 px-4 py-3">
+            <div className="staff-page__delete-modal-info">
               <AtmText weight="semibold">
                 {deleteConfirmation.name}
               </AtmText>
 
-              <AtmText as='p' size="sm" color="dimmer" className="mt-1">
+              <AtmText as='p' size="sm" color="dimmer" className="staff-page__delete-modal-warning">
                 This action cannot be undone.
               </AtmText>
             </div>
 
-            <div className="flex items-center justify-end gap-3">
+            <div className="staff-page__delete-modal-actions">
               <Button onClick={() => setDeleteConfirmation(null)} variant='secondary' size='lg'>
                 Cancel
               </Button>
 
               <Button onClick={() => handleDeleteEmployee(deleteConfirmation.id)} variant='danger' size='lg'>
-                <Trash2 className="w-4 h-4" />
+                <Trash2 size={16} />
                 Delete
               </Button>
             </div>

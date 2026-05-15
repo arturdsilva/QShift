@@ -5,6 +5,7 @@ import { AtmText } from '../AtmText';
 import { MolFormField } from '../MolFormField';
 import { TemplateItem } from '../MolScheduleTemplateItem';
 import { COLOR_OPTIONS } from '../../constants/shiftColors.js';
+import './ObjCreateShiftModal.css';
 
 const DEFAULT_FORM = { name: '', start: '', end: '', staff: '', color: 'blue' };
 
@@ -29,17 +30,17 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
   const previewMeta = `${form.start || '--:--'}–${form.end || '--:--'} · ${form.staff || 0} staff`;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#131c2e] border border-slate-800 rounded-2xl overflow-hidden w-full max-w-2xl shadow-2xl flex">
+    <div className="obj-create-shift-modal__overlay">
+      <div className="obj-create-shift-modal">
 
         {/* left column: header + form + footer */}
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="obj-create-shift-modal__left">
 
-          <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-800">
-            <div className="w-9 h-9 bg-slate-800 rounded-xl flex items-center justify-center shrink-0">
+          <div className="obj-create-shift-modal__header">
+            <div className="obj-create-shift-modal__header-icon">
               <Clock size={18} className="text-blue-400" />
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="obj-create-shift-modal__header-title">
               <AtmText as="p" size="base" weight="semibold" color="white">
                 Create New Template
               </AtmText>
@@ -49,7 +50,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
             </Button>
           </div>
 
-          <div className="flex-1 p-6 flex flex-col gap-5">
+          <div className="obj-create-shift-modal__form">
             <MolFormField
               label="Template Name"
               variant="shiftConfig"
@@ -58,7 +59,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
               onChange={(e) => set('name', e.target.value)}
             />
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="obj-create-shift-modal__time-grid">
               <MolFormField
                 label="Start Time"
                 type="time"
@@ -89,7 +90,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
               <AtmText as="p" size="sm" weight="medium" color="dimmer" className="mb-2">
                 Primary Color Tag
               </AtmText>
-              <div className="flex gap-2.5">
+              <div className="obj-create-shift-modal__color-section">
                 {COLOR_OPTIONS.map((opt) => (
                   <SelectableButton
                     key={opt.value}
@@ -106,7 +107,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 px-6 py-4 border-t border-slate-800">
+          <div className="obj-create-shift-modal__footer">
             <Button variant="secondary" size="md" onClick={onCancel}>
               Cancel
             </Button>
@@ -117,7 +118,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
           </div>
         </div>
 
-        <div className="w-56 p-4 bg-slate-900 border-l border-slate-800 shrink-0 flex flex-col gap-4">
+        <div className="obj-create-shift-modal__preview">
           <AtmText as="p" size="xs" weight="medium" color="faint" className="uppercase tracking-widest">
             Preview
           </AtmText>
@@ -130,7 +131,7 @@ export function ObjCreateShiftModal({ onSave, onCancel }) {
             onDelete={() => { }}
           />
 
-          <div className="border border-dashed border-slate-800 rounded-lg p-3">
+          <div className="obj-create-shift-modal__preview-hint">
             <AtmText as="p" size="xs" color="faint" className="text-center leading-relaxed">
               This template can be dragged onto the calendar to quickly populate shifts.
             </AtmText>

@@ -2,17 +2,18 @@ import { AtmInput } from '../AtmInput/index.js';
 import { AtmCheckbox } from '../AtmCheckbox/index.js';
 import { AtmText } from '../AtmText/index.js';
 import { AtmAvatar } from '../AtmAvatar/index.js';
+import './MolEmployeeProfile.css';
 
 /**
  * MolEmployeeProfile – avatar + name input + active checkbox card
  */
 export function MolEmployeeProfile({ name, setName, workload, setWorkload, isActive, setIsActive, error }) {
   return (
-    <div className="flex bg-slate-800 rounded-lg border border-slate-700 p-6 justify-center">
-      <div className="flex-1">
-        <div className="flex items-center gap-4">
+    <div className="mol-employee-profile">
+      <div className="mol-employee-profile__info">
+        <div className="mol-employee-profile__avatar-row">
           <AtmAvatar name={name} active={isActive} />
-          <div className="flex-1">
+          <div className="mol-employee-profile__name-input-wrapper">
             <AtmText as="label" size="sm" weight="medium" color="dimmer" className="block mb-2 w-[150px]">
               Employee name
             </AtmText>
@@ -27,7 +28,7 @@ export function MolEmployeeProfile({ name, setName, workload, setWorkload, isAct
             {error && <AtmText as="p" size="xs" color="red" className="mt-1">{error}</AtmText>}
           </div>
         </div>
-        <div className="flex items-center gap-3 pt-2">
+        <div className="mol-employee-profile__checkbox-row">
           <AtmCheckbox
             checked={isActive}
             onChange={() => setIsActive(!isActive)}
@@ -36,8 +37,8 @@ export function MolEmployeeProfile({ name, setName, workload, setWorkload, isAct
           />
         </div>
       </div>
-      <div className='border-l border-slate-700 ml-8'></div>
-      <div className='flex flex-col ml-8'>
+      <div className='mol-employee-profile__divider'></div>
+      <div className='mol-employee-profile__workload'>
         <AtmText as="label" size="sm" weight="medium" color="dimmer" className="block mb-2">
           Weekly Workload (hours)
         </AtmText>

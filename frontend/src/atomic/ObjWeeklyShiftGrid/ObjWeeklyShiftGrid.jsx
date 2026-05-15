@@ -4,17 +4,18 @@ import { AtmText } from '../AtmText';
 import { Button } from '../AtmButton';
 import { MolShiftChip } from '../MolShiftChip';
 import { DAY_LABELS } from '../../constants/constantsOfTable';
+import './ObjWeeklyShiftGrid.css';
 
 /* ── single shift card inside the grid ─────────────────── */
 const GridShiftCard = memo(function GridShiftCard({ shift, onRemove, onEdit }) {
   return (
-    <div className="group relative">
+    <div className="obj-grid-shift-card group">
       <MolShiftChip shift={shift} />
-      <div className="absolute top-1 right-1 flex gap-0.5">
+      <div className="obj-grid-shift-card__actions">
         {onEdit && (
           <button
             onClick={() => onEdit(shift.id)}
-            className="w-5 h-5 flex items-center justify-center rounded bg-slate-700/80 hover:bg-blue-600 transition-colors"
+            className="obj-grid-shift-card__edit-btn"
           >
             <Pencil size={10} className="text-white" />
           </button>
@@ -77,14 +78,24 @@ function DayColumn({
   };
 
   const columnClasses = [
-    'flex flex-col rounded-lg border transition-all duration-200 min-h-[340px]',
+    'obj-day-column',
     isActive
       ? isSelected
-        ? 'border-green-500/60 bg-green-500/5'
+        ? 'obj-day-column--selected'
         : isDragOver
-          ? 'border-blue-500 bg-blue-500/10 border-dashed shadow-lg shadow-blue-500/10'
-          : 'border-slate-800 bg-[#0c1220]/60'
-      : 'border-slate-800/50 bg-[#0c1220]/30 opacity-50 pointer-events-none',
+          ? 'obj-day-column--drag-over'
+          : 'obj-day-column--active'
+      : 'obj-day-column--inactive',
+  ].join(' ');
+
+  const headerClasses = [
+    'obj-day-column__header',
+    isToday
+      ? 'obj-day-column__header--today'
+      : isSelected
+        ? 'obj-day-column__header--selected'
+        : 'obj-day-column__header--default',
+    isActive ? 'hover:bg-white/5' : '',
   ].join(' ');
 
   return (
@@ -97,10 +108,7 @@ function DayColumn({
       {/* header – clickable to select day */}
       <div
         onClick={() => isActive && onHeaderClick?.(dayIndex)}
-        className={`text-center py-3 border-b cursor-pointer select-none transition-colors
-          ${isToday ? 'border-blue-500' : isSelected ? 'border-green-500/40' : 'border-slate-800'}
-          ${isActive ? 'hover:bg-white/5' : ''}
-        `}
+        className={headerClasses}
       >
         <AtmText
           as="p" size="xs" weight="bold"
@@ -122,7 +130,7 @@ function DayColumn({
         )}
       </div>
 
-      <div className="flex-1 p-2 flex flex-col gap-1.5 overflow-y-auto">
+      <div className="obj-day-column__body">
         {isActive ? (
           <>
             {shifts.map((shift) => (
@@ -134,7 +142,7 @@ function DayColumn({
               />
             ))}
             {shifts.length === 0 && !isDragOver && (
-              <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40">
+              <div className="obj-day-column__empty">
                 <Download size={22} className="text-slate-500 mb-2" />
                 <AtmText size="xs" color="faint" className="uppercase tracking-wider leading-relaxed">
                   Drop shift<br />or template
@@ -142,8 +150,8 @@ function DayColumn({
               </div>
             )}
             {isDragOver && (
-              <div className="border border-dashed border-blue-500/40 rounded-lg p-4 text-center bg-blue-500/5">
-                <div className="flex items-center justify-center">
+              <div className="obj-day-column__drop-zone">
+                <div className="obj-day-column__drop-zone-inner">
                   <ArrowDown size={15} className="text-blue-400" />
                   <AtmText size="xs" color="blue">Drop here</AtmText>
                 </div>
@@ -151,8 +159,8 @@ function DayColumn({
             )}
           </>
         ) : (
-          <div className="flex-1 flex items-center justify-center">
-            <div className="w-7 h-7 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center">
+          <div className="obj-day-column__inactive-icon">
+            <div className="obj-day-column__inactive-icon-wrapper">
               <Ban size={22} className="text-slate-500" />
             </div>
           </div>
@@ -163,7 +171,7 @@ function DayColumn({
         <Button
           onClick={() => onAddShift?.(dayIndex)}
           variant="ghost"
-          className="mx-2 mb-2 w-auto py-1.5 border border-dashed border-slate-800 hover:border-blue-500/50 hover:bg-blue-500/5"
+          className="obj-day-column__add-btn"
         >
           <Plus size={14} className="text-slate-500" />
         </Button>
@@ -214,7 +222,7 @@ export function ObjWeeklyShiftGrid({
 
   return (
     <div
-      className="grid grid-cols-7 gap-2 flex-1 min-w-0"
+      className="obj-weekly-grid"
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleGridDrop}
     >

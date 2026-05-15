@@ -1,0 +1,36 @@
+.obj-employee-selector {
+  @apply bg-slate-800 rounded-lg shadow-xl w-full border border-slate-700 overflow-hidden transition-all duration-300;
+}
+
+.obj-employee-selector__header-icon {
+  @apply bg-blue-600/20 p-2 rounded-lg;
+}
+
+.obj-employee-selector__list-wrapper {
+  @apply p-3 border-t border-slate-700 bg-slate-800/50;
+}
+
+.obj-employee-selector__list {
+  @apply max-h-96 overflow-y-auto pr-2;
+  scrollbar-width: thin;
+}
+
+.obj-employee-selector__avatar-wrapper {
+  @apply p-1.5 rounded-md;
+}
+
+.obj-employee-selector__avatar-wrapper--selected {
+  @apply bg-white/20;
+}
+
+.obj-employee-selector__avatar-wrapper--default {
+  @apply bg-slate-700;
+}
+
+.atm-selectable-btn:hover .obj-employee-selector__avatar-wrapper--default {
+  @apply bg-slate-600;
+}
+
+.obj-employee-selector__active-dot {
+  @apply ml-auto w-1.5 h-1.5 rounded-full bg-white;
+}

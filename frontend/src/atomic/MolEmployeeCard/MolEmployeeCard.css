@@ -1,0 +1,19 @@
+.mol-employee-card {
+  @apply bg-slate-800 rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-200 p-4 flex flex-col gap-4;
+}
+
+.mol-employee-card__header {
+  @apply flex items-start justify-between;
+}
+
+.mol-employee-card__actions {
+  @apply flex gap-6;
+}
+
+.mol-employee-card__footer {
+  @apply flex items-center justify-between;
+}
+
+.mol-employee-card__status {
+  @apply flex flex-col;
+}

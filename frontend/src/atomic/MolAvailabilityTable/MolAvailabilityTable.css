@@ -1,0 +1,35 @@
+.mol-availability-table {
+  @apply overflow-x-auto;
+}
+
+.mol-availability-table__wrapper {
+  @apply inline-block min-w-full border border-slate-700 rounded-lg overflow-hidden;
+}
+
+.mol-availability-grid {
+  @apply grid;
+}
+
+.mol-availability-corner {
+  @apply sticky left-0 top-0 bg-slate-900/40 z-20 border border-slate-700;
+}
+
+.mol-availability-header-cell {
+  @apply text-center py-3 border border-slate-700 select-none bg-slate-900/40;
+}
+
+.mol-availability-day-label {
+  @apply sticky left-0 bg-slate-900/40 z-10 py-2 px-3 flex items-center border border-slate-700/50;
+}
+
+.mol-availability-cell {
+  @apply h-10 border border-slate-700/30 cursor-pointer transition-colors select-none;
+}
+
+.mol-availability-cell--active {
+  @apply bg-green-500 hover:bg-green-600;
+}
+
+.mol-availability-cell--inactive {
+  @apply bg-slate-900/40 hover:bg-slate-700/50;
+}

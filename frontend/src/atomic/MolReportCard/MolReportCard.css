@@ -1,0 +1,7 @@
+.mol-report-card {
+  @apply bg-slate-800 rounded-lg p-6 w-64 border border-slate-700 hover:border-indigo-500 transition-all duration-200 overflow-hidden cursor-pointer;
+}
+
+.mol-report-card__icon {
+  @apply text-blue-400 mb-4;
+}

@@ -5,16 +5,17 @@ import { AtmCheckbox } from '../AtmCheckbox/index.js';
 import { Button } from '../AtmButton/index.js';
 import { AtmText } from '../AtmText/index.js';
 import { AtmDivider } from '../AtmDivider/index.js';
+import './MolEmployeeCard.css';
 
 /**
  * MolEmployeeCard – employee card with edit, delete, and active toggle buttons
  */
 export function MolEmployeeCard({ employee, onEdit, onDelete, onToggleActive }) {
   return (
-    <div className="bg-slate-800 rounded-lg border border-slate-700 hover:border-indigo-500 transition-all duration-200 p-4 flex flex-col gap-4">
-      <div className="flex items-start justify-between">
+    <div className="mol-employee-card">
+      <div className="mol-employee-card__header">
         <AtmAvatar name={employee.name} active={employee.active} />
-        <div className="flex gap-6">
+        <div className="mol-employee-card__actions">
           <Button variant="ghost" onClick={() => onEdit(employee.id)}>
             <Pencil className="h-5 w-5" />
           </Button>
@@ -27,8 +28,8 @@ export function MolEmployeeCard({ employee, onEdit, onDelete, onToggleActive }) 
         {employee.name}
       </AtmText>
       <AtmDivider />
-      <div className="flex items-center justify-between">
-        <div className='flex flex-col'>
+      <div className="mol-employee-card__footer">
+        <div className='mol-employee-card__status'>
           <AtmText size="sm" color="muted">{employee.active ? 'Scheduled' : 'Unscheduled'}</AtmText>
         </div>
         <AtmCheckbox
