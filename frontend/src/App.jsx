@@ -11,6 +11,7 @@ import GeneratedSchedule from './pages/GeneratedSchedule.jsx';
 import ScheduleRecordsPage from './pages/ScheduleRecordsPage.jsx';
 import RegisterPage from './pages/RegisterPage.jsx';
 import EmployeeReportsPage from './pages/EmployeeReportsPage.jsx';
+import TemplatesPage from './pages/TemplatesPage.jsx';
 
 function App() {
   const now = new Date();
@@ -184,6 +185,7 @@ function App() {
             />
           }
         />
+        <Route path="/templates" element={<TemplatesPage />} />
         <Route path="/settings" element={<SettingsPage />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="*" element={<Navigate to="/" replace />} />

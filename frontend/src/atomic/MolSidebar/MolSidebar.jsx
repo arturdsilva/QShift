@@ -1,4 +1,4 @@
-import { X, LogOut, CalendarRange, BarChart3 } from 'lucide-react';
+import { X, LogOut, CalendarRange, BarChart3, LayoutTemplate } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button, SelectableButton } from '../AtmButton/index.js';
 import { AtmText } from '../AtmText/index.js';
@@ -6,6 +6,7 @@ import './MolSidebar.css';
 
 const navItems = [
   { icon: CalendarRange, label: 'Create Schedule', path: '/staff', indexPage: 1 },
+  { icon: LayoutTemplate, label: 'Templates', path: '/templates', indexPage: 2 },
   { icon: BarChart3, label: 'Reports', path: '/reports', indexPage: 3 },
 ];
 
