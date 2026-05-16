@@ -8,11 +8,5 @@
 }
 
 .calendar-page__actions {
-  @apply flex gap-4 mt-4;
-}
-
-@media (min-width: 640px) {
-  .calendar-page__next-btn {
-    margin-left: auto;
-  }
+  @apply flex justify-between mt-4;
 }

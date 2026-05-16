@@ -69,6 +69,7 @@
   padding: 0.5rem;
   background: transparent;
   border: none;
+  color: white;
 }
 .atm-btn--periodNav:hover { background-color: #334155; }
 .atm-btn--periodNav.atm-btn--disabled {

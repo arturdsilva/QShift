@@ -131,13 +131,13 @@ function CalendarPage({
       />
 
       <div className="calendar-page__actions">
-        <Button onClick={handleBack} responsive variant='primary' size='lg'>
-          <ArrowLeft size={24} />
+        <Button onClick={handleBack} variant='primary' size='md'>
+          <ArrowLeft size={16} />
           Back
         </Button>
-        <Button onClick={handleAdvance} responsive className="calendar-page__next-btn" variant='primary' size='lg'>
+        <Button onClick={handleAdvance} className="calendar-page__next-btn" variant='primary' size='md'>
           Next
-          <ArrowRight size={24} />
+          <ArrowRight size={16} />
         </Button>
       </div>
     </BaseLayout>

@@ -47,11 +47,11 @@
 }
 
 .obj-app-layout__content-wrapper--with-sidebar {
-  @apply pt-16;
+  @apply pt-16 lg:pt-0;
 }
 
 .obj-app-layout__content {
-  @apply flex-1 p-4 w-full lg:overflow-auto;
+  @apply flex-1 px-4 pt-4 pb-4 w-full lg:overflow-auto;
 }
 
 .obj-app-layout__selection-panel {
