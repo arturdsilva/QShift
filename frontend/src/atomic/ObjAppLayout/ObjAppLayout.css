@@ -55,7 +55,7 @@
 }
 
 .obj-app-layout__selection-panel {
-  @apply border-t border-slate-700 bg-slate-900/50 lg:h-full lg:overflow-y-auto shrink-0;
+  @apply bg-slate-900/50 lg:h-full lg:overflow-y-auto shrink-0;
 }
 
 .obj-app-layout__selection-panel-inner {
