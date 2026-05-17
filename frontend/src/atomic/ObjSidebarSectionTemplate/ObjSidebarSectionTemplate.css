@@ -15,7 +15,7 @@
 }
 
 .obj-sidebar-section__list {
-  @apply max-h-[200px] overflow-y-auto pr-1;
+  @apply space-y-1.5 max-h-[200px] overflow-y-auto pr-1;
   scrollbar-width: thin;
 }
 
