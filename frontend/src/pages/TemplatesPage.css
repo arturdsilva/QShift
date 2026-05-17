@@ -150,7 +150,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  padding: 1rem;
+  padding: 0.25rem;
 }
 
 .templates-page__delete-modal-info {
@@ -163,6 +163,45 @@
   justify-content: flex-end;
   gap: 0.75rem;
 }
+
+/* ─── Cascade impact warning ─── */
+.templates-page__delete-cascade {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  background-color: rgba(234, 179, 8, 0.06);
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+.templates-page__delete-cascade-title {
+  display: block;
+}
+
+.templates-page__delete-cascade-list {
+  margin: 0.125rem 0 0 1rem;
+  padding: 0;
+  list-style: disc;
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.templates-page__delete-cascade-list li {
+  margin-bottom: 0.125rem;
+}
+
+/* ─── Inline form error ─── */
+.templates-page__form-error {
+  font-size: 0.75rem;
+  color: #f87171;
+  background-color: rgba(248, 113, 113, 0.08);
+  border: 1px solid rgba(248, 113, 113, 0.25);
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+}
+
 
 /* ─── Edit modal ─── */
 .templates-page__edit-modal-actions {

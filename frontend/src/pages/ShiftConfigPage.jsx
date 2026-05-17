@@ -16,7 +16,7 @@ import { ObjModal } from '../atomic/ObjModal';
 
 import { useScheduleCreate } from '../hooks/useScheduleGeneration';
 import { STATUS } from '../hooks/useRetryOnSleep';
-import { useIndexedDB } from '../services/useIndexedDB.js';
+import { useTemplateStore } from '../services/useTemplateStore.js';
 import { daysOfWeek } from '../constants/constantsOfTable.js';
 import './ShiftConfigPage.css';
 
@@ -42,9 +42,7 @@ function ShiftConfigPage({
   const { run, status, retryCountdown, retriesLeft, errorInfo, getMessage } = useScheduleCreate();
   const isBusy = status === STATUS.RUNNING || status === STATUS.WAKING_UP;
 
-  const shiftsDB = useIndexedDB('shifts');
-  const daysDB = useIndexedDB('days');
-  const schedulesDB = useIndexedDB('schedules');
+  const { shiftsDB, daysDB, schedulesDB } = useTemplateStore();
 
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [showDayModal, setShowDayModal] = useState(false);

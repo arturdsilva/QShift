@@ -12,7 +12,7 @@ import { ObjModal } from '../atomic/ObjModal';
 import { MolFormField } from '../atomic/MolFormField';
 import { BADGE_COLOR, COLOR_OPTIONS } from '../constants/shiftColors.js';
 
-import { useIndexedDB } from '../services/useIndexedDB.js';
+import { useTemplateStore } from '../services/useTemplateStore.js';
 import './TemplatesPage.css';
 
 const FILTERS = [
@@ -31,9 +31,10 @@ function getColorHex(colorName) {
 
 function TemplatesPage() {
   const navigate = useNavigate();
-  const shiftsDB = useIndexedDB('shifts');
-  const daysDB = useIndexedDB('days');
-  const schedulesDB = useIndexedDB('schedules');
+  const {
+    shiftsDB, daysDB, schedulesDB,
+    getShiftDeleteImpact, getDayDeleteImpact,
+  } = useTemplateStore();
 
   const [activeFilter, setActiveFilter] = useState('all');
 
@@ -42,6 +43,14 @@ function TemplatesPage() {
   const [showDayModal, setShowDayModal] = useState(false);
   const [showWeekModal, setShowWeekModal] = useState(false);
   const [deleteItem, setDeleteItem] = useState(null);
+
+  /* ── Inline form errors ── */
+  const [shiftModalError, setShiftModalError] = useState('');
+  const [dayModalError,   setDayModalError]   = useState('');
+  const [weekModalError,  setWeekModalError]  = useState('');
+  const [editShiftError,  setEditShiftError]  = useState('');
+  const [editDayError,    setEditDayError]    = useState('');
+  const [editWeekError,   setEditWeekError]   = useState('');
 
   /* ── Edit states ── */
   const [editShift, setEditShift] = useState(null);
@@ -65,28 +74,23 @@ function TemplatesPage() {
     Array.from({ length: 7 }, () => ({ dayTemplateId: null, shiftIds: [] })),
   );
 
-  /* ── helpers ── */
-  const getDB = useCallback(
-    (type) => {
-      if (type === 'shift') return shiftsDB;
-      if (type === 'day') return daysDB;
-      return schedulesDB;
-    },
-    [shiftsDB, daysDB, schedulesDB],
-  );
-
   /* ── CRUD handlers ── */
   const handleShiftModalSave = useCallback(
     async (data) => {
-      await shiftsDB.add({
-        id: data.id ?? Date.now(),
-        name: data.name,
-        start: data.start,
-        end: data.end,
-        staff: Number(data.staff),
-        color: data.color,
-      });
-      setShowShiftModal(false);
+      try {
+        await shiftsDB.add({
+          id: data.id ?? Date.now(),
+          name: data.name,
+          start: data.start,
+          end: data.end,
+          staff: Number(data.staff),
+          color: data.color,
+        });
+        setShiftModalError('');
+        setShowShiftModal(false);
+      } catch (e) {
+        setShiftModalError(e.message);
+      }
     },
     [shiftsDB],
   );
@@ -107,19 +111,20 @@ function TemplatesPage() {
   const handleSaveDay = useCallback(async () => {
     if (!dayForm.name.trim() || selectedShiftIds.length === 0) return;
     const selectedShifts = shiftsDB.items.filter((s) => selectedShiftIds.includes(s.id));
-    await daysDB.add({
-      id: Date.now(),
-      name: dayForm.name.trim(),
-      color: dayForm.color,
-      shifts: selectedShifts.map((s) => ({
-        name: s.name,
-        start: s.start,
-        end: s.end,
-        staff: s.staff,
-        color: s.color,
-      })),
-    });
-    setShowDayModal(false);
+    try {
+      await daysDB.add({
+        id: Date.now(),
+        name: dayForm.name.trim(),
+        color: dayForm.color,
+        shifts: selectedShifts.map((s) => ({
+          name: s.name, start: s.start, end: s.end, staff: s.staff, color: s.color,
+        })),
+      });
+      setDayModalError('');
+      setShowDayModal(false);
+    } catch (e) {
+      setDayModalError(e.message);
+    }
   }, [dayForm, selectedShiftIds, shiftsDB.items, daysDB]);
 
   /* ── Week modal handlers ── */
@@ -146,19 +151,24 @@ function TemplatesPage() {
         const dayTpl = daysDB.items.find((d) => d.id === assignment.dayTemplateId);
         if (dayTpl?.shifts) shifts = dayTpl.shifts;
       }
-      return { dayIndex: idx, shifts };
+      return { dayIndex: idx, dayTemplateId: assignment.dayTemplateId || null, shifts };
     });
 
     const configuredDays = days.filter((d) => d.shifts.length > 0).length;
 
-    await schedulesDB.add({
-      id: Date.now(),
-      name: weekForm.name.trim(),
-      color: 'purple',
-      days,
-      meta: `${configuredDays} day${configuredDays !== 1 ? 's' : ''} configured`,
-    });
-    setShowWeekModal(false);
+    try {
+      await schedulesDB.add({
+        id: Date.now(),
+        name: weekForm.name.trim(),
+        color: 'purple',
+        days,
+        meta: `${configuredDays} day${configuredDays !== 1 ? 's' : ''} configured`,
+      });
+      setWeekModalError('');
+      setShowWeekModal(false);
+    } catch (e) {
+      setWeekModalError(e.message);
+    }
   }, [weekForm, weekDayAssignments, daysDB.items, schedulesDB]);
 
   /* ── Edit handlers ── */
@@ -169,8 +179,13 @@ function TemplatesPage() {
 
   const handleEditShiftSave = useCallback(async () => {
     if (!editShift || !editShiftForm.name.trim()) return;
-    await shiftsDB.update({ ...editShift, name: editShiftForm.name.trim(), start: editShiftForm.start, end: editShiftForm.end, staff: Number(editShiftForm.staff), color: editShiftForm.color });
-    setEditShift(null);
+    try {
+      await shiftsDB.update({ ...editShift, name: editShiftForm.name.trim(), start: editShiftForm.start, end: editShiftForm.end, staff: Number(editShiftForm.staff), color: editShiftForm.color });
+      setEditShiftError('');
+      setEditShift(null);
+    } catch (e) {
+      setEditShiftError(e.message);
+    }
   }, [editShift, editShiftForm, shiftsDB]);
 
   const handleEditDay = useCallback((item) => {
@@ -186,16 +201,25 @@ function TemplatesPage() {
   const handleEditDaySave = useCallback(async () => {
     if (!editDay || !editDayForm.name.trim()) return;
     const selectedShifts = shiftsDB.items.filter((s) => editDayShiftIds.includes(s.id));
-    await daysDB.update({ ...editDay, name: editDayForm.name.trim(), color: editDayForm.color, shifts: selectedShifts.map((s) => ({ name: s.name, start: s.start, end: s.end, staff: s.staff, color: s.color })) });
-    setEditDay(null);
+    try {
+      await daysDB.update({ ...editDay, name: editDayForm.name.trim(), color: editDayForm.color, shifts: selectedShifts.map((s) => ({ name: s.name, start: s.start, end: s.end, staff: s.staff, color: s.color })) });
+      setEditDayError('');
+      setEditDay(null);
+    } catch (e) {
+      setEditDayError(e.message);
+    }
   }, [editDay, editDayForm, editDayShiftIds, shiftsDB.items, daysDB]);
 
   const handleEditWeek = useCallback((item) => {
     setEditWeek(item);
     setEditWeekForm({ name: item.name });
+    setEditWeekError('');
+    // Use stored dayTemplateId if available, else fall back to heuristic match
     const assignments = Array.from({ length: 7 }, (_, idx) => {
       const dayData = item.days?.[idx];
-      if (!dayData?.shifts?.length) return { dayTemplateId: null };
+      if (!dayData) return { dayTemplateId: null };
+      if (dayData.dayTemplateId !== undefined) return { dayTemplateId: dayData.dayTemplateId };
+      if (!dayData.shifts?.length) return { dayTemplateId: null };
       const match = daysDB.items.find((d) => d.shifts?.length === dayData.shifts.length && d.shifts.every((ds, i) => ds.name === dayData.shifts[i]?.name));
       return { dayTemplateId: match?.id || null };
     });
@@ -207,11 +231,16 @@ function TemplatesPage() {
     const days = editWeekAssignments.map((a, idx) => {
       let shifts = [];
       if (a.dayTemplateId) { const tpl = daysDB.items.find((d) => d.id === a.dayTemplateId); if (tpl?.shifts) shifts = tpl.shifts; }
-      return { dayIndex: idx, shifts };
+      return { dayIndex: idx, dayTemplateId: a.dayTemplateId || null, shifts };
     });
     const configuredDays = days.filter((d) => d.shifts.length > 0).length;
-    await schedulesDB.update({ ...editWeek, name: editWeekForm.name.trim(), days, meta: `${configuredDays} day${configuredDays !== 1 ? 's' : ''} configured` });
-    setEditWeek(null);
+    try {
+      await schedulesDB.update({ ...editWeek, name: editWeekForm.name.trim(), days, meta: `${configuredDays} day${configuredDays !== 1 ? 's' : ''} configured` });
+      setEditWeekError('');
+      setEditWeek(null);
+    } catch (e) {
+      setEditWeekError(e.message);
+    }
   }, [editWeek, editWeekForm, editWeekAssignments, daysDB.items, schedulesDB]);
 
   const handleEdit = useCallback((item, type) => {
@@ -226,15 +255,20 @@ function TemplatesPage() {
   }, [navigate]);
 
   const handleDelete = useCallback((item, type) => {
-    setDeleteItem({ item, type });
-  }, []);
+    // Compute cascade impact for the confirmation modal
+    let impact = null;
+    if (type === 'shift') impact = getShiftDeleteImpact(item.id);
+    if (type === 'day')   impact = getDayDeleteImpact(item.id);
+    setDeleteItem({ item, type, impact });
+  }, [getShiftDeleteImpact, getDayDeleteImpact]);
 
   const handleDeleteConfirm = useCallback(async () => {
     if (!deleteItem) return;
-    const db = getDB(deleteItem.type);
-    await db.remove(deleteItem.item.id);
+    if (deleteItem.type === 'shift')    await shiftsDB.remove(deleteItem.item.id);
+    else if (deleteItem.type === 'day') await daysDB.remove(deleteItem.item.id);
+    else                                await schedulesDB.remove(deleteItem.item.id);
     setDeleteItem(null);
-  }, [deleteItem, getDB]);
+  }, [deleteItem, shiftsDB, daysDB, schedulesDB]);
 
   /* ── derived data ── */
   const sections = [];
@@ -449,6 +483,9 @@ function TemplatesPage() {
               </div>
             </div>
 
+            {dayModalError && (
+              <p className="templates-page__form-error">{dayModalError}</p>
+            )}
             <div className="templates-page__edit-modal-actions">
               <Button variant="secondary" size="md" onClick={() => setShowDayModal(false)}>Cancel</Button>
               <Button
@@ -553,6 +590,9 @@ function TemplatesPage() {
               })}
             </div>
 
+            {weekModalError && (
+              <p className="templates-page__form-error">{weekModalError}</p>
+            )}
             <div className="templates-page__edit-modal-actions">
               <Button variant="secondary" size="md" onClick={() => setShowWeekModal(false)}>Cancel</Button>
               <Button
@@ -587,6 +627,9 @@ function TemplatesPage() {
                 ))}
               </div>
             </div>
+            {editShiftError && (
+              <p className="templates-page__form-error">{editShiftError}</p>
+            )}
             <div className="templates-page__edit-modal-actions">
               <Button variant="secondary" size="md" onClick={() => setEditShift(null)}>Cancel</Button>
               <Button variant="primary" size="md" onClick={handleEditShiftSave} disabled={!editShiftForm.name.trim()}><Save size={14} />Save</Button>
@@ -626,6 +669,9 @@ function TemplatesPage() {
                 })}
               </div>
             </div>
+            {editDayError && (
+              <p className="templates-page__form-error">{editDayError}</p>
+            )}
             <div className="templates-page__edit-modal-actions">
               <Button variant="secondary" size="md" onClick={() => setEditDay(null)}>Cancel</Button>
               <Button variant="primary" size="md" onClick={handleEditDaySave} disabled={!editDayForm.name.trim() || editDayShiftIds.length === 0}><Save size={14} />Save</Button>
@@ -695,6 +741,9 @@ function TemplatesPage() {
                 );
               })}
             </div>
+            {editWeekError && (
+              <p className="templates-page__form-error">{editWeekError}</p>
+            )}
             <div className="templates-page__edit-modal-actions">
               <Button variant="secondary" size="md" onClick={() => setEditWeek(null)}>Cancel</Button>
               <Button variant="primary" size="md" onClick={handleEditWeekSave} disabled={!editWeekForm.name.trim()}><Save size={14} />Save</Button>
@@ -708,16 +757,59 @@ function TemplatesPage() {
         <ObjModal title="Confirm Delete" onClose={() => setDeleteItem(null)}>
           <div className="templates-page__delete-modal-body">
             <AtmText color="dimmer">
-              Are you sure you want to delete this template? This action cannot be undone.
+              Tem certeza que deseja deletar este template? Esta ação não pode ser desfeita.
             </AtmText>
             <div className="templates-page__delete-modal-info">
               <AtmText weight="semibold">{deleteItem.item.name}</AtmText>
             </div>
+
+            {/* Cascade impact warning — shift delete */}
+            {deleteItem.type === 'shift' && deleteItem.impact?.willDeleteDays?.length > 0 && (
+              <div className="templates-page__delete-cascade">
+                <AtmText size="xs" weight="semibold" color="muted" className="templates-page__delete-cascade-title">
+                  ⚠️ Este turno é o único em {deleteItem.impact.willDeleteDays.length} day template{deleteItem.impact.willDeleteDays.length !== 1 ? 's' : ''}, que também serão deletados:
+                </AtmText>
+                <ul className="templates-page__delete-cascade-list">
+                  {deleteItem.impact.willDeleteDays.map((d) => <li key={d.id}>{d.name}</li>)}
+                </ul>
+                {deleteItem.impact.affectedWeeks?.length > 0 && (
+                  <AtmText size="xs" color="muted">
+                    E vai remover esses dias de {deleteItem.impact.affectedWeeks.length} week template{deleteItem.impact.affectedWeeks.length !== 1 ? 's' : ''}: {deleteItem.impact.affectedWeeks.map((w) => w.name).join(', ')}.
+                  </AtmText>
+                )}
+              </div>
+            )}
+            {deleteItem.type === 'shift' && deleteItem.impact?.willDeleteWeeks?.length > 0 && (
+              <div className="templates-page__delete-cascade">
+                <AtmText size="xs" weight="semibold" color="muted" className="templates-page__delete-cascade-title">
+                  ⚠️ {deleteItem.impact.willDeleteWeeks.length} week template{deleteItem.impact.willDeleteWeeks.length !== 1 ? 's' : ''} ficarão sem nenhum turno e também serão deletados:
+                </AtmText>
+                <ul className="templates-page__delete-cascade-list">
+                  {deleteItem.impact.willDeleteWeeks.map((w) => <li key={w.id}>{w.name}</li>)}
+                </ul>
+              </div>
+            )}
+            {deleteItem.type === 'shift' && deleteItem.impact?.affectedDays?.length > 0 && deleteItem.impact.willDeleteDays.length === 0 && (
+              <div className="templates-page__delete-cascade">
+                <AtmText size="xs" color="muted">
+                  ⚠️ Este turno será removido de {deleteItem.impact.affectedDays.length} day template{deleteItem.impact.affectedDays.length !== 1 ? 's' : ''}: {deleteItem.impact.affectedDays.map((d) => d.name).join(', ')}.
+                </AtmText>
+              </div>
+            )}
+            {/* Cascade impact warning — day delete */}
+            {deleteItem.type === 'day' && deleteItem.impact?.affectedWeeks?.length > 0 && (
+              <div className="templates-page__delete-cascade">
+                <AtmText size="xs" color="muted">
+                  ⚠️ Esse dia será removido de {deleteItem.impact.affectedWeeks.length} week template{deleteItem.impact.affectedWeeks.length !== 1 ? 's' : ''}: {deleteItem.impact.affectedWeeks.map((w) => w.name).join(', ')}.
+                </AtmText>
+              </div>
+            )}
+
             <div className="templates-page__delete-modal-actions">
-              <Button variant="secondary" size="lg" onClick={() => setDeleteItem(null)}>Cancel</Button>
+              <Button variant="secondary" size="lg" onClick={() => setDeleteItem(null)}>Cancelar</Button>
               <Button variant="danger" size="lg" onClick={handleDeleteConfirm}>
                 <Trash2 size={16} />
-                Delete
+                Deletar
               </Button>
             </div>
           </div>
