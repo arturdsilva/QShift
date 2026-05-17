@@ -113,7 +113,7 @@ export function MolTemplateCard({ item, type, onEdit, onDelete, onUse }) {
             Use
           </Button>
         )}
-        <Button variant="secondary" size="sm" onClick={() => onEdit?.(item)}>
+        <Button variant="ghost" size="sm" onClick={() => onEdit?.(item)}>
           <Pencil size={13} />
           Edit
         </Button>

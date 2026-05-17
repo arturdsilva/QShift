@@ -4,10 +4,10 @@ import { AtmDivider } from "../AtmDivider/Divider.jsx";
 import { AtmText } from "../AtmText/Text.jsx";
 import './ObjModal.css';
 
-export function ObjModal({ title, children, onClose }) {
+export function ObjModal({ title, children, onClose, wide = false }) {
     return (
         <div className="obj-modal-overlay">
-            <div className="obj-modal">
+            <div className={`obj-modal${wide ? ' obj-modal--wide' : ''}`}>
                 <div className="obj-modal__header">
                     <div className="obj-modal__title-group">
                         <AtmText as="h3" size="lg" weight="semibold" color="white">

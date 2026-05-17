@@ -252,18 +252,18 @@ function TemplatesPage() {
   const totalCount = shiftsDB.items.length + daysDB.items.length + schedulesDB.items.length;
 
   return (
-    <BaseLayout currentPage={2}>
+    <BaseLayout currentPage={11}>
       <MolPageHeader title="Templates" icon={LayoutTemplate}>
         <div className="templates-page__add-actions">
-          <Button variant="primary" size="md" onClick={() => setShowShiftModal(true)}>
+          <Button variant="primary" size="sm" onClick={() => setShowShiftModal(true)}>
             <Plus size={16} />
             Add Shift
           </Button>
-          <Button variant="primary" size="md" onClick={openDayModal} disabled={shiftsDB.items.length === 0}>
+          <Button variant="primary" size="sm" onClick={openDayModal} disabled={shiftsDB.items.length === 0}>
             <Plus size={16} />
             Add Day
           </Button>
-          <Button variant="primary" size="md" onClick={openWeekModal} disabled={daysDB.items.length === 0}>
+          <Button variant="primary" size="sm" onClick={openWeekModal} disabled={daysDB.items.length === 0}>
             <Plus size={16} />
             Add Week
           </Button>
@@ -467,7 +467,7 @@ function TemplatesPage() {
 
       {/* ── Create Week Modal ── */}
       {showWeekModal && (
-        <ObjModal title="Create Week Template" onClose={() => setShowWeekModal(false)}>
+        <ObjModal wide title="Create Week Template" onClose={() => setShowWeekModal(false)}>
           <div className="templates-page__week-modal">
             <AtmText size="sm" color="muted">
               Assign a day template to each day of the week.
@@ -481,41 +481,71 @@ function TemplatesPage() {
               onChange={(e) => setWeekForm((f) => ({ ...f, name: e.target.value }))}
             />
 
-            {/* Day assignments */}
+            {/* Day assignments — visual card picker */}
             <div className="templates-page__week-days">
               {DAYS_OF_WEEK.map((dayName, idx) => {
                 const assignment = weekDayAssignments[idx];
+                const activeTpl = assignment.dayTemplateId
+                  ? daysDB.items.find((d) => d.id === assignment.dayTemplateId)
+                  : null;
                 return (
                   <div key={dayName} className="templates-page__week-day-row">
-                    <AtmText size="sm" weight="medium" className="templates-page__week-day-label">
-                      {dayName}
-                    </AtmText>
-                    <select
-                      value={assignment.dayTemplateId || ''}
-                      onChange={(e) => assignDayTemplate(idx, e.target.value ? Number(e.target.value) : null)}
-                      className="templates-page__week-day-select"
-                    >
-                      <option value="">— No template —</option>
-                      {daysDB.items.map((dayTpl) => (
-                        <option key={dayTpl.id} value={dayTpl.id}>
-                          {dayTpl.name} ({dayTpl.shifts?.length || 0} shifts)
-                        </option>
-                      ))}
-                    </select>
-                    {assignment.dayTemplateId && (
+                    <div className="templates-page__week-day-header">
+                      <AtmText size="sm" weight="semibold" className="templates-page__week-day-label">
+                        {dayName}
+                      </AtmText>
+                      {activeTpl && (
+                        <span className="templates-page__week-day-badge">
+                          {activeTpl.shifts?.length || 0} shift{activeTpl.shifts?.length !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Template card chips */}
+                    <div className="templates-page__week-day-options">
+                      <button
+                        type="button"
+                        onClick={() => assignDayTemplate(idx, null)}
+                        className={`templates-page__week-day-option templates-page__week-day-option--none ${!assignment.dayTemplateId ? 'templates-page__week-day-option--active-none' : ''}`}
+                      >
+                        Off
+                      </button>
+                      {daysDB.items.map((dayTpl) => {
+                        const isActive = assignment.dayTemplateId === dayTpl.id;
+                        const colorHex = dayTpl.color ? getColorHex(dayTpl.color) : '#60a5fa';
+                        return (
+                          <button
+                            key={dayTpl.id}
+                            type="button"
+                            onClick={() => assignDayTemplate(idx, dayTpl.id)}
+                            className={`templates-page__week-day-option ${isActive ? 'templates-page__week-day-option--active' : ''}`}
+                            style={isActive ? { '--tpl-color': colorHex, borderColor: colorHex, backgroundColor: `${colorHex}18` } : { '--tpl-color': colorHex }}
+                          >
+                            <span
+                              className="templates-page__week-day-option-dot"
+                              style={{ backgroundColor: colorHex }}
+                            />
+                            {dayTpl.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Shifts preview */}
+                    {activeTpl?.shifts?.length > 0 && (
                       <div className="templates-page__week-day-preview">
-                        {(() => {
-                          const tpl = daysDB.items.find((d) => d.id === assignment.dayTemplateId);
-                          return tpl?.shifts?.map((s, i) => (
-                            <span key={i} className="templates-page__week-day-shift-tag">
-                              <span
-                                className="templates-page__week-day-shift-dot"
-                                style={{ backgroundColor: getColorHex(s.color) }}
-                              />
-                              {s.name}
+                        {activeTpl.shifts.map((s, i) => (
+                          <span key={i} className="templates-page__week-day-shift-tag">
+                            <span
+                              className="templates-page__week-day-shift-dot"
+                              style={{ backgroundColor: getColorHex(s.color) }}
+                            />
+                            <strong>{s.name}</strong>
+                            <span className="templates-page__week-day-shift-time">
+                              {s.start || '--:--'}–{s.end || '--:--'}
                             </span>
-                          ));
-                        })()}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -606,19 +636,61 @@ function TemplatesPage() {
 
       {/* ── Edit Week Modal ── */}
       {editWeek && (
-        <ObjModal title="Edit Week Template" onClose={() => setEditWeek(null)}>
+        <ObjModal wide title="Edit Week Template" onClose={() => setEditWeek(null)}>
           <div className="templates-page__week-modal">
             <MolFormField label="Week Name" variant="shiftConfig" value={editWeekForm.name} onChange={(e) => setEditWeekForm((f) => ({ ...f, name: e.target.value }))} />
             <div className="templates-page__week-days">
               {DAYS_OF_WEEK.map((dayName, idx) => {
                 const assignment = editWeekAssignments[idx];
+                const activeTpl = assignment.dayTemplateId
+                  ? daysDB.items.find((d) => d.id === assignment.dayTemplateId)
+                  : null;
                 return (
                   <div key={dayName} className="templates-page__week-day-row">
-                    <AtmText size="sm" weight="medium" className="templates-page__week-day-label">{dayName}</AtmText>
-                    <select value={assignment.dayTemplateId || ''} onChange={(e) => { const next = [...editWeekAssignments]; next[idx] = { dayTemplateId: e.target.value ? Number(e.target.value) : null }; setEditWeekAssignments(next); }} className="templates-page__week-day-select">
-                      <option value="">— No template —</option>
-                      {daysDB.items.map((d) => (<option key={d.id} value={d.id}>{d.name} ({d.shifts?.length || 0} shifts)</option>))}
-                    </select>
+                    <div className="templates-page__week-day-header">
+                      <AtmText size="sm" weight="semibold" className="templates-page__week-day-label">{dayName}</AtmText>
+                      {activeTpl && (
+                        <span className="templates-page__week-day-badge">
+                          {activeTpl.shifts?.length || 0} shift{activeTpl.shifts?.length !== 1 ? 's' : ''}
+                        </span>
+                      )}
+                    </div>
+                    <div className="templates-page__week-day-options">
+                      <button
+                        type="button"
+                        onClick={() => { const next = [...editWeekAssignments]; next[idx] = { dayTemplateId: null }; setEditWeekAssignments(next); }}
+                        className={`templates-page__week-day-option templates-page__week-day-option--none ${!assignment.dayTemplateId ? 'templates-page__week-day-option--active-none' : ''}`}
+                      >
+                        Off
+                      </button>
+                      {daysDB.items.map((d) => {
+                        const isActive = assignment.dayTemplateId === d.id;
+                        const colorHex = d.color ? getColorHex(d.color) : '#60a5fa';
+                        return (
+                          <button
+                            key={d.id}
+                            type="button"
+                            onClick={() => { const next = [...editWeekAssignments]; next[idx] = { dayTemplateId: d.id }; setEditWeekAssignments(next); }}
+                            className={`templates-page__week-day-option ${isActive ? 'templates-page__week-day-option--active' : ''}`}
+                            style={isActive ? { '--tpl-color': colorHex, borderColor: colorHex, backgroundColor: `${colorHex}18` } : { '--tpl-color': colorHex }}
+                          >
+                            <span className="templates-page__week-day-option-dot" style={{ backgroundColor: colorHex }} />
+                            {d.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {activeTpl?.shifts?.length > 0 && (
+                      <div className="templates-page__week-day-preview">
+                        {activeTpl.shifts.map((s, i) => (
+                          <span key={i} className="templates-page__week-day-shift-tag">
+                            <span className="templates-page__week-day-shift-dot" style={{ backgroundColor: getColorHex(s.color) }} />
+                            <strong>{s.name}</strong>
+                            <span className="templates-page__week-day-shift-time">{s.start || '--:--'}–{s.end || '--:--'}</span>
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
