@@ -7,7 +7,7 @@ export function MolMetricSelector({ metrics, selectedMetric, onSelect, colors })
             {metrics.map((metric) => (
                 <SelectableButton
                     key={metric.key}
-                    variant="default"
+                    variant="metric"
                     size="md"
                     selected={selectedMetric === metric.key}
                     className={selectedMetric === metric.key ? colors[metric.key].bgButton + '' : ''}

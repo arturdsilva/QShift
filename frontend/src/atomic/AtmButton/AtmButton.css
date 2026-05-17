@@ -155,6 +155,21 @@
 .atm-selectable-btn--md { padding: 0.5rem 1rem; }
 .atm-selectable-btn--lg { padding: 1rem 1.5rem; }
 
+/* Metric variant */
+.atm-selectable-btn--metric {
+  border-radius: 0.5rem;
+  text-align: left;
+}
+
+.atm-selectable-btn--metric.atm-selectable-btn--selected {
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.atm-selectable-btn--metric:not(.atm-selectable-btn--selected) {
+  color: #cbd5e1;
+}
+
 /* Default variant */
 .atm-selectable-btn--default {
   border-radius: 0.5rem;
