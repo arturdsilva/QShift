@@ -1,19 +1,21 @@
+import './AtmCheckbox.css';
+
 /**
  * AtmCheckbox – styled checkbox with active/inactive label
  */
 export function AtmCheckbox({ checked, onChange, activeLabel = 'Active', inactiveLabel = 'Inactive', className = '' }) {
   return (
-    <label className={`flex items-center gap-3 cursor-pointer group ${className}`}>
-      <div className="relative">
+    <label className={`atm-checkbox ${className}`}>
+      <div className="atm-checkbox__input-wrapper">
         <input
           type="checkbox"
           checked={checked}
           onChange={onChange}
-          className="w-5 h-5 rounded border-2 border-slate-600 bg-slate-900 checked:bg-indigo-600 checked:border-indigo-600 cursor-pointer transition-colors focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-800"
+          className="atm-checkbox__input"
         />
         {checked && (
           <svg
-            className="absolute top-0.5 left-0.5 w-4 h-4 text-white pointer-events-none"
+            className="atm-checkbox__check-icon"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -22,7 +24,7 @@ export function AtmCheckbox({ checked, onChange, activeLabel = 'Active', inactiv
           </svg>
         )}
       </div>
-      <span className={`text-sm font-medium transition-colors ${checked ? 'text-green-400' : 'text-slate-500'}`}>
+      <span className={`atm-checkbox__label ${checked ? 'atm-checkbox__label--active' : 'atm-checkbox__label--inactive'}`}>
         {checked ? activeLabel : inactiveLabel}
       </span>
     </label>

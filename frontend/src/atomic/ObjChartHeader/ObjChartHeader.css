@@ -1,0 +1,25 @@
+.obj-chart-header {
+  @apply bg-slate-800 rounded-lg px-4 py-3 border border-slate-700;
+}
+
+.obj-chart-header__controls {
+  @apply flex flex-col lg:flex-row items-center mb-4 gap-4;
+}
+
+.obj-chart-header__nav-group {
+  @apply flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto lg:ml-auto;
+}
+
+.obj-chart-header__nav {
+  @apply flex items-center justify-center gap-2 w-full sm:w-auto;
+}
+
+.obj-chart-header__month-label {
+  min-width: 120px;
+  text-align: center;
+}
+
+.obj-chart-header__year-label {
+  min-width: 80px;
+  text-align: center;
+}

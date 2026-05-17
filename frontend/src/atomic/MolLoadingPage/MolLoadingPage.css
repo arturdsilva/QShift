@@ -1,0 +1,11 @@
+.mol-loading-page {
+  @apply flex items-center justify-center min-h-screen;
+}
+
+.mol-loading-page__content {
+  @apply text-center;
+}
+
+.mol-loading-page__spinner {
+  @apply animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4;
+}

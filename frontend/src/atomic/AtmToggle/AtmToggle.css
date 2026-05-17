@@ -1,0 +1,83 @@
+.atm-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+/* Track */
+.atm-toggle__track {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  transition: background-color 0.2s;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.atm-toggle__track--md {
+  width: 2.75rem;
+  height: 1.5rem;
+}
+
+.atm-toggle__track--sm {
+  width: 2rem;
+  height: 1rem;
+}
+
+.atm-toggle__track--checked {
+  background-color: #22c55e;
+}
+
+.atm-toggle__track--unchecked {
+  background-color: #475569;
+}
+
+/* Thumb */
+.atm-toggle__thumb {
+  display: inline-block;
+  background-color: white;
+  border-radius: 9999px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.atm-toggle__thumb--md {
+  width: 1rem;
+  height: 1rem;
+}
+
+.atm-toggle__thumb--sm {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.atm-toggle__thumb--md-checked {
+  transform: translateX(1.5rem);
+}
+
+.atm-toggle__thumb--md-unchecked {
+  transform: translateX(0.25rem);
+}
+
+.atm-toggle__thumb--sm-checked {
+  transform: translateX(1rem);
+}
+
+.atm-toggle__thumb--sm-unchecked {
+  transform: translateX(0.125rem);
+}
+
+/* Label */
+.atm-toggle__label {
+  font-size: 0.875rem;
+}
+
+.atm-toggle__label--active {
+  color: #4ade80;
+}
+
+.atm-toggle__label--inactive {
+  color: #94a3b8;
+}

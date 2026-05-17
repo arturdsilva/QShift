@@ -7,6 +7,7 @@ import { GeneratedScheduleApi, ShiftConfigApi } from '../services/api.js';
 import { daysOfWeek, scheduleEmpty } from '../constants/constantsOfTable.js';
 import { Button } from '../atomic/AtmButton/index.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import './GeneratedSchedule.css';
 
 function GeneratedSchedule({
   employees,
@@ -95,7 +96,7 @@ function GeneratedSchedule({
   return (
     <BaseLayout showSidebar={false} currentPage={7}>
       <MolPageHeader title="Generated Schedule" />
-      <div className="p-3">
+      <div className="generated-schedule__content">
         <ObjScheduleTable
           scheduleData={scheduleData}
           setScheduleData={setScheduleData}
@@ -105,23 +106,23 @@ function GeneratedSchedule({
         />
 
         {!editMode ? (
-          <div className="flex flex-col-reverse sm:flex-row mt-4 gap-3 sm:gap-0">
-            <div className="flex-1 justify-center sm:justify-start flex w-full sm:w-auto">
+          <div className="generated-schedule__actions">
+            <div className="generated-schedule__actions-left">
               <Button onClick={handleCancel} responsive variant='secondary' size='lg'>Cancel</Button>
             </div>
-            <div className="justify-end flex flex-col sm:flex-row flex-1 w-full sm:w-auto gap-2 sm:gap-0">
-              <div className="w-full sm:w-auto px-0 sm:px-2 py-1.5">
+            <div className="generated-schedule__actions-right">
+              <div className="generated-schedule__action-item">
                 <Button onClick={handleEdit} responsive variant='primary' size='lg'>Edit</Button>
               </div>
-              <div className="w-full sm:w-auto px-0 sm:px-2 py-1.5">
+              <div className="generated-schedule__action-item">
                 <Button onClick={handleApproved} responsive variant='success' size='lg'>Approved</Button>
               </div>
             </div>
           </div>
         ) : (
-          <div className="flex mt-4">
-            <div className="flex-1 justify-center sm:justify-end flex w-full">
-              <div className="w-full sm:w-auto px-0 sm:px-40 py-1.5">
+          <div className="generated-schedule__edit-actions">
+            <div className="generated-schedule__edit-save-wrapper">
+              <div className="generated-schedule__edit-save-item">
                 <Button onClick={handleEdit} responsive variant='primary' size='lg'>Save</Button>
               </div>
             </div>

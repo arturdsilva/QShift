@@ -1,0 +1,18 @@
+.availability-page__content {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.availability-page__grid-wrapper {
+  @apply bg-slate-800 rounded-lg border border-slate-700 p-6;
+}
+
+.availability-page__actions {
+  @apply flex justify-end gap-3;
+}
+
+.availability-page__save-btn:disabled {
+  background-color: #334155;
+  cursor: not-allowed;
+}

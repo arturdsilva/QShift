@@ -1,0 +1,15 @@
+.mol-page-header {
+  @apply mb-6;
+}
+
+.mol-page-header__title-row {
+  @apply flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4;
+}
+
+.mol-page-header__title-group {
+  @apply flex items-center gap-3;
+}
+
+.mol-page-header__icon {
+  @apply text-blue-400;
+}

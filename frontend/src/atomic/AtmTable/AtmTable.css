@@ -1,0 +1,75 @@
+/* ─── Table ─── */
+.atm-table {
+  width: 100%;
+}
+
+/* ─── THead ─── */
+.atm-thead {
+  background-color: #334155;
+}
+
+/* ─── TR ─── */
+.atm-tr {
+  border-top: 1px solid #334155;
+}
+
+.atm-tr--day-off {
+  border-top: 2px solid #475569;
+}
+
+.atm-tr--calendar-header {
+  background-color: rgba(51, 65, 85, 0.9);
+}
+
+.atm-tr--calendar-body {
+  border-top: 1px solid #334155;
+  transition: background-color 0.15s;
+  text-align: center;
+}
+
+/* ─── TH ─── */
+.atm-th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-right: 1px solid #475569;
+}
+
+.atm-th--calendar-header {
+  text-align: center;
+  border-right: none;
+}
+
+/* ─── TD ─── */
+.atm-td {
+  padding: 0.75rem;
+  border-right: 1px solid #475569;
+}
+
+.atm-td:last-child {
+  border-right: none;
+}
+
+.atm-td--under-staffed {
+  background-color: rgba(127, 29, 29, 0.5);
+}
+
+.atm-td--clickable {
+  cursor: pointer;
+}
+
+.atm-td--clickable:hover {
+  background-color: #334155;
+}
+
+.atm-td--time-slot {
+  font-size: 0.75rem;
+}
+
+.atm-td--day-off {
+  text-align: center;
+}
+
+.atm-td--calendar-body {
+  border-right: none;
+  padding: 0.5rem;
+}

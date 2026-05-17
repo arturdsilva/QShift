@@ -1,25 +1,23 @@
 import { Loader2, AlertTriangle, XCircle } from 'lucide-react';
 import { AtmText } from '../AtmText';
 import { Button } from '../AtmButton';
+import './MolStatusBanner.css';
 
 const VARIANT_CONFIG = {
     info: {
-        bg: 'bg-blue-950/40',
-        border: 'border-blue-600/50',
+        bannerClass: 'mol-status-banner--info',
+        iconClass: 'mol-status-banner__icon--info',
         icon: Loader2,
-        iconClass: 'text-blue-400 animate-spin',
     },
     warning: {
-        bg: 'bg-amber-950/40',
-        border: 'border-amber-600/50',
+        bannerClass: 'mol-status-banner--warning',
+        iconClass: 'mol-status-banner__icon--warning',
         icon: AlertTriangle,
-        iconClass: 'text-amber-400',
     },
     error: {
-        bg: 'bg-red-950/40',
-        border: 'border-red-600/50',
+        bannerClass: 'mol-status-banner--error',
+        iconClass: 'mol-status-banner__icon--error',
         icon: XCircle,
-        iconClass: 'text-red-400',
     },
 };
 
@@ -43,18 +41,12 @@ export function MolStatusBanner({ variant = 'info', title, description, actions 
     const btnVariantMap = { primary: 'danger', secondary: 'secondary' };
 
     return (
-        <div
-            className={`
-                flex items-start gap-3 rounded-lg px-4 py-3 mb-4
-                border transition-all duration-300
-                ${config.bg} ${config.border}
-            `}
-        >
-            <div className="mt-0.5 shrink-0">
-                <Icon className={`w-5 h-5 ${config.iconClass}`} />
+        <div className={`mol-status-banner ${config.bannerClass}`}>
+            <div className="mol-status-banner__icon">
+                <Icon className={config.iconClass} />
             </div>
 
-            <div className="flex flex-col gap-0.5 flex-1 min-w-0">
+            <div className="mol-status-banner__content">
                 <AtmText as="span" size="sm" weight="semibold" color={titleColor}>
                     {title}
                 </AtmText>
@@ -63,7 +55,7 @@ export function MolStatusBanner({ variant = 'info', title, description, actions 
                 </AtmText>
 
                 {actions && actions.length > 0 && (
-                    <div className="flex gap-2 mt-2">
+                    <div className="mol-status-banner__actions">
                         {actions.map((action, idx) => {
                             const ActionIcon = action.icon;
                             const btnVariant = btnVariantMap[action.variant] ?? 'danger';

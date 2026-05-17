@@ -1,0 +1,7 @@
+.obj-calendar-table {
+  @apply space-y-4;
+}
+
+.obj-calendar-table__wrapper {
+  @apply bg-slate-800 rounded-lg overflow-hidden border border-slate-700 overflow-x-auto;
+}

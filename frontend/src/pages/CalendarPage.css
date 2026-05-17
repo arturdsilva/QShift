@@ -1,0 +1,12 @@
+.calendar-page__nav {
+  @apply flex items-center gap-4;
+}
+
+.calendar-page__month-label {
+  min-width: 200px;
+  text-align: center;
+}
+
+.calendar-page__actions {
+  @apply flex justify-between mt-4;
+}

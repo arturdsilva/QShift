@@ -16,8 +16,9 @@ import { ObjModal } from '../atomic/ObjModal';
 
 import { useScheduleCreate } from '../hooks/useScheduleGeneration';
 import { STATUS } from '../hooks/useRetryOnSleep';
-import { useIndexedDB } from '../services/useIndexedDB.js';
+import { useTemplateStore } from '../services/useTemplateStore.js';
 import { daysOfWeek } from '../constants/constantsOfTable.js';
+import './ShiftConfigPage.css';
 
 function buildShiftFromTemplate(tpl) {
   return {
@@ -41,9 +42,7 @@ function ShiftConfigPage({
   const { run, status, retryCountdown, retriesLeft, errorInfo, getMessage } = useScheduleCreate();
   const isBusy = status === STATUS.RUNNING || status === STATUS.WAKING_UP;
 
-  const shiftsDB = useIndexedDB('shifts');
-  const daysDB = useIndexedDB('days');
-  const schedulesDB = useIndexedDB('schedules');
+  const { shiftsDB, daysDB, schedulesDB } = useTemplateStore();
 
   const [showShiftModal, setShowShiftModal] = useState(false);
   const [showDayModal, setShowDayModal] = useState(false);
@@ -284,9 +283,9 @@ function ShiftConfigPage({
         onRetry={createSchedule}
       />
 
-      <div className="flex flex-1 gap-3 mt-3 overflow-hidden" style={{ minHeight: 0 }}>
-        <aside className="w-[240px] shrink-0 flex flex-col h-full border border-slate-800 rounded-lg bg-black bg-opacity-15">
-          <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+      <div className="shift-config__layout">
+        <aside className="shift-config__sidebar">
+          <div className="shift-config__sidebar-inner">
             <ObjSidebarSectionTemplate
               title="Shifts"
               items={shiftsDB.items}
@@ -329,12 +328,12 @@ function ShiftConfigPage({
         />
       </div>
 
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-800">
+      <div className="shift-config__footer">
         <Button onClick={() => navigate('/calendar')} variant="primary" size="lg" disabled={isBusy}>
           <ArrowLeft size={20} />
           Back
         </Button>
-        <Button onClick={createSchedule} variant="primary" size="lg" disabled={isBusy} className="bg-blue-600 hover:bg-blue-500">
+        <Button onClick={createSchedule} variant="primary" size="lg" disabled={isBusy} className="shift-config__create-btn">
           <Calendar className="w-4 h-4" />
           {isBusy ? 'Generating…' : 'Create Schedule'}
         </Button>
@@ -356,7 +355,7 @@ function ShiftConfigPage({
           </AtmText>
 
           {selectedDay !== null && selectedDayShifts.length > 0 && (
-            <div className="bg-slate-900 rounded-lg p-3 flex flex-col gap-1 mb-1">
+            <div className="shift-config__day-modal-preview">
               {selectedDayShifts.map((s) => (
                 <MolShiftChip key={s.id} shift={s} small />
               ))}
@@ -371,7 +370,7 @@ function ShiftConfigPage({
             onChange={(e) => setDayForm((f) => ({ ...f, name: e.target.value }))}
           />
 
-          <div className="flex justify-end gap-3 mb-1 mt-1">
+          <div className="shift-config__modal-actions">
             <Button variant="secondary" size="md" onClick={() => setShowDayModal(false)}>Cancel</Button>
             <Button
               variant="primary" size="md"
@@ -399,7 +398,7 @@ function ShiftConfigPage({
             onChange={(e) => setWeekForm((f) => ({ ...f, name: e.target.value }))}
           />
 
-          <div className="flex justify-end gap-3 mb-1 mt-1">
+          <div className="shift-config__modal-actions">
             <Button variant="secondary" size="md" onClick={() => setShowWeekModal(false)}>Cancel</Button>
             <Button
               variant="primary" size="md"

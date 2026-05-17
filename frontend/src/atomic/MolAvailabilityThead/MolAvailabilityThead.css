@@ -1,0 +1,19 @@
+.mol-availability-thead {
+  @apply mb-6 flex items-center justify-between;
+}
+
+.mol-availability-legend {
+  @apply flex gap-4 text-sm;
+}
+
+.mol-availability-legend__item {
+  @apply flex items-center gap-2;
+}
+
+.mol-availability-legend__dot--available {
+  @apply w-4 h-4 bg-green-500 rounded;
+}
+
+.mol-availability-legend__dot--unavailable {
+  @apply w-4 h-4 bg-slate-900/40 border border-slate-600 rounded;
+}

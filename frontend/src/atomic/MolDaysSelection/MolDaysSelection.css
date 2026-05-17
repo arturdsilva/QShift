@@ -1,0 +1,19 @@
+.mol-days-selection {
+  @apply space-y-3;
+}
+
+.mol-days-selection__container {
+  @apply bg-slate-800 rounded-xl border border-slate-700 p-4 min-h-[100px];
+}
+
+.mol-days-selection__chips {
+  @apply flex flex-wrap gap-2;
+}
+
+.mol-days-selection__chip {
+  @apply w-8 h-8 flex items-center justify-center bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 rounded-lg text-sm font-medium;
+}
+
+.mol-days-selection__empty {
+  @apply h-full flex items-center justify-center italic;
+}

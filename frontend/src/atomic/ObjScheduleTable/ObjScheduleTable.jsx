@@ -5,6 +5,7 @@ import { MolSlotEmployeesPicker } from '../MolSlotEmployeePicker/index.js';
 import { Table } from '../AtmTable/index.js';
 import { MolScheduleTableHeader } from '../MolScheduleHeader';
 import { MolScheduleTableBody } from '../MolScheduleBody';
+import './ObjScheduleTable.css';
 
 /**
  * ObjScheduleTable – full schedule table with employee selector modal
@@ -77,8 +78,8 @@ export function ObjScheduleTable({ scheduleData, setScheduleData, employeeList, 
 
   return (
     <div>
-      <div className="bg-slate-800 rounded-lg overflow-hidden border border-slate-700 shadow-xl">
-        <div className="overflow-x-auto">
+      <div className="obj-schedule-table__wrapper">
+        <div className="obj-schedule-table__scroll">
           <Table>
             <MolScheduleTableHeader visibleSlots={visibleSlots} selectedDaysMap={hendleSelecetedDaysMap()} />
             <MolScheduleTableBody

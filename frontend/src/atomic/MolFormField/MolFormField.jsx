@@ -1,5 +1,6 @@
 import { AtmText } from '../AtmText';
 import { AtmInput } from '../AtmInput';
+import './MolFormField.css';
 
 /**
  * MolFormField – label + AtmInput + optional hint
@@ -23,7 +24,7 @@ export function MolFormField({
   min,
 }) {
   return (
-    <div className={`flex flex-col gap-1.5 ${className}`}>
+    <div className={`mol-form-field ${className}`}>
       {label && (
         <AtmText as="label" size="sm" weight="medium" color="dimmer" htmlFor={id}>
           {label}

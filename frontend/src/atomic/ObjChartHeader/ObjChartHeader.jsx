@@ -4,6 +4,7 @@ import { METRIC_COLORS, STATS_CONFIG } from '../../constants/employeeStatsConfig
 import { months } from '../../constants/constantsOfTable.js';
 import { AtmText } from '../AtmText/Text.jsx';
 import { MolMetricSelector } from '../MolMetricSelector';
+import './ObjChartHeader.css';
 
 export function ObjChartHeader({
     selectedMetric,
@@ -16,28 +17,28 @@ export function ObjChartHeader({
     onNextYear,
 }) {
     return (
-        <div className="bg-slate-800 rounded-lg px-4 py-3 border border-slate-700">
-            <div className="flex flex-col lg:flex-row items-center mb-4 gap-4">
+        <div className="obj-chart-header">
+            <div className="obj-chart-header__controls">
                 <AtmText as="h3" size="lg" weight="semibold" color="white">
                     Select Metric to Display
                 </AtmText>
-                <div className="flex flex-col sm:flex-row items-center gap-4 w-full lg:w-auto lg:ml-auto">
-                    <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                <div className="obj-chart-header__nav-group">
+                    <div className="obj-chart-header__nav">
                         <Button onClick={onPrevMonth} variant="periodNav" title="Previous month">
                             <ChevronLeft size={24} className="text-white" />
                         </Button>
-                        <AtmText as="span" size="xl" weight="medium" color="white" className="min-w-[120px] text-center">
+                        <AtmText as="span" size="xl" weight="medium" color="white" className="obj-chart-header__month-label">
                             {months[currentMonth - 1]}
                         </AtmText>
                         <Button onClick={onNextMonth} variant="periodNav" title="Next month">
                             <ChevronRight size={24} className="text-white" />
                         </Button>
                     </div>
-                    <div className="flex items-center justify-center gap-2 w-full sm:w-auto">
+                    <div className="obj-chart-header__nav">
                         <Button onClick={onPrevYear} variant="periodNav" title="Previous Year">
                             <ChevronLeft size={24} className="text-white" />
                         </Button>
-                        <AtmText as="span" size="xl" weight="medium" color="white" className="min-w-[80px] text-center">
+                        <AtmText as="span" size="xl" weight="medium" color="white" className="obj-chart-header__year-label">
                             {currentYear}
                         </AtmText>
                         <Button onClick={onNextYear} variant="periodNav" title="Next Year">

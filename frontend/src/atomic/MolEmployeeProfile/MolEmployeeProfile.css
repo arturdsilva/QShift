@@ -1,0 +1,27 @@
+.mol-employee-profile {
+  @apply flex bg-slate-800 rounded-lg border border-slate-700 p-6 justify-center;
+}
+
+.mol-employee-profile__info {
+  @apply flex-1;
+}
+
+.mol-employee-profile__avatar-row {
+  @apply flex items-center gap-4;
+}
+
+.mol-employee-profile__name-input-wrapper {
+  @apply flex-1;
+}
+
+.mol-employee-profile__checkbox-row {
+  @apply flex items-center gap-3 pt-2;
+}
+
+.mol-employee-profile__divider {
+  @apply border-l border-slate-700 ml-8;
+}
+
+.mol-employee-profile__workload {
+  @apply flex flex-col ml-8;
+}

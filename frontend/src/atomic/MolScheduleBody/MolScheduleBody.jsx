@@ -3,6 +3,7 @@ import React from 'react';
 import { daysOfWeek } from '../../constants/constantsOfTable.js';
 import { AtmText } from '../AtmText/Text.jsx';
 import { TBody, TR, TH, TD } from '../AtmTable/index.js';
+import './MolScheduleBody.css';
 
 export function MolScheduleTableBody({ scheduleData, employeeList, visibleSlots, maxSlots, editMode, onSlotClick }) {
     return (
@@ -32,7 +33,7 @@ export function MolScheduleTableBody({ scheduleData, employeeList, visibleSlots,
                                     clickable={!!(editMode && slot)}
                                     onClick={() => slot && editMode && onSlotClick(slot, day)}
                                 >
-                                    <div className="min-h-[80px] flex flex-col gap-1">
+                                    <div className="mol-schedule-cell">
                                         {slot ? (
                                             <>
                                                 {isUnderStaffed && (
@@ -42,14 +43,14 @@ export function MolScheduleTableBody({ scheduleData, employeeList, visibleSlots,
                                                 )}
                                                 {employees.length > 0 ? (
                                                     employees.map((emp, i) => (
-                                                        <div key={i} className="px-2 py-1 bg-blue-600/50 rounded text-center leading-none">
+                                                        <div key={i} className="mol-schedule-employee-chip">
                                                             <AtmText color='white' size='sm' weight='medium'>
                                                                 {emp.name}
                                                             </AtmText>
                                                         </div>
                                                     ))
                                                 ) : (
-                                                    <div className="text-center py-6">
+                                                    <div className="mol-schedule-empty">
                                                         <AtmText color='muted' size='sm'>
                                                             {editMode ? 'click' : '—'}
                                                         </AtmText>
@@ -57,7 +58,7 @@ export function MolScheduleTableBody({ scheduleData, employeeList, visibleSlots,
                                                 )}
                                             </>
                                         ) : (
-                                            <div className="text-center py-6">
+                                            <div className="mol-schedule-empty">
                                                 <AtmText color='muted' size='sm'>—</AtmText>
                                             </div>
                                         )}

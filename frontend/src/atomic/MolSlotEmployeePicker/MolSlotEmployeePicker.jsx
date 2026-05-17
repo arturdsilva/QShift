@@ -2,20 +2,21 @@ import { AtmText } from "../AtmText/Text.jsx";
 import { SelectableButton, Button } from "../AtmButton/index.js";
 import { AtmAvatar } from "../AtmAvatar/index.js";
 import { Check } from "lucide-react";
+import './MolSlotEmployeePicker.css';
 
 /**
  * MolSlotEmployeesPicker – employee selector for a time slot
  */
 export function MolSlotEmployeesPicker({ day, slot, assignedEmployees, employeeList, onToggleEmployee, onClose }) {
     return (
-        <div className="p-6">
-            <div className="text-sm text-slate-400 mb-4">
+        <div className="mol-slot-picker">
+            <div className="mol-slot-picker__info">
                 {day} | {slot.startTime} - {slot.endTime} {' '}
-                <AtmText as="span" size="sm" color="muted" className="">
+                <AtmText as="span" size="sm" color="muted">
                     ({assignedEmployees.length}/{slot.minEmployees} employees)
                 </AtmText>
             </div>
-            <div className="space-y-2 max-h-96 overflow-y-auto mb-6">
+            <div className="mol-slot-picker__list">
                 {employeeList
                     .filter((emp) => emp.active)
                     .map((emp) => {
@@ -29,13 +30,13 @@ export function MolSlotEmployeesPicker({ day, slot, assignedEmployees, employeeL
                                 size='md'
                                 fullWidth={true}
                             >
-                                <div className={`p-1.5 rounded-md ${isSelected ? 'bg-white/20' : 'bg-slate-700 group-hover:bg-slate-600'}`}>
+                                <div className={`mol-slot-picker__avatar-wrapper ${isSelected ? 'mol-slot-picker__avatar-wrapper--selected' : 'mol-slot-picker__avatar-wrapper--default'}`}>
                                     <AtmAvatar name={emp.name} active={emp.active} size='sm' />
                                 </div>
                                 <div className="flex items-center justify-between">
-                                    <AtmText as="span" size="md" color="white" className="font-medium max-w-full break-all leading-none">{emp.name}</AtmText>
+                                    <AtmText as="span" size="md" color="white" className="mol-slot-picker__name">{emp.name}</AtmText>
                                 </div>
-                                {isSelected && <Check size={20} className='ml-auto' />}
+                                {isSelected && <Check size={20} className='mol-slot-picker__check' />}
                             </SelectableButton>
                         );
                     })}

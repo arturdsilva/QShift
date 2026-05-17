@@ -1,0 +1,31 @@
+.generated-schedule__content {
+  padding: 0.75rem;
+}
+
+.generated-schedule__actions {
+  @apply flex flex-col-reverse sm:flex-row mt-4 gap-3 sm:gap-0;
+}
+
+.generated-schedule__actions-left {
+  @apply flex-1 justify-center sm:justify-start flex w-full sm:w-auto;
+}
+
+.generated-schedule__actions-right {
+  @apply justify-end flex flex-col sm:flex-row flex-1 w-full sm:w-auto gap-2 sm:gap-0;
+}
+
+.generated-schedule__action-item {
+  @apply w-full sm:w-auto px-0 sm:px-2 py-1.5;
+}
+
+.generated-schedule__edit-actions {
+  @apply flex mt-4;
+}
+
+.generated-schedule__edit-save-wrapper {
+  @apply flex-1 justify-center sm:justify-end flex w-full;
+}
+
+.generated-schedule__edit-save-item {
+  @apply w-full sm:w-auto px-0 sm:px-40 py-1.5;
+}

@@ -1,0 +1,7 @@
+.mol-template-item {
+  @apply flex cursor-grab items-center justify-between rounded-[10px] border border-slate-800 bg-slate-900 px-[12px] py-[10px] transition-colors duration-150 hover:border-blue-500;
+}
+
+.mol-template-item__content {
+  @apply flex flex-col gap-1.5;
+}

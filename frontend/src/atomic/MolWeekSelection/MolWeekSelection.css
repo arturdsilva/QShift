@@ -1,0 +1,15 @@
+.mol-week-selection {
+  @apply space-y-3 mt-4;
+}
+
+.mol-week-selection__card {
+  @apply bg-slate-800 rounded-xl border border-slate-700 overflow-hidden;
+}
+
+.mol-week-selection__card-inner {
+  @apply p-4 space-y-4;
+}
+
+.mol-week-selection__separator {
+  @apply border-t border-slate-700 pt-3;
+}
