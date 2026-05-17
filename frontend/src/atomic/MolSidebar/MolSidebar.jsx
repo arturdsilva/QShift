@@ -6,7 +6,7 @@ import './MolSidebar.css';
 
 const navItems = [
   { icon: CalendarRange, label: 'Create Schedule', path: '/staff', indexPage: 1 },
-  { icon: LayoutTemplate, label: 'Templates', path: '/templates', indexPage: 2 },
+  { icon: LayoutTemplate, label: 'Templates', path: '/templates', indexPage: 11 },
   { icon: BarChart3, label: 'Reports', path: '/reports', indexPage: 3 },
 ];
 
