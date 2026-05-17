@@ -91,10 +91,10 @@
 }
 
 /* Responsive */
+.atm-btn--responsive { width: 100%}
 @media (min-width: 640px) {
   .atm-btn--responsive { width: auto; }
 }
-.atm-btn--responsive { width: 100%; }
 
 
 /* ═══════════════════════════════════════════════════════
