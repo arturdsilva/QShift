@@ -132,6 +132,26 @@ def test_generate_schedule_route_accepts_job_and_sends_callback(monkeypatch):
 
 
 @pytest.mark.unit
+def test_generator_health_and_metrics_endpoints_expose_operational_signals():
+    client = TestClient(app)
+
+    health_response = client.get("/healthz")
+    metrics_response = client.get("/metrics")
+
+    assert health_response.status_code == 200
+    assert health_response.headers["X-Request-ID"]
+    assert health_response.json()["status"] == "ok"
+    assert health_response.json()["service"] == "schedule_generator_api"
+
+    assert metrics_response.status_code == 200
+    assert "qshift_process_uptime_seconds" in metrics_response.text
+    assert (
+        'qshift_http_requests_total{method="GET",route="/healthz",service="schedule_generator_api",status_class="2xx",status_code="200"}'
+        in metrics_response.text
+    )
+
+
+@pytest.mark.unit
 def test_process_schedule_generation_job_reports_failure_when_preview_breaks(monkeypatch):
     dispatch_request = _build_dispatch_request()
     sent_callbacks = []

@@ -25,6 +25,16 @@ def process_schedule_generation_job(
 ) -> None:
     try:
         preview = build_schedule_preview(dispatch_request)
+        logger.info(
+            "Schedule generation completed",
+            extra={
+                "job_id": str(dispatch_request.job_id),
+                "possible": preview.possible,
+                "generated_shift_count": (
+                    len(preview.schedule.shifts) if preview.schedule is not None else 0
+                ),
+            },
+        )
         callback_payload = schemas.ScheduleGenerationCallbackIn(
             job_id=dispatch_request.job_id,
             status=schemas.ScheduleGenerationJobStatus.DONE,

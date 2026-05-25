@@ -260,7 +260,7 @@ def test_preview_schedule_dispatches_employee_weekly_workload_hours(
     employee_payload = next(
         employee
         for employee in dispatch_request.payload.employees
-        if employee.id == patch_response.json()["id"]
+        if str(employee.id) == patch_response.json()["id"]
     )
     assert employee_payload.weekly_workload_hours == 24
 

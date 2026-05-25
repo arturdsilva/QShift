@@ -9,6 +9,7 @@ from core_api.api.routes.dev import router as dev_router
 from core_api.api.routes.schedule import router as schedule_router
 from core_api.api.routes.users import router as users_router
 from core_api.api.routes.auth import router as auth_router
+from core_api.api.routes.operations import router as operations_router
 
 api_router = APIRouter()
 
@@ -19,6 +20,7 @@ api_router.include_router(weeks_router)
 api_router.include_router(schedule_router)
 api_router.include_router(users_router)
 api_router.include_router(auth_router)
+api_router.include_router(operations_router)
 
 if settings.ENV in {"dev", "test"}:
     api_router.include_router(dev_router)
