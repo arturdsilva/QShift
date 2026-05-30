@@ -20,6 +20,7 @@ class ScheduleGenerator:
         employee_ids: List[UUID],
         employee_names: List[str],
         employee_weekly_workload_hours: List[int | None] | None = None,
+        employee_preferred_weekdays: List[List[int]] | None = None,
         shift_vector: List[shift_domain.Shift],
         availability_matrix: List[List[bool]],
     ):
@@ -34,6 +35,17 @@ class ScheduleGenerator:
                 "employee_weekly_workload_hours must match employee_ids length"
             )
         self.employee_weekly_workload_hours = employee_weekly_workload_hours
+        if employee_preferred_weekdays is None:
+            employee_preferred_weekdays = [[] for _ in self.employee_ids]
+        if len(employee_preferred_weekdays) != len(self.employee_ids):
+            raise ValueError(
+                "employee_preferred_weekdays must match employee_ids length"
+            )
+        self.employee_preferred_weekdays = employee_preferred_weekdays
+        self.employee_preferred_weekday_sets = [
+            set(preferred_weekdays)
+            for preferred_weekdays in self.employee_preferred_weekdays
+        ]
         self.shift_vector = shift_vector
         self.availability_matrix = availability_matrix
 
@@ -78,6 +90,9 @@ class ScheduleGenerator:
             employee_names=employee_names,
             employee_weekly_workload_hours=[
                 employee.weekly_workload_hours for employee in payload.employees
+            ],
+            employee_preferred_weekdays=[
+                employee.preferred_weekdays for employee in payload.employees
             ],
             shift_vector=shift_vector,
             availability_matrix=cls._build_availability_matrix_from_payload(
@@ -299,6 +314,44 @@ class ScheduleGenerator:
             fairness_tol = 0.05
             model.Add(sum(dev.values()) <= int((1.0 + fairness_tol) * best_fairness))
 
+        non_preferred_terms = []
+        for e in range(self.num_employees):
+            preferred_weekdays = self.employee_preferred_weekday_sets[e]
+            if not preferred_weekdays:
+                continue
+            for t in range(self.num_shifts):
+                if self.weekday[t] not in preferred_weekdays:
+                    non_preferred_terms.append(x[e][t])
+
+        if non_preferred_terms:
+            model.ClearHints()
+            for e in range(self.num_employees):
+                for t in range(self.num_shifts):
+                    model.AddHint(x[e][t], chosen_after_1.Value(x[e][t]))
+
+            preference_objective = sum(non_preferred_terms)
+            model.Minimize(preference_objective)
+
+            solver2 = cp_model.CpSolver()
+            solver2.parameters.max_time_in_seconds = 15.0
+            solver2.parameters.num_search_workers = self.num_search_workers
+            status2 = solver2.Solve(model)
+            if status2 not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+                print(
+                    "\033[91mWARNING:\033[0mNo feasible solution found for "
+                    "step 2. Status: ",
+                    solver2.StatusName(),
+                )
+                chosen_after_2 = chosen_after_1
+            else:
+                chosen_after_2 = solver2
+                best_preference = sum(
+                    int(chosen_after_2.Value(term)) for term in non_preferred_terms
+                )
+                model.Add(preference_objective <= best_preference)
+        else:
+            chosen_after_2 = chosen_after_1
+
         over_vars = []
         for e in range(self.num_employees):
             for d in range(7):
@@ -316,31 +369,33 @@ class ScheduleGenerator:
                 model.Add(over >= num_shifts_in_day - 1)
                 over_vars.append(over)
 
+        model.ClearHints()
         for e in range(self.num_employees):
             for t in range(self.num_shifts):
-                model.ClearHints()
-                model.AddHint(x[e][t], chosen_after_1.Value(x[e][t]))
+                model.AddHint(x[e][t], chosen_after_2.Value(x[e][t]))
 
         obj_over = sum(over_vars) if over_vars else 0
         model.Minimize(obj_over)
 
-        solver2 = cp_model.CpSolver()
-        solver2.parameters.max_time_in_seconds = 15.0
-        solver2.parameters.num_search_workers = self.num_search_workers
-        status2 = solver2.Solve(model)
-        if status2 not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
+        solver3 = cp_model.CpSolver()
+        solver3.parameters.max_time_in_seconds = 15.0
+        solver3.parameters.num_search_workers = self.num_search_workers
+        status3 = solver3.Solve(model)
+        if status3 not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
             print(
-                f"\033[91mWARNING:\033[0mNo feasible solution found for step 2. Status: ", solver2.StatusName()
+                "\033[91mWARNING:\033[0mNo feasible solution found for "
+                "step 3. Status: ",
+                solver3.StatusName(),
             )
-            chosen_after_2 = solver1
+            chosen_after_3 = chosen_after_2
         else:
-            chosen_after_2 = solver2
+            chosen_after_3 = solver3
 
         schedule_shifts_out: List[schemas.PreviewScheduleShiftOut] = []
         for t in range(self.num_shifts):
             employees_out: List[schemas.ScheduleShiftEmployeeOut] = []
             for e in range(self.num_employees):
-                if chosen_after_2.Value(x[e][t]) == 1:
+                if chosen_after_3.Value(x[e][t]) == 1:
                     employees_out.append(
                         schemas.ScheduleShiftEmployeeOut(
                             employee_id=self.employee_ids[e],

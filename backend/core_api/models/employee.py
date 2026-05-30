@@ -4,7 +4,7 @@ import uuid
 from typing import List
 from sqlalchemy import String, Boolean, ForeignKey, Integer, UniqueConstraint, Index, text
 from sqlalchemy.orm import relationship, Mapped, mapped_column
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 import core_api.core.constants as constants
 
 from .base import Base
@@ -35,6 +35,12 @@ class Employee(Base):
     )
     weekly_workload_hours: Mapped[int | None] = mapped_column(
         Integer, nullable=True
+    )
+    preferred_weekdays: Mapped[list[int]] = mapped_column(
+        ARRAY(Integer),
+        nullable=False,
+        default=list,
+        server_default=text("'{}'::integer[]"),
     )
 
     # relationships

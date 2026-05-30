@@ -52,6 +52,23 @@ def test_create_employee_with_weekly_workload_hours(client: TestClient, seeded_d
 
 
 @pytest.mark.integration
+def test_create_employee_with_preferred_weekdays(client: TestClient, seeded_data):
+    """Should create employee with preferred work weekdays."""
+    response = client.post(
+        "/api/v1/employees",
+        json={
+            "name": "Ana Paula",
+            "active": True,
+            "preferred_weekdays": [0, 2],
+        },
+    )
+
+    assert response.status_code == 201
+    data = response.json()
+    assert data["preferred_weekdays"] == [0, 2]
+
+
+@pytest.mark.integration
 def test_create_employee_empty_name(client: TestClient, seeded_data):
     """Should reject employee with empty name."""
     response = client.post(
@@ -96,6 +113,7 @@ def test_create_employee_default_active(client: TestClient, seeded_data):
     assert response.status_code == 201
     assert response.json()["active"] is True
     assert response.json()["weekly_workload_hours"] is None
+    assert response.json()["preferred_weekdays"] == []
 
 
 @pytest.mark.integration
@@ -106,6 +124,23 @@ def test_create_employee_negative_weekly_workload_hours(
     response = client.post(
         "/api/v1/employees",
         json={"name": "Pedro Costa", "weekly_workload_hours": -1},
+    )
+
+    assert response.status_code == 422
+
+
+@pytest.mark.integration
+@pytest.mark.parametrize(
+    "preferred_weekdays",
+    [[-1], [7], [0, 0]],
+)
+def test_create_employee_invalid_preferred_weekdays(
+    client: TestClient, seeded_data, preferred_weekdays
+):
+    """Should reject invalid weekday preferences."""
+    response = client.post(
+        "/api/v1/employees",
+        json={"name": "Pedro Costa", "preferred_weekdays": preferred_weekdays},
     )
 
     assert response.status_code == 422
@@ -274,6 +309,65 @@ def test_update_employee_clears_weekly_workload_hours(client: TestClient, seeded
 
     assert response.status_code == 200
     assert response.json()["weekly_workload_hours"] is None
+
+
+@pytest.mark.integration
+def test_update_employee_preferred_weekdays(client: TestClient, seeded_data):
+    """Should update employee weekday preferences."""
+    create_response = client.post(
+        "/api/v1/employees",
+        json={"name": "Employee", "active": True},
+    )
+    employee_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/api/v1/employees/{employee_id}",
+        json={"preferred_weekdays": [1, 3, 5]},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["preferred_weekdays"] == [1, 3, 5]
+
+
+@pytest.mark.integration
+def test_update_employee_clears_preferred_weekdays(client: TestClient, seeded_data):
+    """Should allow clearing employee weekday preferences."""
+    create_response = client.post(
+        "/api/v1/employees",
+        json={
+            "name": "Employee",
+            "active": True,
+            "preferred_weekdays": [1, 3],
+        },
+    )
+    employee_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/api/v1/employees/{employee_id}",
+        json={"preferred_weekdays": []},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["preferred_weekdays"] == []
+
+
+@pytest.mark.integration
+def test_update_employee_rejects_null_preferred_weekdays(
+    client: TestClient, seeded_data
+):
+    """Should reject null weekday preferences; [] clears the field."""
+    create_response = client.post(
+        "/api/v1/employees",
+        json={"name": "Employee", "active": True},
+    )
+    employee_id = create_response.json()["id"]
+
+    response = client.patch(
+        f"/api/v1/employees/{employee_id}",
+        json={"preferred_weekdays": None},
+    )
+
+    assert response.status_code == 422
 
 
 @pytest.mark.integration

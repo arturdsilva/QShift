@@ -363,6 +363,46 @@ def _build_custom_workload_instance() -> ScheduleGenerator:
     )
 
 
+def _build_preferred_weekday_instance() -> ScheduleGenerator:
+    """
+    Preference-sensitive instance:
+      - 2 employees, 3 one-hour shifts.
+      - Two Monday shifts and one Tuesday shift.
+      - All employees can work all shifts.
+      - One employee prefers Monday, the other prefers Tuesday.
+
+    Without the weekday preference objective, the final concentration objective can
+    avoid two Monday shifts for the same employee. With preferences prioritized
+    before concentration, the Monday-preferring employee should receive both
+    Monday shifts.
+    """
+    employee_names = ["Monday Preferred", "Tuesday Preferred"]
+    employee_ids = [uuid.uuid4() for _ in employee_names]
+
+    shift_ids = [uuid.uuid4() for _ in range(3)]
+    shifts: List[shift_domain.Shift] = [
+        shift_domain.Shift(
+            id=shift_ids[0], weekday=0, start_time=_t(9), end_time=_t(10), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[1], weekday=0, start_time=_t(10), end_time=_t(11), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[2], weekday=1, start_time=_t(9), end_time=_t(10), min_staff=1
+        ),
+    ]
+    availability = [[True for _ in shifts] for _ in employee_ids]
+
+    return ScheduleGenerator(
+        shift_ids=shift_ids,
+        employee_ids=employee_ids,
+        employee_names=employee_names,
+        employee_preferred_weekdays=[[0], [1]],
+        shift_vector=shifts,
+        availability_matrix=availability,
+    )
+
+
 def _build_week_constrained_instance() -> ScheduleGenerator:
     """
     Week-long instance with employee constraints and varying daily demand.
@@ -598,6 +638,26 @@ def test_generate_schedule_respects_individual_workload_targets(
 
     assert hours_by_name["Ana"] == 8.0
     assert hours_by_name["Bruno"] == 4.0
+
+
+@pytest.mark.unit
+def test_generate_schedule_prefers_employee_weekdays_before_daily_concentration():
+    gen = _build_preferred_weekday_instance()
+    assert gen.check_possibility() is True
+
+    schedule: schemas.ScheduleOut = gen.generate_schedule()
+    _print_schedule(schedule, gen.employee_ids, gen.employee_names)
+    _assert_basic_constraints(gen, schedule)
+
+    employees_by_shift = [
+        [employee.name for employee in shift.employees] for shift in schedule.shifts
+    ]
+    assert employees_by_shift == [
+        ["Monday Preferred"],
+        ["Monday Preferred"],
+        ["Tuesday Preferred"],
+    ]
+    assert _employees_worked_multiple_shifts_in_a_day(schedule) == 1
 
 
 @pytest.mark.unit

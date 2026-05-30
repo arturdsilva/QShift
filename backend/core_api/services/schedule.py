@@ -76,6 +76,7 @@ def build_schedule_generation_payload(
                 id=employee.id,
                 name=employee.name,
                 weekly_workload_hours=employee.weekly_workload_hours,
+                preferred_weekdays=employee.preferred_weekdays,
             )
             for employee in employees
         ],

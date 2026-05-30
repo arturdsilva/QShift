@@ -6,6 +6,20 @@ from pydantic import BaseModel, Field, field_validator
 import core_api.core.constants as constants
 
 
+def _validate_preferred_weekdays(v: list[int] | None) -> list[int]:
+    if v is None:
+        raise ValueError("preferred_weekdays cannot be null; use [] to clear it")
+
+    invalid_weekdays = [weekday for weekday in v if weekday < 0 or weekday > 6]
+    if invalid_weekdays:
+        raise ValueError("preferred_weekdays must contain only values from 0 to 6")
+
+    if len(set(v)) != len(v):
+        raise ValueError("preferred_weekdays cannot contain duplicates")
+
+    return v
+
+
 class EmployeeBase(BaseModel):
     name: str = Field(
         ...,
@@ -24,6 +38,13 @@ class EmployeeBase(BaseModel):
             "to balance assignments for this employee"
         ),
     )
+    preferred_weekdays: list[int] = Field(
+        default_factory=list,
+        description=(
+            "Weekdays the employee prefers to work, where 0 = monday and "
+            "6 = sunday. Empty means no preference."
+        ),
+    )
 
     @field_validator("name")
     @classmethod
@@ -32,6 +53,11 @@ class EmployeeBase(BaseModel):
         if not v2:
             raise ValueError("name cannot be empty or whitespace")
         return v2
+
+    @field_validator("preferred_weekdays")
+    @classmethod
+    def _preferred_weekdays_valid(cls, v: list[int]):
+        return _validate_preferred_weekdays(v)
 
 
 class EmployeeCreate(EmployeeBase):
@@ -46,6 +72,13 @@ class EmployeeUpdate(BaseModel):
         ge=0,
         le=constants.MAX_WEEKLY_WORKLOAD_HOURS,
     )
+    preferred_weekdays: list[int] | None = Field(
+        None,
+        description=(
+            "Weekdays the employee prefers to work, where 0 = monday and "
+            "6 = sunday. Empty means no preference."
+        ),
+    )
 
     @field_validator("name")
     @classmethod
@@ -57,6 +90,11 @@ class EmployeeUpdate(BaseModel):
         if not v2:
             raise ValueError("name cannot be empty or whitespace")
         return v2
+
+    @field_validator("preferred_weekdays")
+    @classmethod
+    def _preferred_weekdays_valid(cls, v: list[int] | None):
+        return _validate_preferred_weekdays(v)
 
 
 class EmployeeOut(EmployeeBase):
