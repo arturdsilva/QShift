@@ -247,6 +247,7 @@ class ScheduleGenerator:
             model.Add(sum(x[e][t] for e in range(self.num_employees)) - self.demand[t] == deviation1[t] - deviation2[t])
             model.Add(deviation_from_required_staff[t] == deviation1[t] + deviation2[t])
 
+        # Step 1: minimize deviation from required staffing.
         model.Minimize(sum(deviation_from_required_staff.values()))
         solver0 = cp_model.CpSolver()
         solver0.parameters.max_time_in_seconds = 20.0
@@ -298,6 +299,7 @@ class ScheduleGenerator:
             for t in range(self.num_shifts):
                 model.AddHint(x[e][t], solver0.Value(x[e][t]))
 
+        # Step 2: minimize deviation from employee workload targets.
         model.Minimize(sum(dev.values()))
         solver1 = cp_model.CpSolver()
         solver1.parameters.max_time_in_seconds = 20.0
@@ -323,6 +325,7 @@ class ScheduleGenerator:
                 if self.weekday[t] not in preferred_weekdays:
                     non_preferred_terms.append(x[e][t])
 
+        # Step 3: minimize assignments on non-preferred weekdays.
         if non_preferred_terms:
             model.ClearHints()
             for e in range(self.num_employees):
@@ -369,6 +372,7 @@ class ScheduleGenerator:
                 model.Add(over >= num_shifts_in_day - 1)
                 over_vars.append(over)
 
+        # Step 4: minimize multiple shifts for the same employee in one day.
         model.ClearHints()
         for e in range(self.num_employees):
             for t in range(self.num_shifts):

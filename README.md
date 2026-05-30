@@ -124,10 +124,11 @@ Hard constraints:
 Optimization is done in stages:
 
 1. Minimize deviation from required staffing per shift.
-2. Keep workload balanced across employees by minimizing deviation from the average target workload.
-3. Reduce fragmented days by minimizing cases where the same employee receives multiple shifts in a single day.
+2. Keep workload balanced across employees by minimizing deviation from each employee's weekly workload target, or from the average target when no individual targets are configured.
+3. Respect employee weekday preferences by minimizing assignments on non-preferred days. Employees with no preferred weekdays configured are neutral in this stage.
+4. Reduce fragmented days by minimizing cases where the same employee receives multiple shifts in a single day.
 
-In short: feasibility comes first, coverage quality comes next, and fairness/shift concentration are refined after that.
+In short: feasibility comes first, coverage quality comes next, then workload balance, weekday preferences, and shift concentration are refined in that order.
 
 ## Tests
 
