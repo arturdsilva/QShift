@@ -91,16 +91,26 @@ VITE_BASE_URL=http://localhost:8000/api/v1
 
 ## Run
 
-Start the main API:
+The backend is composed of two separate processes that must both be running for full functionality:
+
+- `core_api` (port 8000) — main API consumed by the frontend
+- `schedule_generator_api` (port 8001) — internal service called by `core_api` when generating schedules; without it the schedule preview feature fails, but all other API operations work normally
+
+Start both backend services together:
 
 ```bash
 cd backend
 ./scripts/run.sh
 ```
 
-Start the schedule generator API:
+Or start each service individually:
 
 ```bash
+# Terminal 1
+cd backend
+./scripts/run_core.sh
+
+# Terminal 2
 cd backend
 ./scripts/run_generator.sh
 ```
