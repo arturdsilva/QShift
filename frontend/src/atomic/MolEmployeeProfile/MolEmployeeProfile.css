@@ -22,6 +22,41 @@
   @apply border-l border-slate-700 ml-8;
 }
 
+.mol-employee-profile__right {
+  @apply flex flex-col gap-4 ml-8;
+}
+
 .mol-employee-profile__workload {
-  @apply flex flex-col ml-8;
+  @apply flex flex-col;
+}
+
+.mol-employee-profile__preferred-days {
+  @apply flex flex-col;
+}
+
+.mol-employee-profile__weekday-buttons {
+  @apply flex gap-1.5;
+}
+
+.mol-employee-profile__weekday-btn {
+  @apply text-xs font-medium rounded cursor-pointer transition-colors;
+  width: 2.25rem;
+  height: 2rem;
+  background-color: #334155;
+  color: #94a3b8;
+  border: none;
+}
+
+.mol-employee-profile__weekday-btn:hover {
+  background-color: #475569;
+  color: #e2e8f0;
+}
+
+.mol-employee-profile__weekday-btn--selected {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.mol-employee-profile__weekday-btn--selected:hover {
+  background-color: #4338ca;
 }

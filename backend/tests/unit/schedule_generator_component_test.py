@@ -116,6 +116,44 @@ def _employees_worked_multiple_shifts_in_a_day(schedule: schemas.ScheduleOut) ->
     return count_emp
 
 
+def _daily_concentration_penalty(schedule: schemas.ScheduleOut) -> int:
+    """
+    Count the solver's daily concentration penalty:
+    for each employee/day, shifts after the first one add one penalty point.
+    """
+    by_emp_day = defaultdict(lambda: defaultdict(int))
+    for s in schedule.shifts:
+        for emp in s.employees:
+            by_emp_day[emp.employee_id][s.weekday] += 1
+
+    penalty = 0
+    for day_counts in by_emp_day.values():
+        for count in day_counts.values():
+            penalty += max(0, count - 1)
+    return penalty
+
+
+def _non_preferred_assignment_count(
+    gen: ScheduleGenerator, schedule: schemas.ScheduleOut
+) -> int:
+    """
+    Count assignments on non-preferred weekdays.
+    Employees with no configured preference are neutral and do not add penalty.
+    """
+    preferred_weekdays_by_employee = {
+        employee_id: set(gen.employee_preferred_weekdays[index])
+        for index, employee_id in enumerate(gen.employee_ids)
+    }
+
+    count = 0
+    for shift in schedule.shifts:
+        for employee in shift.employees:
+            preferred_weekdays = preferred_weekdays_by_employee[employee.employee_id]
+            if preferred_weekdays and shift.weekday not in preferred_weekdays:
+                count += 1
+    return count
+
+
 def _mean_std(values: List[float]) -> Tuple[float, float]:
     """Compute population mean and population standard deviation."""
     if not values:
@@ -363,6 +401,65 @@ def _build_custom_workload_instance() -> ScheduleGenerator:
     )
 
 
+def _build_preferred_weekday_instance() -> ScheduleGenerator:
+    """
+    Priority-order instance:
+      - 5 employees, 6 one-hour shifts.
+      - Demand can be covered exactly.
+      - Workload targets can be met exactly: [2, 1, 1, 1, 1].
+      - One employee must work outside preference to preserve workload balance.
+      - One employee must work two Monday shifts to preserve weekday preference
+        before the daily concentration objective.
+    """
+    employee_names = [
+        "Mon Anchor",
+        "Tue Preferred",
+        "Wed Preferred",
+        "Thu Preferred",
+        "Needs Hours",
+    ]
+    employee_ids = [uuid.uuid4() for _ in employee_names]
+
+    shift_ids = [uuid.uuid4() for _ in range(6)]
+    shifts: List[shift_domain.Shift] = [
+        shift_domain.Shift(
+            id=shift_ids[0], weekday=0, start_time=_t(9), end_time=_t(10), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[1], weekday=0, start_time=_t(10), end_time=_t(11), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[2], weekday=1, start_time=_t(9), end_time=_t(10), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[3], weekday=1, start_time=_t(10), end_time=_t(11), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[4], weekday=2, start_time=_t(9), end_time=_t(10), min_staff=1
+        ),
+        shift_domain.Shift(
+            id=shift_ids[5], weekday=3, start_time=_t(9), end_time=_t(10), min_staff=1
+        ),
+    ]
+    availability = [
+        [True, True, True, True, True, False],  # Mon Anchor
+        [True, True, True, True, False, False],  # Tue Preferred
+        [True, True, True, True, True, False],  # Wed Preferred
+        [False, False, False, False, False, True],  # Thu Preferred
+        [True, True, True, True, False, False],  # Needs Hours
+    ]
+
+    return ScheduleGenerator(
+        shift_ids=shift_ids,
+        employee_ids=employee_ids,
+        employee_names=employee_names,
+        employee_weekly_workload_hours=[2, 1, 1, 1, 1],
+        employee_preferred_weekdays=[[0], [1], [2], [3], [4]],
+        shift_vector=shifts,
+        availability_matrix=availability,
+    )
+
+
 def _build_week_constrained_instance() -> ScheduleGenerator:
     """
     Week-long instance with employee constraints and varying daily demand.
@@ -598,6 +695,64 @@ def test_generate_schedule_respects_individual_workload_targets(
 
     assert hours_by_name["Ana"] == 8.0
     assert hours_by_name["Bruno"] == 4.0
+
+
+@pytest.mark.unit
+def test_generate_schedule_respects_priority_order_with_weekday_preferences():
+    gen = _build_preferred_weekday_instance()
+    assert gen.check_possibility() is True
+
+    schedule: schemas.ScheduleOut = gen.generate_schedule()
+    _print_schedule(schedule, gen.employee_ids, gen.employee_names)
+    _assert_basic_constraints(gen, schedule)
+
+    # Priority 1: staffing coverage is optimized before all employee objectives.
+    assert all(
+        len(schedule_shift.employees) == int(input_shift.min_staff)
+        for schedule_shift, input_shift in zip(schedule.shifts, gen.shift_vector)
+    )
+
+    # Priority 2: workload targets are preserved even though "Tue Preferred"
+    # could take both Tuesday shifts and reduce preference penalties.
+    hours_by_name = {
+        display_name: total_hours
+        for display_name, total_hours in _hours_per_employee(
+            schedule, gen.employee_ids, gen.employee_names
+        ).values()
+    }
+    assert hours_by_name == {
+        "Mon Anchor": 2.0,
+        "Tue Preferred": 1.0,
+        "Wed Preferred": 1.0,
+        "Thu Preferred": 1.0,
+        "Needs Hours": 1.0,
+    }
+
+    # Priority 3: after exact workload is fixed, preference penalties are
+    # minimized. "Needs Hours" has no available preferred day, so one
+    # non-preferred assignment is unavoidable; no extra ones are accepted just
+    # to improve daily concentration.
+    assert _non_preferred_assignment_count(gen, schedule) == 1
+
+    monday_assignments = [
+        employee.name
+        for shift in schedule.shifts
+        if shift.weekday == 0
+        for employee in shift.employees
+    ]
+    tuesday_assignments = [
+        employee.name
+        for shift in schedule.shifts
+        if shift.weekday == 1
+        for employee in shift.employees
+    ]
+    assert monday_assignments == ["Mon Anchor", "Mon Anchor"]
+    assert set(tuesday_assignments) == {"Tue Preferred", "Needs Hours"}
+
+    # Priority 4: daily concentration is optimized only after the previous
+    # objectives. One concentration penalty is the minimum compatible with the
+    # preference optimum above.
+    assert _daily_concentration_penalty(schedule) == 1
 
 
 @pytest.mark.unit

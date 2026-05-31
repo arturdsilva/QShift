@@ -18,6 +18,7 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
   const [name, setName] = useState(selectEditEmployee?.name || '');
   const [workload, setWorkload] = useState(selectEditEmployee?.weekly_workload_hours ?? '');
   const [isActive, setIsActive] = useState(selectEditEmployee?.active ?? true);
+  const [preferredWeekdays, setPreferredWeekdays] = useState(selectEditEmployee?.preferred_weekdays ?? []);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [paintMode, setPaintMode] = useState(true);
   const [error, setError] = useState(null);
@@ -128,10 +129,10 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
       const availabilitySchemas = convertAvailabilityToSchemas();
       let employeeId = selectEditEmployee?.id;
       if (!employeeId) {
-        const newEmployee = await AvailabilityApi.addNewEmployee({ name, active: isActive, weekly_workload_hours: workloadNum });
+        const newEmployee = await AvailabilityApi.addNewEmployee({ name, active: isActive, weekly_workload_hours: workloadNum, preferred_weekdays: preferredWeekdays });
         employeeId = newEmployee.id;
       } else {
-        await StaffApi.updateEmployeeData(employeeId, { name, active: isActive, weekly_workload_hours: workloadNum });
+        await StaffApi.updateEmployeeData(employeeId, { name, active: isActive, weekly_workload_hours: workloadNum, preferred_weekdays: preferredWeekdays });
       }
       try {
         await AvailabilityApi.replaceAllAvailabilities(employeeId, availabilitySchemas);
@@ -167,6 +168,8 @@ function AvailabilityPage({ selectEditEmployee, setSelectEditEmployee, isLoading
           setWorkload={setWorkload}
           isActive={isActive}
           setIsActive={setIsActive}
+          preferredWeekdays={preferredWeekdays}
+          setPreferredWeekdays={setPreferredWeekdays}
           error={error}
         />
 

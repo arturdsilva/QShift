@@ -91,16 +91,26 @@ VITE_BASE_URL=http://localhost:8000/api/v1
 
 ## Run
 
-Start the main API:
+The backend is composed of two separate processes that must both be running for full functionality:
+
+- `core_api` (port 8000) — main API consumed by the frontend
+- `schedule_generator_api` (port 8001) — internal service called by `core_api` when generating schedules; without it the schedule preview feature fails, but all other API operations work normally
+
+Start both backend services together:
 
 ```bash
 cd backend
 ./scripts/run.sh
 ```
 
-Start the schedule generator API:
+Or start each service individually:
 
 ```bash
+# Terminal 1
+cd backend
+./scripts/run_core.sh
+
+# Terminal 2
 cd backend
 ./scripts/run_generator.sh
 ```
@@ -124,10 +134,11 @@ Hard constraints:
 Optimization is done in stages:
 
 1. Minimize deviation from required staffing per shift.
-2. Keep workload balanced across employees by minimizing deviation from the average target workload.
-3. Reduce fragmented days by minimizing cases where the same employee receives multiple shifts in a single day.
+2. Keep workload balanced across employees by minimizing deviation from each employee's weekly workload target, or from the average target when no individual targets are configured.
+3. Respect employee weekday preferences by minimizing assignments on non-preferred days. Employees with no preferred weekdays configured are neutral in this stage.
+4. Reduce fragmented days by minimizing cases where the same employee receives multiple shifts in a single day.
 
-In short: feasibility comes first, coverage quality comes next, and fairness/shift concentration are refined after that.
+In short: feasibility comes first, coverage quality comes next, then workload balance, weekday preferences, and shift concentration are refined in that order.
 
 ## Tests
 
