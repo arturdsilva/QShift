@@ -10,6 +10,9 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "cypress:run:full": "cypress run --spec 'cypress/e2e/00_full_flow.cy.js'"
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test-storybook": "vitest --project=storybook"
   },
   "dependencies": {
     "axios": "^1.12.2",
@@ -24,15 +27,30 @@
     "tailwind-variants": "^3.2.2"
   },
   "devDependencies": {
+    "@chromatic-com/storybook": "^5.2.1",
+    "@storybook/addon-a11y": "^10.4.1",
+    "@storybook/addon-docs": "^10.4.1",
+    "@storybook/addon-mcp": "^0.6.0",
+    "@storybook/addon-vitest": "^10.4.1",
+    "@storybook/react-vite": "^10.4.1",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
+    "@vitest/browser-playwright": "^4.1.7",
+    "@vitest/coverage-v8": "^4.1.7",
     "autoprefixer": "^10.4.21",
     "cypress": "^15.16.0",
+    "jsdom": "^29.1.1",
+    "playwright": "^1.60.0",
     "postcss": "^8.5.6",
     "prettier": "3.6.2",
+    "prop-types": "^15.8.1",
+    "storybook": "^10.4.1",
     "tailwindcss": "^3.4.18",
     "vite": "^7.1.7",
-    "vite-plugin-pwa": "^1.1.0"
+    "vite-plugin-pwa": "^1.1.0",
+    "vitest": "^4.1.7"
   }
 }
