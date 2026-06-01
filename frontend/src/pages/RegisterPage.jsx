@@ -18,7 +18,7 @@ function RegisterPage() {
   const [error, setError] = useState('');
   const isBusy = status === STATUS.RUNNING || status === STATUS.WAKING_UP;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     if (!email || !confEmail || !password) {
@@ -29,15 +29,12 @@ function RegisterPage() {
       setError('Emails do not match');
       return;
     }
-    const result = run({ email, password });
-    const resultData = result.data;
-    if (resultData?.success) {
-      alert('User registered successfully');
+    const result = await run({ email, password });
+    if (result?.success) {
       navigate('/login');
-    } else if (resultData?.error.response?.data?.detail === 'Email already registered') {
+    } else if (result?.error?.response?.data?.detail === 'Email already registered') {
       setError('Email already registered');
     }
-    console.error(resultData?.error);
   };
 
   return (

@@ -7,6 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:full": "cypress run --spec 'cypress/e2e/00_full_flow.cy.js'"
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "vitest --project=storybook"
@@ -38,6 +41,7 @@
     "@vitest/browser-playwright": "^4.1.7",
     "@vitest/coverage-v8": "^4.1.7",
     "autoprefixer": "^10.4.21",
+    "cypress": "^15.16.0",
     "jsdom": "^29.1.1",
     "playwright": "^1.60.0",
     "postcss": "^8.5.6",
