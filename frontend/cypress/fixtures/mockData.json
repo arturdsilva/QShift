@@ -1,0 +1,67 @@
+{
+  "testUser": {
+    "email": "cypress_test@qshift.com",
+    "password": "CypressTest@123"
+  },
+  "employees": [
+    {
+      "name": "Employee1",
+      "workload": 24
+    },
+    {
+      "name": "Employee2",
+      "workload": 24
+    },
+    {
+      "name": "Employee3",
+      "workload": 18
+    },
+    {
+      "name": "Employee4",
+      "workload": 18
+    },
+    {
+      "name": "Employee5",
+      "workload": 24
+    }
+  ],
+  "shifts": [
+    {
+      "name": "Turno 1",
+      "start": "08:00",
+      "end": "12:00",
+      "staff": 2
+    },
+    {
+      "name": "Turno 2",
+      "start": "11:00",
+      "end": "14:00",
+      "staff": 1
+    },
+    {
+      "name": "Turno 3",
+      "start": "15:00",
+      "end": "19:00",
+      "staff": 2
+    },
+    {
+      "name": "Turno 1",
+      "start": "09:00",
+      "end": "12:00",
+      "staff": 2
+    },
+    {
+      "name": "Turno 2",
+      "start": "13:00",
+      "end": "16:00",
+      "staff": 1
+    },
+    {
+      "name": "Turno 3",
+      "start": "16:00",
+      "end": "20:00",
+      "staff": 2
+    }
+  ],
+  "apiBase": "http://localhost:8000/api/v1"
+}

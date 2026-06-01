@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "cypress:run:full": "cypress run --spec 'cypress/e2e/00_full_flow.cy.js'"
   },
   "dependencies": {
     "axios": "^1.12.2",
@@ -25,6 +28,7 @@
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
     "autoprefixer": "^10.4.21",
+    "cypress": "^15.16.0",
     "postcss": "^8.5.6",
     "prettier": "3.6.2",
     "tailwindcss": "^3.4.18",
