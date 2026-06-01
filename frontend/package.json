@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "cypress:run:full": "cypress run --spec 'cypress/e2e/00_full_flow.cy.js'"
+    "cypress:run:full": "cypress run --spec 'cypress/e2e/00_full_flow.cy.js'",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "test-storybook": "vitest --project=storybook"
