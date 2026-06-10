@@ -105,11 +105,13 @@ def generate_preview_schedule(
         },
     )
 
-    dispatch_request = schedule_service.build_schedule_generation_dispatch_request(
-        job_id=job.id,
-        payload=dispatch_payload,
+    dispatch_request, request_payload = (
+        schedule_service.build_schedule_generation_dispatch_artifacts(
+            job_id=job.id,
+            payload=dispatch_payload,
+        )
     )
-    job.request_payload = dispatch_request.model_dump(mode="json")
+    job.request_payload = request_payload
 
     try:
         schedule_service.dispatch_schedule_generation_job(dispatch_request)

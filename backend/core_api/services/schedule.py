@@ -49,15 +49,25 @@ def build_schedule_generation_payload(
 ) -> schemas.ScheduleGenerationDispatchPayload:
     from core_api.models import Availability, Employee
 
-    employees = (
-        db.query(Employee)
+    employee_rows = (
+        db.query(
+            Employee.id,
+            Employee.name,
+            Employee.weekly_workload_hours,
+            Employee.preferred_weekdays,
+        )
         .filter(Employee.user_id == user_id, Employee.active == True)
         .order_by(Employee.name.asc(), Employee.id.asc())
         .all()
     )
-    employee_ids = [employee.id for employee in employees]
-    availabilities = (
-        db.query(Availability)
+    employee_ids = [employee.id for employee in employee_rows]
+    availability_rows = (
+        db.query(
+            Availability.employee_id,
+            Availability.weekday,
+            Availability.start_time,
+            Availability.end_time,
+        )
         .filter(
             Availability.user_id == user_id,
             Availability.employee_id.in_(employee_ids) if employee_ids else false(),
@@ -80,7 +90,7 @@ def build_schedule_generation_payload(
                 weekly_workload_hours=employee.weekly_workload_hours,
                 preferred_weekdays=employee.preferred_weekdays,
             )
-            for employee in employees
+            for employee in employee_rows
         ],
         availabilities=[
             schemas.ScheduleGenerationAvailabilityOut(
@@ -89,9 +99,21 @@ def build_schedule_generation_payload(
                 start_time=availability.start_time,
                 end_time=availability.end_time,
             )
-            for availability in availabilities
+            for availability in availability_rows
         ],
     )
+
+
+def build_schedule_generation_dispatch_artifacts(
+    *,
+    job_id: UUID,
+    payload: schemas.ScheduleGenerationDispatchPayload,
+):
+    dispatch_request = build_schedule_generation_dispatch_request(
+        job_id=job_id,
+        payload=payload,
+    )
+    return dispatch_request, dispatch_request.model_dump(mode="json")
 
 
 def build_schedule_assignments_to_create(
