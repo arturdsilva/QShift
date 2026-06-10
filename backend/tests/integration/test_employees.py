@@ -1,4 +1,5 @@
 from fastapi.testclient import TestClient
+import calendar
 import pytest
 import core_api.services.schedule as schedule_service
 
@@ -482,3 +483,57 @@ def test_delete_employee_cascades_availabilities(client: TestClient, seeded_data
 
     avail_response = client.get(f"/api/v1/employees/{employee_id}/availabilities")
     assert avail_response.status_code == 404
+
+
+@pytest.mark.integration
+def test_get_employee_year_report_returns_all_months_with_aggregated_stats(
+    client: TestClient, seeded_data
+):
+    employees = client.get("/api/v1/employees").json()
+    employee_id = employees[0]["id"]
+    week_id = seeded_data["week_id"]
+    year = int(seeded_data["week_start"].split("-")[0])
+
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    selected_shift_ids = [
+        shift["id"]
+        for shift in shifts
+        if shift["weekday"] in [0, 1] and shift["start_time"] in ["09:00:00", "13:00:00"]
+    ]
+
+    schedule_response = client.post(
+        f"/api/v1/weeks/{week_id}/schedule",
+        json={
+            "shifts": [
+                {"shift_id": shift_id, "employee_ids": [employee_id]}
+                for shift_id in selected_shift_ids
+            ]
+        },
+    )
+    assert schedule_response.status_code == 201
+
+    response = client.get(f"/api/v1/employees/{employee_id}/report/{year}")
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["name"] == employees[0]["name"]
+    assert len(data["months_data"]) == 12
+
+    populated_month_index, populated_month = next(
+        (idx, month)
+        for idx, month in enumerate(data["months_data"], start=1)
+        if month["num_days_worked"] > 0
+    )
+    empty_months = [month for month in data["months_data"] if month["num_days_worked"] == 0]
+
+    assert populated_month["hours_worked"] == 18.0
+    assert populated_month["num_days_worked"] == 2
+    assert populated_month["num_morning_shifts"] == 2
+    assert populated_month["num_afternoon_shifts"] == 2
+    assert populated_month["num_night_shifts"] == 0
+    assert (
+        populated_month["num_days_off"] + populated_month["num_days_worked"]
+        == calendar.monthrange(year, populated_month_index)[1]
+    )
+    assert len(empty_months) == 11
+    assert all(month["hours_worked"] == 0.0 for month in empty_months)
