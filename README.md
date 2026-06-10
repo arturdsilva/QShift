@@ -169,3 +169,21 @@ Frontend production build:
 cd frontend
 npm run build
 ```
+
+Open Cypress:
+
+The frontend and backend must already be running before starting Cypress:
+
+```bash
+# Terminal 1
+cd backend
+./scripts/run.sh
+
+# Terminal 2
+cd frontend
+npm run dev
+
+# Terminal 3
+cd frontend
+npm run cypress:open
+```

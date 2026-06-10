@@ -1,6 +1,8 @@
 import json
 import time as time_module
 from datetime import datetime, timezone
+from collections import defaultdict
+from fastapi import HTTPException, status
 from sqlalchemy import false
 from sqlalchemy.orm import Session
 from typing import List
@@ -47,15 +49,25 @@ def build_schedule_generation_payload(
 ) -> schemas.ScheduleGenerationDispatchPayload:
     from core_api.models import Availability, Employee
 
-    employees = (
-        db.query(Employee)
+    employee_rows = (
+        db.query(
+            Employee.id,
+            Employee.name,
+            Employee.weekly_workload_hours,
+            Employee.preferred_weekdays,
+        )
         .filter(Employee.user_id == user_id, Employee.active == True)
         .order_by(Employee.name.asc(), Employee.id.asc())
         .all()
     )
-    employee_ids = [employee.id for employee in employees]
-    availabilities = (
-        db.query(Availability)
+    employee_ids = [employee.id for employee in employee_rows]
+    availability_rows = (
+        db.query(
+            Availability.employee_id,
+            Availability.weekday,
+            Availability.start_time,
+            Availability.end_time,
+        )
         .filter(
             Availability.user_id == user_id,
             Availability.employee_id.in_(employee_ids) if employee_ids else false(),
@@ -78,7 +90,7 @@ def build_schedule_generation_payload(
                 weekly_workload_hours=employee.weekly_workload_hours,
                 preferred_weekdays=employee.preferred_weekdays,
             )
-            for employee in employees
+            for employee in employee_rows
         ],
         availabilities=[
             schemas.ScheduleGenerationAvailabilityOut(
@@ -87,9 +99,95 @@ def build_schedule_generation_payload(
                 start_time=availability.start_time,
                 end_time=availability.end_time,
             )
-            for availability in availabilities
+            for availability in availability_rows
         ],
     )
+
+
+def build_schedule_generation_dispatch_artifacts(
+    *,
+    job_id: UUID,
+    payload: schemas.ScheduleGenerationDispatchPayload,
+):
+    dispatch_request = build_schedule_generation_dispatch_request(
+        job_id=job_id,
+        payload=payload,
+    )
+    return dispatch_request, dispatch_request.model_dump(mode="json")
+
+
+def build_schedule_assignments_to_create(
+    *,
+    week_id: UUID,
+    user_id: UUID,
+    payload: schemas.ScheduleCreate,
+    db: Session,
+):
+    from core_api.models import Employee, ShiftAssignment
+    from core_api.models.shift import Shift
+
+    assignment_pairs: list[tuple[UUID, UUID]] = []
+    shift_ids: list[UUID] = []
+    employee_ids: list[UUID] = []
+    seen_shift_ids: set[UUID] = set()
+    seen_employee_ids: set[UUID] = set()
+
+    for schedule_shift in payload.shifts:
+        if schedule_shift.shift_id not in seen_shift_ids:
+            seen_shift_ids.add(schedule_shift.shift_id)
+            shift_ids.append(schedule_shift.shift_id)
+
+        for employee_id in schedule_shift.employee_ids:
+            assignment_pairs.append((schedule_shift.shift_id, employee_id))
+            if employee_id not in seen_employee_ids:
+                seen_employee_ids.add(employee_id)
+                employee_ids.append(employee_id)
+
+    if shift_ids:
+        existing_shift_ids = {
+            shift_id
+            for (shift_id,) in (
+                db.query(Shift.id)
+                .filter(
+                    Shift.user_id == user_id,
+                    Shift.week_id == week_id,
+                    Shift.id.in_(shift_ids),
+                )
+                .all()
+            )
+        }
+        if len(existing_shift_ids) != len(shift_ids):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Shift not found",
+            )
+
+    if employee_ids:
+        existing_employee_ids = {
+            employee_id
+            for (employee_id,) in (
+                db.query(Employee.id)
+                .filter(
+                    Employee.user_id == user_id,
+                    Employee.id.in_(employee_ids),
+                )
+                .all()
+            )
+        }
+        if len(existing_employee_ids) != len(employee_ids):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Employee not found",
+            )
+
+    return [
+        ShiftAssignment(
+            user_id=user_id,
+            shift_id=shift_id,
+            employee_id=employee_id,
+        )
+        for shift_id, employee_id in assignment_pairs
+    ]
 
 
 def dispatch_schedule_generation_job(
@@ -226,29 +324,39 @@ def build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
     from core_api.models import ShiftAssignment, Employee
 
     shifts = (
-        db.query(Shift).filter(Shift.week_id == week_id, Shift.user_id == user_id).all()
+        db.query(Shift)
+        .filter(Shift.week_id == week_id, Shift.user_id == user_id)
+        .order_by(Shift.weekday, Shift.start_time, Shift.end_time, Shift.id)
+        .all()
     )
-    schedule_shifts_out = []
-    shift: Shift
-    for shift in shifts:
-        assignments = (
-            db.query(ShiftAssignment)
-            .filter(
-                ShiftAssignment.shift_id == shift.id,
-                ShiftAssignment.user_id == user_id,
+
+    employees_by_shift_id: dict[UUID, list[schemas.ScheduleShiftEmployeeOut]] = defaultdict(list)
+    shift_ids = [shift.id for shift in shifts]
+    if shift_ids:
+        assignment_rows = (
+            db.query(ShiftAssignment.shift_id, Employee.id, Employee.name)
+            .join(
+                Employee,
+                (Employee.id == ShiftAssignment.employee_id)
+                & (Employee.user_id == ShiftAssignment.user_id),
             )
+            .filter(
+                ShiftAssignment.user_id == user_id,
+                ShiftAssignment.shift_id.in_(shift_ids),
+            )
+            .order_by(ShiftAssignment.shift_id, Employee.name, Employee.id)
             .all()
         )
-        schedule_shift_employees_out = []
-        for assignment in assignments:
-            employee = (
-                db.query(Employee).filter(Employee.id == assignment.employee_id).first()
-            )
-            schedule_shift_employees_out.append(
+        for shift_id, employee_id, employee_name in assignment_rows:
+            employees_by_shift_id[shift_id].append(
                 schemas.ScheduleShiftEmployeeOut(
-                    employee_id=employee.id, name=str(employee.name)
+                    employee_id=employee_id,
+                    name=str(employee_name),
                 )
             )
+
+    schedule_shifts_out = []
+    for shift in shifts:
         schedule_shifts_out.append(
             schemas.ScheduleShiftOut(
                 shift_id=shift.id,
@@ -256,7 +364,7 @@ def build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
                 start_time=shift.start_time,
                 end_time=shift.end_time,
                 min_staff=shift.min_staff,
-                employees=schedule_shift_employees_out,
+                employees=employees_by_shift_id.get(shift.id, []),
             )
         )
     return schemas.ScheduleOut(shifts=schedule_shifts_out)

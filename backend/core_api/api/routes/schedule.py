@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 import core_api.schemas.schedule as schemas
 import core_api.services.schedule as schedule_service
-from core_api.models import ShiftAssignment, Employee, ScheduleGenerationJob, Week
+from core_api.models import ScheduleGenerationJob, Week, ShiftAssignment, Employee
 from core_api.models.shift import Shift
 from core_api.api.dependencies import current_user_id
 from core_api.core.config import settings
@@ -23,22 +23,13 @@ def create_schedule(
     user_id: UUID = Depends(current_user_id),
     db: Session = Depends(get_session),
 ):
-    for schedule_shift in payload.shifts:
-        if db.get(Shift, schedule_shift.shift_id) is None:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="Shift not found"
-            )
-        for employee_id in schedule_shift.employee_ids:
-            if db.get(Employee, employee_id) is None:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND, detail="Employee not found"
-                )
-            new_assignment = ShiftAssignment(
-                user_id=user_id,
-                shift_id=schedule_shift.shift_id,
-                employee_id=employee_id,
-            )
-            db.add(new_assignment)
+    new_assignments = schedule_service.build_schedule_assignments_to_create(
+        week_id=week_id,
+        user_id=user_id,
+        payload=payload,
+        db=db,
+    )
+    db.add_all(new_assignments)
 
     db.commit()
 
@@ -114,11 +105,13 @@ def generate_preview_schedule(
         },
     )
 
-    dispatch_request = schedule_service.build_schedule_generation_dispatch_request(
-        job_id=job.id,
-        payload=dispatch_payload,
+    dispatch_request, request_payload = (
+        schedule_service.build_schedule_generation_dispatch_artifacts(
+            job_id=job.id,
+            payload=dispatch_payload,
+        )
     )
-    job.request_payload = dispatch_request.model_dump(mode="json")
+    job.request_payload = request_payload
 
     try:
         schedule_service.dispatch_schedule_generation_job(dispatch_request)

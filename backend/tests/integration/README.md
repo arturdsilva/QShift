@@ -251,6 +251,48 @@ Run tests with integration marker:
 pytest -m integration -v
 ```
 
+Benchmark conventions:
+- Local-only diagnostics, not CI gates
+- Files must not start with `test_`
+- Standard name pattern: `*_latency_benchmark.py`
+- Standard marker: `@pytest.mark.benchmark`
+- Prefer printing `avg`, `median`, `stddev`, `min`, and `p95`, plus a final summary block
+
+Run the local annual-report latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/employee_report_latency_benchmark.py -s
+```
+
+Run the local monthly-report latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/employee_month_report_latency_benchmark.py -s
+```
+
+Run the local schedule-read latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/schedule_read_latency_benchmark.py -s
+```
+
+Run the local schedule-create latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/schedule_create_latency_benchmark.py -s
+```
+
+Run the local preview-schedule latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/preview_schedule_latency_benchmark.py -s
+```
+
 ## Test Patterns
 
 All tests follow this structure:
@@ -271,4 +313,3 @@ def test_create_employee_success(client: TestClient, seeded_data):
     assert response.status_code == 201
     assert response.json()["name"] == "João Silva"
 ```
-
