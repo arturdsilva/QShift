@@ -1,30 +1,15 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// TDD Sprint 5 — US-14
-// Nível 2: Testes de componente para EmployeeReportsPage
-//
-// FASE RED: estes testes documentam os comportamentos ESPERADOS que ainda
-// estão quebrados no código atual:
-//   1. alert() é chamado quando não há funcionários (deve ser substituído por UI)
-//   2. sessionStorage bloqueia chamada à API (dados ficam stale)
-//   3. hoursWorked deve ser exibido com 2 casas decimais
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import EmployeeReportsPage from './EmployeeReportsPage.jsx';
-
-// ── Mock da API ───────────────────────────────────────────────────────────────
 vi.mock('../services/api.js', () => ({
   EmployeeReportsApi: {
     getEmployeeYearStats: vi.fn(),
   },
 }));
 
-// Importa após o mock estar definido
 import { EmployeeReportsApi } from '../services/api.js';
 
-// Dado típico retornado pela API
 const mockApiResponse = {
   data: {
     name: 'Alice',
@@ -68,8 +53,7 @@ describe('EmployeeReportsPage — sem funcionários', () => {
   let alertSpy;
 
   beforeEach(() => {
-    // Espiona window.alert para verificar se ele é (in)devidamente chamado
-    alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => {});
+    alertSpy = vi.spyOn(window, 'alert').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -118,7 +102,7 @@ describe('EmployeeReportsPage — busca da API sem cache', () => {
     const staleData = {
       name: 'Alice',
       monthsData: Array.from({ length: 12 }, () => ({
-        hoursWorked: 999, // valor intencionalmente errado para detectar uso do cache
+        hoursWorked: 999,
         daysOff: 0,
         daysWorked: 0,
         morningShifts: 0,
@@ -167,7 +151,6 @@ describe('EmployeeReportsPage — busca da API sem cache', () => {
 
 describe('EmployeeReportsPage — formatação de hoursWorked', () => {
   beforeEach(() => {
-    // janeiro tem hours_worked = 8.333333 para testar limite de casas decimais
     EmployeeReportsApi.getEmployeeYearStats.mockResolvedValue(mockApiResponse);
     sessionStorage.clear();
   });

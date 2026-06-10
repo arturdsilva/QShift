@@ -52,15 +52,12 @@ function EmployeeReportsPage({
       if (employeesList.length > 0) {
         setCurrentEmployee(employeesList[0]);
       } else {
-        // FIX (US-14): não usar alert() — navegar silenciosamente de volta
         navigate('/reports');
         return;
       }
     }
     async function fetchEmployeeStats() {
       try {
-        // FIX (US-14): cache sessionStorage removido — sempre busca dados frescos da API
-        // para evitar dados stale quando escalas são criadas/deletadas na mesma sessão.
         const response = await EmployeeReportsApi.getEmployeeYearStats(currentEmployee.id, currentYear);
         if (response.data) {
           const f = convertEmployeeStatsFormat(response.data);
@@ -83,7 +80,6 @@ function EmployeeReportsPage({
   const handleNextYear = () => setCurrentYear(currentYear + 1);
   const handleBack = () => navigate('/reports');
 
-  // FIX (US-14): exibe mensagem na UI quando não há funcionários (sem alert())
   if (!isLoading && employeesList.length === 0) {
     return (
       <BaseLayout currentPage={10} showSidebar={false}>

@@ -1,18 +1,8 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// TDD Sprint 5 — US-14
-// Nível 1: Testes unitários para funções puras de employeeReportsUtils
-//
-// FASE RED: estes testes são escritos ANTES da implementação correta.
-// Devem FALHAR enquanto a lógica ainda estiver no componente (não em utils).
-// ─────────────────────────────────────────────────────────────────────────────
-
 import { describe, it, expect } from 'vitest';
 import {
   formatWorkedHours,
   convertEmployeeStatsFormat,
 } from './employeeReportsUtils.js';
-
-// ── formatWorkedHours ────────────────────────────────────────────────────────
 
 describe('formatWorkedHours', () => {
   it('deve formatar inteiro com duas casas decimais', () => {
@@ -24,7 +14,6 @@ describe('formatWorkedHours', () => {
   });
 
   it('deve limitar número com muitas casas decimais a duas', () => {
-    // Bug confirmado: sem .toFixed(2) retornaria "8.333333..." sem limite
     expect(formatWorkedHours(8.333333)).toBe('8.33');
   });
 
@@ -44,7 +33,6 @@ describe('formatWorkedHours', () => {
 // ── convertEmployeeStatsFormat ───────────────────────────────────────────────
 
 describe('convertEmployeeStatsFormat', () => {
-  // Dado típico retornado pela API: /employees/{id}/report/{year}
   const apiRawData = {
     name: 'Alice',
     months_data: [
@@ -93,9 +81,7 @@ describe('convertEmployeeStatsFormat', () => {
     expect(result.monthsData[0].daysWorked).toBe(22);
   });
 
-  it('deve mapear num_morning_shifts → morningShifts (sem typo "monrning")', () => {
-    // Bug existente no código: a chave está com typo "monrningShifts" no componente original.
-    // A função utils deve usar a chave correta "morningShifts".
+  it('deve mapear num_morning_shifts → morningShifts', () => {
     const result = convertEmployeeStatsFormat(apiRawData);
     expect(result.monthsData[0].morningShifts).toBe(10);
     expect(result.monthsData[0]).not.toHaveProperty('monrningShifts');

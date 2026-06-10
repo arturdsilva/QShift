@@ -1,19 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/08_employee_reports.cy.js
-// TDD Sprint 5 — US-14: Consistência e qualidade da página Employee Reports
-//
-// Fluxo completo encadeado (mesmo padrão de 00_full_flow):
-//   Setup via before():
-//     1. Registra usuário de teste
-//     2. Cria 5 funcionários com disponibilidade full-week via API
-//     3. Gera e aprova uma escala (necessário para que Employee Reports tenha dados)
-//
-//   Testes (it):
-//     - Navega Reports → card "Employees" → /employee-reports sem alert()
-//     - API sempre chamada de novo (sem cache stale do sessionStorage)
-//     - Horas exibidas com no máximo 2 casas decimais
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('US-14 — Employee Reports: consistência de dados com o backend', () => {
   let createdEmployeeIds = [];
   let scheduleCreated = false;
@@ -155,15 +139,6 @@ describe('US-14 — Employee Reports: consistência de dados com o backend', () 
     });
   });
 
-  /**
-   * Helper reutilizável: visita /staff, aguarda a API de funcionários
-   * e salva a resposta no sessionStorage.
-   *
-   * Necessário porque cada cy.visit() reinicia o React e App.jsx lê
-   * employees do sessionStorage no useState initializer. StaffPage
-   * chama setEmployees() mas não persiste no sessionStorage, então
-   * populamos manualmente para que /reports encontre os funcionários.
-   */
   const loadEmployeesToSession = () => {
     cy.intercept('GET', '**/employees').as('loadEmployees');
     cy.visit('/staff');
