@@ -2,6 +2,7 @@ import json
 import time as time_module
 from datetime import datetime, timezone
 from collections import defaultdict
+from fastapi import HTTPException, status
 from sqlalchemy import false
 from sqlalchemy.orm import Session
 from typing import List
@@ -91,6 +92,80 @@ def build_schedule_generation_payload(
             for availability in availabilities
         ],
     )
+
+
+def build_schedule_assignments_to_create(
+    *,
+    week_id: UUID,
+    user_id: UUID,
+    payload: schemas.ScheduleCreate,
+    db: Session,
+):
+    from core_api.models import Employee, ShiftAssignment
+    from core_api.models.shift import Shift
+
+    assignment_pairs: list[tuple[UUID, UUID]] = []
+    shift_ids: list[UUID] = []
+    employee_ids: list[UUID] = []
+    seen_shift_ids: set[UUID] = set()
+    seen_employee_ids: set[UUID] = set()
+
+    for schedule_shift in payload.shifts:
+        if schedule_shift.shift_id not in seen_shift_ids:
+            seen_shift_ids.add(schedule_shift.shift_id)
+            shift_ids.append(schedule_shift.shift_id)
+
+        for employee_id in schedule_shift.employee_ids:
+            assignment_pairs.append((schedule_shift.shift_id, employee_id))
+            if employee_id not in seen_employee_ids:
+                seen_employee_ids.add(employee_id)
+                employee_ids.append(employee_id)
+
+    if shift_ids:
+        existing_shift_ids = {
+            shift_id
+            for (shift_id,) in (
+                db.query(Shift.id)
+                .filter(
+                    Shift.user_id == user_id,
+                    Shift.week_id == week_id,
+                    Shift.id.in_(shift_ids),
+                )
+                .all()
+            )
+        }
+        if len(existing_shift_ids) != len(shift_ids):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Shift not found",
+            )
+
+    if employee_ids:
+        existing_employee_ids = {
+            employee_id
+            for (employee_id,) in (
+                db.query(Employee.id)
+                .filter(
+                    Employee.user_id == user_id,
+                    Employee.id.in_(employee_ids),
+                )
+                .all()
+            )
+        }
+        if len(existing_employee_ids) != len(employee_ids):
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Employee not found",
+            )
+
+    return [
+        ShiftAssignment(
+            user_id=user_id,
+            shift_id=shift_id,
+            employee_id=employee_id,
+        )
+        for shift_id, employee_id in assignment_pairs
+    ]
 
 
 def dispatch_schedule_generation_job(

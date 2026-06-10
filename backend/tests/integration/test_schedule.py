@@ -125,6 +125,45 @@ def test_create_schedule_employee_not_found(client: TestClient, seeded_data):
 
 
 @pytest.mark.integration
+def test_create_schedule_shift_from_another_week_not_found(client: TestClient, seeded_data):
+    """Should reject assignment when shift does not belong to the target week."""
+    week_id = seeded_data["week_id"]
+    employees = client.get("/api/v1/employees").json()
+
+    other_week_response = client.post(
+        "/api/v1/weeks",
+        json={"start_date": "2025-12-01", "open_days": [0, 1, 2, 3, 4]},
+    )
+    assert other_week_response.status_code == 201
+    other_week_id = other_week_response.json()["id"]
+
+    shift_response = client.post(
+        f"/api/v1/weeks/{other_week_id}/shifts",
+        json={
+            "weekday": 0,
+            "start_time": "09:00",
+            "end_time": "13:00",
+            "min_staff": 1,
+        },
+    )
+    assert shift_response.status_code == 201
+
+    response = client.post(
+        f"/api/v1/weeks/{week_id}/schedule",
+        json={
+            "shifts": [
+                {
+                    "shift_id": shift_response.json()["id"],
+                    "employee_ids": [employees[0]["id"]],
+                },
+            ]
+        },
+    )
+
+    assert response.status_code == 404
+
+
+@pytest.mark.integration
 def test_read_schedule_success(client: TestClient, seeded_data):
     """Should return existing schedule."""
     week_id = seeded_data["week_id"]
