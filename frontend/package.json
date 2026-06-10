@@ -12,7 +12,9 @@
     "cypress:run:full": "cypress run --spec 'cypress/e2e/00_full_flow.cy.js'",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "vitest --project=storybook"
+    "test-storybook": "vitest --project=storybook",
+    "test:unit": "vitest run --project=unit",
+    "test:unit:watch": "vitest --project=unit"
   },
   "dependencies": {
     "axios": "^1.12.2",
