@@ -551,11 +551,16 @@ def test_get_employee_month_report_returns_aggregated_stats_for_selected_month(
     month = int(week_start.split("-")[1])
 
     shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
-    selected_shift_ids = [
-        shift["id"]
+    selected_shifts = [
+        shift
         for shift in shifts
-        if shift["weekday"] in [0, 2] and shift["start_time"] in ["09:00:00", "18:00:00"]
+        if (
+            shift["local_date"].startswith(f"{year:04d}-{month:02d}-")
+            and shift["weekday"] in [0, 2]
+            and shift["start_time"] in ["09:00:00", "18:00:00"]
+        )
     ]
+    selected_shift_ids = [shift["id"] for shift in selected_shifts]
 
     schedule_response = client.post(
         f"/api/v1/weeks/{week_id}/schedule",
@@ -573,13 +578,18 @@ def test_get_employee_month_report_returns_aggregated_stats_for_selected_month(
     assert response.status_code == 200
     data = response.json()
     month_data = data["month_data"]
+    worked_dates = {shift["local_date"] for shift in selected_shifts}
 
     assert data["name"] == employees[0]["name"]
-    assert month_data["hours_worked"] == 16.0
-    assert month_data["num_days_worked"] == 2
-    assert month_data["num_morning_shifts"] == 2
+    assert month_data["hours_worked"] == 4.0 * len(selected_shifts)
+    assert month_data["num_days_worked"] == len(worked_dates)
+    assert month_data["num_morning_shifts"] == sum(
+        1 for shift in selected_shifts if shift["start_time"] == "09:00:00"
+    )
     assert month_data["num_afternoon_shifts"] == 0
-    assert month_data["num_night_shifts"] == 2
+    assert month_data["num_night_shifts"] == sum(
+        1 for shift in selected_shifts if shift["start_time"] == "18:00:00"
+    )
     assert (
         month_data["num_days_off"] + month_data["num_days_worked"]
         == calendar.monthrange(year, month)[1]
