@@ -18,6 +18,10 @@ import { months } from '../constants/constantsOfTable.js';
 import { Button } from '../atomic/AtmButton/index.js';
 import { AtmText } from '../atomic/AtmText/index.js';
 import { MolLoadingPage } from '../atomic/MolLoadingPage';
+import {
+  convertEmployeeStatsFormat,
+  formatWorkedHours,
+} from '../utils/employeeReportsUtils.js';
 import './EmployeeReportsPage.css';
 
 function EmployeeReportsPage({
@@ -34,54 +38,40 @@ function EmployeeReportsPage({
   const [employeeYearStats, setEmployeeYearStats] = useState(null);
   const [statsCards, setStatsCards] = useState([]);
 
-  const convertEmployeeStatsFormat = (stats) => ({
-    name: stats.name,
-    monthsData: stats.months_data.map((monthData) => ({
-      hoursWorked: monthData.hours_worked,
-      daysOff: monthData.num_days_off,
-      daysWorked: monthData.num_days_worked,
-      monrningShifts: monthData.num_morning_shifts,
-      afternoonShifts: monthData.num_afternoon_shifts,
-      nightShifts: monthData.num_night_shifts,
-    })),
-  });
-
   const createStatsCards = (employeeStatsFormatted) =>
     STATS_CONFIG.map((config) => ({
       ...config,
       ...METRIC_COLORS[config.key],
       value: config.suffix
-        ? `${employeeStatsFormatted.monthsData[currentMonth - 1][config.key]}${config.suffix}`
+        ? `${formatWorkedHours(employeeStatsFormatted.monthsData[currentMonth - 1][config.key])}${config.suffix}`
         : employeeStatsFormatted.monthsData[currentMonth - 1][config.key],
     }));
 
   useEffect(() => {
     if (!currentEmployee) {
-      if (employeesList.length > 0) { setCurrentEmployee(employeesList[0]); }
-      else { alert('No employees available. Redirecting to Reports page.'); navigate('/reports'); return; }
+      if (employeesList.length > 0) {
+        setCurrentEmployee(employeesList[0]);
+      } else {
+        // FIX (US-14): não usar alert() — navegar silenciosamente de volta
+        navigate('/reports');
+        return;
+      }
     }
     async function fetchEmployeeStats() {
-      const cacheKey = `employee_stats_${currentEmployee.id}_${currentYear}`;
       try {
-        const cachedData = sessionStorage.getItem(cacheKey);
-        if (cachedData) {
-          const f = JSON.parse(cachedData);
-          setEmployeeYearStats(f);
-          setStatsCards(createStatsCards(f));
-          setIsLoading(false);
-          return;
-        }
-      } catch (error) { console.warn('Error reading from sessionStorage:', error); }
-      try {
+        // FIX (US-14): cache sessionStorage removido — sempre busca dados frescos da API
+        // para evitar dados stale quando escalas são criadas/deletadas na mesma sessão.
         const response = await EmployeeReportsApi.getEmployeeYearStats(currentEmployee.id, currentYear);
         if (response.data) {
           const f = convertEmployeeStatsFormat(response.data);
           setEmployeeYearStats(f);
           setStatsCards(createStatsCards(f));
-          try { sessionStorage.setItem(cacheKey, JSON.stringify(f)); } catch (error) { console.warn('Error writing to sessionStorage:', error); }
         }
-      } catch (error) { console.error('Error fetching employee statistics:', error); }
-      finally { setIsLoading(false); }
+      } catch (error) {
+        console.error('Error fetching employee statistics:', error);
+      } finally {
+        setIsLoading(false);
+      }
     }
     if (currentEmployee) fetchEmployeeStats();
   }, [currentEmployee, currentMonth, currentYear]);
@@ -92,6 +82,25 @@ function EmployeeReportsPage({
   const handlePrevYear = () => setCurrentYear(currentYear - 1);
   const handleNextYear = () => setCurrentYear(currentYear + 1);
   const handleBack = () => navigate('/reports');
+
+  // FIX (US-14): exibe mensagem na UI quando não há funcionários (sem alert())
+  if (!isLoading && employeesList.length === 0) {
+    return (
+      <BaseLayout currentPage={10} showSidebar={false}>
+        <div className="employee-reports__empty">
+          <AtmText as="h2" size="xl" weight="bold" color="white">
+            No employees available
+          </AtmText>
+          <AtmText as="p" size="md" color="muted">
+            Add employees first to view their reports.
+          </AtmText>
+          <Button onClick={() => navigate('/reports')} variant="primary" size="md">
+            <AtmText as="span" size="md" weight="bold" color="white">Back to Reports</AtmText>
+          </Button>
+        </div>
+      </BaseLayout>
+    );
+  }
 
   if (isLoading) return (
     <BaseLayout currentPage={10} showSidebar={false}>
