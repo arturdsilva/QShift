@@ -265,6 +265,13 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
   tests/integration/employee_report_latency_benchmark.py -s
 ```
 
+Run the local monthly-report latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/employee_month_report_latency_benchmark.py -s
+```
+
 Run the local schedule-read latency benchmark explicitly:
 ```bash
 cd backend
