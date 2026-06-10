@@ -279,6 +279,13 @@ PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
   tests/integration/schedule_create_latency_benchmark.py -s
 ```
 
+Run the local preview-schedule latency benchmark explicitly:
+```bash
+cd backend
+PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 ../.venv/bin/pytest \
+  tests/integration/preview_schedule_latency_benchmark.py -s
+```
+
 ## Test Patterns
 
 All tests follow this structure:
