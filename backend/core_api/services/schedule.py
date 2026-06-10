@@ -1,6 +1,7 @@
 import json
 import time as time_module
 from datetime import datetime, timezone
+from collections import defaultdict
 from sqlalchemy import false
 from sqlalchemy.orm import Session
 from typing import List
@@ -226,29 +227,39 @@ def build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
     from core_api.models import ShiftAssignment, Employee
 
     shifts = (
-        db.query(Shift).filter(Shift.week_id == week_id, Shift.user_id == user_id).all()
+        db.query(Shift)
+        .filter(Shift.week_id == week_id, Shift.user_id == user_id)
+        .order_by(Shift.weekday, Shift.start_time, Shift.end_time, Shift.id)
+        .all()
     )
-    schedule_shifts_out = []
-    shift: Shift
-    for shift in shifts:
-        assignments = (
-            db.query(ShiftAssignment)
-            .filter(
-                ShiftAssignment.shift_id == shift.id,
-                ShiftAssignment.user_id == user_id,
+
+    employees_by_shift_id: dict[UUID, list[schemas.ScheduleShiftEmployeeOut]] = defaultdict(list)
+    shift_ids = [shift.id for shift in shifts]
+    if shift_ids:
+        assignment_rows = (
+            db.query(ShiftAssignment.shift_id, Employee.id, Employee.name)
+            .join(
+                Employee,
+                (Employee.id == ShiftAssignment.employee_id)
+                & (Employee.user_id == ShiftAssignment.user_id),
             )
+            .filter(
+                ShiftAssignment.user_id == user_id,
+                ShiftAssignment.shift_id.in_(shift_ids),
+            )
+            .order_by(ShiftAssignment.shift_id, Employee.name, Employee.id)
             .all()
         )
-        schedule_shift_employees_out = []
-        for assignment in assignments:
-            employee = (
-                db.query(Employee).filter(Employee.id == assignment.employee_id).first()
-            )
-            schedule_shift_employees_out.append(
+        for shift_id, employee_id, employee_name in assignment_rows:
+            employees_by_shift_id[shift_id].append(
                 schemas.ScheduleShiftEmployeeOut(
-                    employee_id=employee.id, name=str(employee.name)
+                    employee_id=employee_id,
+                    name=str(employee_name),
                 )
             )
+
+    schedule_shifts_out = []
+    for shift in shifts:
         schedule_shifts_out.append(
             schemas.ScheduleShiftOut(
                 shift_id=shift.id,
@@ -256,7 +267,7 @@ def build_schedule_schema_from_db(week_id: UUID, user_id: UUID, db: Session):
                 start_time=shift.start_time,
                 end_time=shift.end_time,
                 min_staff=shift.min_staff,
-                employees=schedule_shift_employees_out,
+                employees=employees_by_shift_id.get(shift.id, []),
             )
         )
     return schemas.ScheduleOut(shifts=schedule_shifts_out)
