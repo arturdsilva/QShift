@@ -251,6 +251,12 @@ Run tests with integration marker:
 pytest -m integration -v
 ```
 
+Run the local annual-report latency benchmark explicitly:
+```bash
+cd backend
+pytest tests/integration/employee_report_latency_benchmark.py -s
+```
+
 ## Test Patterns
 
 All tests follow this structure:
@@ -271,4 +277,3 @@ def test_create_employee_success(client: TestClient, seeded_data):
     assert response.status_code == 201
     assert response.json()["name"] == "João Silva"
 ```
-
