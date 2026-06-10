@@ -39,6 +39,20 @@ Local ports:
 - `core_api`: `8000`
 - `schedule_generator_api`: `8001`
 
+## Observability
+
+Both backend services expose operational endpoints:
+
+- `GET /healthz`: liveness check for the running process
+- `GET /healthz/ready`: readiness check with dependency status
+- `GET /metrics`: Prometheus-compatible metrics
+
+The `core_api` also exposes authenticated operational JSON at `GET /api/v1/operations/summary`, including HTTP
+latency/error counters, dependency health, uptime, and schedule-generation job totals by status.
+
+Application logs are emitted as structured JSON and include a per-request `request_id`. If a client sends
+`X-Request-ID`, that value is preserved and returned in the response header.
+
 ## Initial Setup
 
 Requirements:

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, BackgroundTasks, status
 
 import core_api.schemas.schedule as schemas
+from schedule_generator_api.core.logging import logger
 from schedule_generator_api.services.generator import process_schedule_generation_job
 
 router = APIRouter()
@@ -15,6 +16,14 @@ def generate_schedule(
     dispatch_request: schemas.ScheduleGenerationDispatchRequest,
     background_tasks: BackgroundTasks,
 ):
+    logger.info(
+        "Schedule generation job accepted by generator",
+        extra={
+            "job_id": str(dispatch_request.job_id),
+            "shift_count": len(dispatch_request.payload.shift_vector),
+            "employee_count": len(dispatch_request.payload.employees),
+        },
+    )
     background_tasks.add_task(
         process_schedule_generation_job,
         dispatch_request,

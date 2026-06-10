@@ -9,6 +9,7 @@ from core_api.models.shift import Shift
 from core_api.api.dependencies import current_user_id
 from core_api.core.config import settings
 from core_api.core.db import get_session
+from core_api.core.logging import logger
 
 router = APIRouter(prefix="", tags=["schedule"])
 
@@ -104,6 +105,14 @@ def generate_preview_schedule(
     db.add(job)
     db.commit()
     db.refresh(job)
+    logger.info(
+        "Schedule generation job created",
+        extra={
+            "job_id": str(job.id),
+            "user_id": str(user_id),
+            "shift_count": len(payload.shift_vector),
+        },
+    )
 
     dispatch_request = schedule_service.build_schedule_generation_dispatch_request(
         job_id=job.id,
@@ -117,9 +126,17 @@ def generate_preview_schedule(
         job.status = schemas.ScheduleGenerationJobStatus.FAILED.value
         job.error_message = str(exc)
         job.finished_at = schedule_service.utcnow()
+        logger.error(
+            "Schedule generation job dispatch failed",
+            extra={"job_id": str(job.id), "user_id": str(user_id), "error": str(exc)},
+        )
     else:
         job.status = schemas.ScheduleGenerationJobStatus.PROCESSING.value
         job.error_message = None
+        logger.info(
+            "Schedule generation job dispatched",
+            extra={"job_id": str(job.id), "user_id": str(user_id)},
+        )
 
     db.add(job)
     db.commit()
@@ -195,6 +212,14 @@ async def receive_schedule_generation_result(
 
     db.add(job)
     db.commit()
+    logger.info(
+        "Schedule generation callback accepted",
+        extra={
+            "job_id": str(job.id),
+            "status": job.status,
+            "has_result": job.result_payload is not None,
+        },
+    )
     return job_schema
 
 
