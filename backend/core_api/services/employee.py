@@ -39,31 +39,27 @@ def _empty_employee_month_data(*, year: int, month: int) -> EmployeeMonthData:
 def _build_employee_month_data(
     employee_id: UUID, year: int, month: int, db: Session
 ) -> EmployeeMonthData:
-    shift_ids = (
-        db.execute(
-            select(ShiftAssignment.shift_id).where(
-                ShiftAssignment.employee_id == employee_id
-            )
-        )
-        .scalars()
-        .all()
-    )
-
     start_date = date(year, month, 1)
     last_month_day = calendar.monthrange(year, month)[1]
     end_date = date(year, month, last_month_day)
 
     shifts = (
         db.execute(
-            select(Shift)
+            select(Shift.local_date, Shift.start_time, Shift.end_time)
+            .join(
+                ShiftAssignment,
+                and_(
+                    ShiftAssignment.shift_id == Shift.id,
+                    ShiftAssignment.user_id == Shift.user_id,
+                ),
+            )
             .where(
-                Shift.id.in_(shift_ids),
+                ShiftAssignment.employee_id == employee_id,
                 Shift.local_date >= start_date,
                 Shift.local_date <= end_date,
             )
-            .order_by(Shift.local_date)
+            .order_by(Shift.local_date, Shift.start_time, Shift.id)
         )
-        .scalars()
         .all()
     )
 

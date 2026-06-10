@@ -537,3 +537,50 @@ def test_get_employee_year_report_returns_all_months_with_aggregated_stats(
     )
     assert len(empty_months) == 11
     assert all(month["hours_worked"] == 0.0 for month in empty_months)
+
+
+@pytest.mark.integration
+def test_get_employee_month_report_returns_aggregated_stats_for_selected_month(
+    client: TestClient, seeded_data
+):
+    employees = client.get("/api/v1/employees").json()
+    employee_id = employees[0]["id"]
+    week_id = seeded_data["week_id"]
+    week_start = seeded_data["week_start"]
+    year = int(week_start.split("-")[0])
+    month = int(week_start.split("-")[1])
+
+    shifts = client.get(f"/api/v1/weeks/{week_id}/shifts").json()
+    selected_shift_ids = [
+        shift["id"]
+        for shift in shifts
+        if shift["weekday"] in [0, 2] and shift["start_time"] in ["09:00:00", "18:00:00"]
+    ]
+
+    schedule_response = client.post(
+        f"/api/v1/weeks/{week_id}/schedule",
+        json={
+            "shifts": [
+                {"shift_id": shift_id, "employee_ids": [employee_id]}
+                for shift_id in selected_shift_ids
+            ]
+        },
+    )
+    assert schedule_response.status_code == 201
+
+    response = client.get(f"/api/v1/employees/{employee_id}/report/{year}/{month}")
+
+    assert response.status_code == 200
+    data = response.json()
+    month_data = data["month_data"]
+
+    assert data["name"] == employees[0]["name"]
+    assert month_data["hours_worked"] == 16.0
+    assert month_data["num_days_worked"] == 2
+    assert month_data["num_morning_shifts"] == 2
+    assert month_data["num_afternoon_shifts"] == 0
+    assert month_data["num_night_shifts"] == 2
+    assert (
+        month_data["num_days_off"] + month_data["num_days_worked"]
+        == calendar.monthrange(year, month)[1]
+    )
