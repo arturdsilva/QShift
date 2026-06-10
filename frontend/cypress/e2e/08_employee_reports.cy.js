@@ -1,4 +1,4 @@
-describe('US-14 — Employee Reports: consistência de dados com o backend', () => {
+describe('Employee Reports: consistência de dados com o backend', () => {
   let createdEmployeeIds = [];
   let scheduleCreated = false;
 

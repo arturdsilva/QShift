@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/05_create_schedule.cy.js
-// Fluxo: Seleção de semana no calendário → configuração de turnos → geração de escala
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Fluxo de Criação de Escala', () => {
   let testUser;
   let shifts;

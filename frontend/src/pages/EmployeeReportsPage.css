@@ -28,7 +28,7 @@
 }
 
 .employee-reports__no-data {
-  height: 100%;
+  height: 20%;
   display: flex;
   align-items: center;
   justify-content: center;

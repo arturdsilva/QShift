@@ -87,7 +87,6 @@ function ScheduleRecordsPage({
         }
       } catch (error) {
         console.error('Error receiving schedule:', error);
-        alert('No schedule has been generated yet.');
       } finally { setIsLoading(false); }
     }
     generateSchedule();

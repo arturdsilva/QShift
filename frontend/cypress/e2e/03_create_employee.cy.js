@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/03_create_employee.cy.js
-// Fluxo: Criação de todos os funcionários com disponibilidade
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Fluxo de Criação de Funcionários', () => {
   let testUser;
   let employees;

@@ -52,7 +52,7 @@ function EmployeeReportsPage({
       if (employeesList.length > 0) {
         setCurrentEmployee(employeesList[0]);
       } else {
-        navigate('/reports');
+        setIsLoading(false);
         return;
       }
     }
@@ -83,17 +83,15 @@ function EmployeeReportsPage({
   if (!isLoading && employeesList.length === 0) {
     return (
       <BaseLayout currentPage={10} showSidebar={false}>
-        <div className="employee-reports__empty">
-          <AtmText as="h2" size="xl" weight="bold" color="white">
-            No employees available
-          </AtmText>
-          <AtmText as="p" size="md" color="muted">
+        <MolPageHeader title="Employees Reports" icon={BarChart3} />
+        <div className="employee-reports__no-data">
+          <AtmText as="p" size="lg" color="muted">
             Add employees first to view their reports.
           </AtmText>
-          <Button onClick={() => navigate('/reports')} variant="primary" size="md">
-            <AtmText as="span" size="md" weight="bold" color="white">Back to Reports</AtmText>
-          </Button>
         </div>
+        <Button onClick={() => navigate('/reports')} variant="primary" size="md">
+          <AtmText as="span" size="md" weight="bold" color="white">Back</AtmText>
+        </Button>
       </BaseLayout>
     );
   }

@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/00_full_flow.cy.js
-// Fluxo completo encadeado:
-// Registro → Login → Criar 5 Funcionários → Editar Disponibilidade → Criar Escala
-//
-// Usa o usuário fixo do mockData.json. O before() limpa o usuário/funcionários
-// antes de começar, garantindo que cada run parte de um estado limpo.
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Fluxo Completo End-to-End — QShift', () => {
   let testUser;
 
