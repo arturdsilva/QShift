@@ -251,6 +251,13 @@ Run tests with integration marker:
 pytest -m integration -v
 ```
 
+Benchmark conventions:
+- Local-only diagnostics, not CI gates
+- Files must not start with `test_`
+- Standard name pattern: `*_latency_benchmark.py`
+- Standard marker: `@pytest.mark.benchmark`
+- Prefer printing `avg`, `median`, `stddev`, `min`, and `p95`, plus a final summary block
+
 Run the local annual-report latency benchmark explicitly:
 ```bash
 cd backend

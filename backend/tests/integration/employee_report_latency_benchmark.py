@@ -10,9 +10,6 @@ the default pytest suite. Run it explicitly:
 
 from __future__ import annotations
 
-import math
-import statistics
-import time
 from dataclasses import dataclass
 from datetime import date, time as time_of_day, timedelta
 
@@ -23,6 +20,7 @@ import core_api.services.employee as employee_service
 from core_api.core.constants import DEMO_EMAIL, DEMO_USER_ID
 from core_api.core.db import SessionLocal
 from core_api.models import Employee, Shift, ShiftAssignment, User, Week
+from tests.benchmarking import measure_ms, print_final_summary, print_summary, stats_row
 
 
 BENCHMARK_YEAR = 2025
@@ -47,88 +45,20 @@ class BenchmarkDataset:
     open_days: tuple[int, ...]
 
 
+def _dataset_summary(dataset: BenchmarkDataset) -> dict[str, int]:
+    return {
+        "year": dataset.year,
+        "weeks": dataset.weeks,
+        "open_days": len(dataset.open_days),
+        "shifts_per_day": dataset.shifts_per_day,
+    }
+
+
 def _first_monday(year: int) -> date:
     current = date(year, 1, 1)
     while current.weekday() != 0:
         current += timedelta(days=1)
     return current
-
-
-def _p95(values: list[float]) -> float:
-    if not values:
-        return 0.0
-    ordered = sorted(values)
-    index = max(0, math.ceil(len(ordered) * 0.95) - 1)
-    return ordered[index]
-
-
-def _sample_stddev(values: list[float]) -> float:
-    if len(values) < 2:
-        return 0.0
-    return statistics.stdev(values)
-
-
-def _stats_row(label: str, samples_ms: list[float]) -> dict[str, float | int | str]:
-    return {
-        "label": label,
-        "runs": len(samples_ms),
-        "min_ms": min(samples_ms),
-        "avg_ms": statistics.mean(samples_ms),
-        "median_ms": statistics.median(samples_ms),
-        "stddev_ms": _sample_stddev(samples_ms),
-        "p95_ms": _p95(samples_ms),
-    }
-
-
-def _print_summary(label: str, samples_ms: list[float], *, dataset: BenchmarkDataset) -> None:
-    stats = _stats_row(label, samples_ms)
-    print(
-        (
-            f"\n[{label}] runs={stats['runs']} "
-            f"min={stats['min_ms']:.2f}ms "
-            f"avg={stats['avg_ms']:.2f}ms "
-            f"median={stats['median_ms']:.2f}ms "
-            f"stddev={stats['stddev_ms']:.2f}ms "
-            f"p95={stats['p95_ms']:.2f}ms "
-            f"dataset=weeks:{dataset.weeks} "
-            f"open_days:{len(dataset.open_days)} "
-            f"shifts_per_day:{dataset.shifts_per_day}"
-        )
-    )
-
-
-def _print_final_summary(
-    rows: list[dict[str, float | int | str]],
-    *,
-    dataset: BenchmarkDataset,
-) -> None:
-    print("\n=== FINAL LATENCY SUMMARY ===")
-    print(
-        (
-            f"dataset: year={dataset.year} weeks={dataset.weeks} "
-            f"open_days={len(dataset.open_days)} shifts_per_day={dataset.shifts_per_day}"
-        )
-    )
-    for row in rows:
-        print(
-            (
-                f"{row['label']}: runs={row['runs']} "
-                f"avg={row['avg_ms']:.2f}ms "
-                f"median={row['median_ms']:.2f}ms "
-                f"stddev={row['stddev_ms']:.2f}ms "
-                f"min={row['min_ms']:.2f}ms "
-                f"p95={row['p95_ms']:.2f}ms"
-            )
-        )
-
-
-def _measure_ms(runs: int, callback) -> list[float]:
-    samples_ms: list[float] = []
-    for _ in range(runs):
-        start = time.perf_counter()
-        callback()
-        samples_ms.append((time.perf_counter() - start) * 1000)
-    return samples_ms
 
 
 @pytest.fixture
@@ -227,11 +157,11 @@ def test_employee_year_report_latency_benchmark(
     for _ in range(WARMUP_RUNS):
         fetch_endpoint()
 
-    endpoint_samples_ms = _measure_ms(MEASURED_RUNS, fetch_endpoint)
-    _print_summary(
+    endpoint_samples_ms = measure_ms(MEASURED_RUNS, fetch_endpoint)
+    print_summary(
         "annual-report-endpoint",
         endpoint_samples_ms,
-        dataset=annual_report_benchmark_dataset,
+        dataset=_dataset_summary(annual_report_benchmark_dataset),
     )
 
     db = SessionLocal()
@@ -250,18 +180,18 @@ def test_employee_year_report_latency_benchmark(
         for _ in range(WARMUP_RUNS):
             build_service_report()
 
-        service_samples_ms = _measure_ms(MEASURED_RUNS, build_service_report)
-        _print_summary(
+        service_samples_ms = measure_ms(MEASURED_RUNS, build_service_report)
+        print_summary(
             "annual-report-service",
             service_samples_ms,
-            dataset=annual_report_benchmark_dataset,
+            dataset=_dataset_summary(annual_report_benchmark_dataset),
         )
-        _print_final_summary(
+        print_final_summary(
             [
-                _stats_row("annual-report-endpoint", endpoint_samples_ms),
-                _stats_row("annual-report-service", service_samples_ms),
+                stats_row("annual-report-endpoint", endpoint_samples_ms),
+                stats_row("annual-report-service", service_samples_ms),
             ],
-            dataset=annual_report_benchmark_dataset,
+            dataset=_dataset_summary(annual_report_benchmark_dataset),
         )
     finally:
         db.close()
