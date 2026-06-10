@@ -48,7 +48,7 @@ export const METRIC_COLORS = {
     bgButtonHex: '#8b5cf6',
   },
 
-  monrningShifts: {
+  morningShifts: {
     color: 'yellow',
     borderColor: 'border-yellow-500',
     borderColorHex: '#eab308',
@@ -96,7 +96,7 @@ export const STATS_CONFIG = [
   { key: 'daysOff', label: 'Days Off' },
   { key: 'daysWorked', label: 'Days Worked' },
   { key: 'hoursWorked', label: 'Hours Worked', suffix: 'h' },
-  { key: 'monrningShifts', label: 'Morning Shifts' },
+  { key: 'morningShifts', label: 'Morning Shifts' },
   { key: 'afternoonShifts', label: 'Afternoon Shifts' },
   { key: 'nightShifts', label: 'Night Shifts' },
 ];
@@ -106,7 +106,7 @@ export const METRIC_TITLES = {
   daysWorked: 'Days Worked per Month',
   hoursWorked: 'Hours Worked per Month',
   daysOff: 'Days Off per Month',
-  monrningShifts: 'Morning Shifts per Month',
+  morningShifts: 'Morning Shifts per Month',
   afternoonShifts: 'Afternoon Shifts per Month',
   nightShifts: 'Night Shifts per Month',
 };
