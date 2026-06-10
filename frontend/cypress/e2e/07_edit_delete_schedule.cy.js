@@ -1,12 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/07_edit_delete_schedule.cy.js
-//
-// Fluxo real do usuário:
-//   /reports → clica em "Generated Scales" → /schedule-records
-//   → modo Edit → troca funcionário em slot → salva
-//   → modo Edit → deleta escala → verifica estado pós-deleção
-// ─────────────────────────────────────────────────────────────────────────────
-
 // Helper: navega via /reports → "Generated Scales" → /schedule-records
 const goToScheduleRecords = () => {
   cy.visit('/reports');

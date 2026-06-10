@@ -1,8 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/04_edit_availability.cy.js
-// Fluxo: Edição de disponibilidade de um funcionário existente
-// ─────────────────────────────────────────────────────────────────────────────
-
 describe('Fluxo de Edição de Disponibilidade', () => {
   let testUser;
   let employeeName;

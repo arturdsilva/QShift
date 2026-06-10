@@ -1,14 +1,3 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// cypress/e2e/06_edit_approve_schedule.cy.js
-//
-// Fluxo real do usuário:
-//   /reports → clica em "Generated Scales" → /schedule-records
-//   → modo Edit → clica em slot → modal de troca de funcionário
-//   → salva → (opcional) aprova via GeneratedSchedule
-//
-// Pré-requisito: usuário de teste deve ter pelo menos 1 escala aprovada.
-// ─────────────────────────────────────────────────────────────────────────────
-
 // Helper reutilizável: vai para /reports, clica em "Generated Scales" e aguarda /schedule-records
 const goToScheduleRecords = () => {
   cy.visit('/reports');
